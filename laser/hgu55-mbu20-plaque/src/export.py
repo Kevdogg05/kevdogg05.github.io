@@ -24,6 +24,7 @@ def scaled(G, s):
         out[k] = affinity.scale(G[k], s, s, origin=(0, 0))
     out['score'] = {k: [affinity.scale(g, s, s, origin=(0, 0)) for g in v] for k, v in G['score'].items()}
     out['frame_in'] = affinity.scale(G['frame_in'], s, s, origin=(0, 0))
+    out['lens'] = affinity.scale(G['lens'], s, s, origin=(0, 0))
     return out
 
 def ghosts(G):

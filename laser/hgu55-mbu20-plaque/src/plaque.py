@@ -125,6 +125,9 @@ def build():
     below_lens = Polygon(np.vstack([lens_l[:-1], lens_r,
                                     [(140, 93), (140, 320), (-140, 320), (-140, 93)]])).buffer(0)
     cheek = below_lens.intersection(inner_region)
+    # visible visor lens (render / optional raster "smoked visor"): above the lens edge, up into the housing
+    crown_r = Pen((0, 38)).C((40, 38), (80, 50), (95, 81)).arr()
+    lens_zone = mirrored(np.vstack([lens_r, crown_r[::-1]]))
 
     # lens-over-leg shadow slot; stops where its round end just tucks under the housing lobe
     i0 = int(np.argmin(np.abs(lens_r[:, 0] - 20.0)))   # whole lens edge: one continuous visible curve
@@ -247,6 +250,7 @@ def build():
     rib_zone = hose_l3.difference(buf(unary_union([cuff_l3, term_body]), 2.5))
     rib_line = unary_union(ribs).intersection(buf(rib_zone, -1.5)).intersection(buf(vis3, -1.0))
     G.update(L1=L1, L2=L2, L3=L3, L4=L4, L5=L5, frame_in=frame_in, housing=housing,
+             lens=lens_zone.intersection(L2),
              NP=NP, score={'L2': [roll_line, rivet_line], 'L3': [lip_line, rib_line, rim_line]})
     return G
 

@@ -60,6 +60,22 @@ The checks run in `src/verify_svg.py`, which reads the exported SVG back in with
 3. Glue Layer 2 on, centring it so the 4 mm reveal is even all round. Then glue Layers 3, 4 and 5 onto their scored guide outlines. Use wood glue or thin CA, and press each layer flat.
 4. Finish (optional): stain the base a shade darker before glue-up, so the reveal, the cheek openings and the visor-edge slots read as shadow.
 
+## Stained render
+
+These are computer renders made from the cut geometry; they are not photos. Each layer is 3 mm high and the plaque stands 4 mm off the wall on its hanger. The renders include ray-marched shadows, charred laser edges, procedural basswood grain and the stain colours below. The name is sample text.
+
+![Stained, with smoked visor](render_stained_visor.jpg)
+
+| Layer | Stain used in the render |
+|---|---|
+| 1 Base | Dark walnut. Engrave after staining, so the burn shows lighter wood. |
+| 2 Shell, mask body, frame | Early American (medium brown) |
+| 3 Housing, hard shell, receivers | Golden oak |
+| 4 Knob, valve, straps | Natural, amber satin poly |
+| 5 Caps | Natural |
+
+The "smoked visor" in the top render is an optional raster engrave of the Layer 2 lens area. Without it the lens takes the shell stain, as in `render_stained_plain.jpg`. `render_stained_detail.jpg` is a full-resolution close-up of the mask. Re-render with `python3 render_photo.py out.jpg [--visor] [--detail closeup.jpg]`. The stain colours are the `STAINS` table at the top of `render_photo.py`.
+
 ## Regenerating / tweaking
 
 The design is parametric (Python 3, `shapely`, `numpy`):
