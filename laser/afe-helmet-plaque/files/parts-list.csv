@@ -1,0 +1,37 @@
+id,name,qty,layer,stain,sheet,width_mm,height_mm
+1A,"Backer",1,1,Dark Walnut,1,286.0,286.0
+2A,"Field panel",1,2,Natural + clear coat,3,264.0,264.0
+3A,"Helmet shadow outline",1,3,Dark Walnut,2,191.4,215.5
+3B,"Banner shadow outline",1,3,Dark Walnut,2,229.2,32.3
+4A,"Shell",1,4,Natural + clear coat,4,183.9,184.9
+4B,"Far-side rim",1,4,Natural + clear coat,4,62.4,100.2
+4C,"Banner tail L",1,4,Golden Pecan / Early American,6,197.4,27.0
+4D,"Hose",1,4,Golden Pecan / Early American,6,77.2,36.3
+4E,"Banner tail R",1,4,Golden Pecan / Early American,6,37.7,23.5
+5A,"Shell dome",1,5,Natural + clear coat,4,180.2,179.8
+5B,"Mask seal",1,5,Golden Pecan / Early American,6,59.6,84.4
+5C,"Banner",1,5,Natural + clear coat,3,175.8,24.1
+5D,"Edge roll trim",1,5,Golden Pecan / Early American,6,134.9,106.6
+5E,"Visor lens edge",1,5,Golden Pecan / Early American,6,143.8,20.2
+5F,"Far-side liner",1,5,Golden Pecan / Early American,6,13.4,44.4
+5G,"Hidden spacer",1,5,Dark Walnut,1,11.1,15.6
+5H,"Hose ring",13,5,Natural + clear coat,3,14.5,8.0
+6A,"Visor housing rim",1,6,Golden Pecan / Early American,6,174.8,78.9
+6B,"Shell crown",1,6,Natural + clear coat,5,59.6,107.5
+6C,"Mask shell",1,6,Natural + clear coat,4,48.2,75.7
+6D,"Ear cup",1,6,Golden Pecan / Early American,6,34.5,41.1
+6E,"Bayonet receiver",1,6,Golden Pecan / Early American,6,35.5,22.5
+6F,"Hose connector",1,6,Golden Pecan / Early American,6,17.4,9.4
+6G,"Hose end fitting",1,6,Golden Pecan / Early American,6,11.9,16.4
+7A,"Visor housing",1,7,Natural + clear coat,5,171.2,75.3
+7B,"Ear cup cover",1,7,Natural + clear coat,3,22.0,22.0
+7C,"Exhalation valve",1,7,Golden Pecan / Early American,6,18.0,18.0
+7D,"Bayonet arm",1,7,Natural + clear coat,3,32.3,16.8
+7E,"Mic boss",1,7,Golden Pecan / Early American,6,8.6,8.6
+8A,"Visor end cap",1,8,Golden Pecan / Early American,6,11.9,28.6
+8B,"Valve cover",1,8,Natural + clear coat,3,10.1,10.1
+8C,"Visor lock knob",1,8,Golden Pecan / Early American,6,8.8,8.8
+8D,"Receiver screw",1,8,Natural + clear coat,3,4.7,4.7
+0A,"Keyhole plate (back)",1,back,Dark Walnut,5,56.0,36.0
+0B,"Keyhole spacer (back)",1,back,Dark Walnut,5,56.0,36.0
+0C,"Wall bumper (back)",4,back,Dark Walnut,5,20.0,20.0
