@@ -111,7 +111,9 @@ def build_cut_svg(G, fit_report):
         if dec:
             out.append(f'    <g id="{gid}_score_detail" fill="none" stroke="#000000" stroke-width="0.1">')
             for ln in merge_lines(dec):
-                out.append(f'      <path d="{polyline_to_d(np.asarray(ln.coords))}"/>')
+                c = np.asarray(ln.coords)
+                d = segments_to_d(ring_to_segments(c, err=CUT_TOL)) if ln.is_ring else polyline_to_d(c)
+                out.append(f'      <path d="{d}"/>')
             out.append('    </g>')
         if ali:
             out.append(f'    <g id="{gid}_score_align" fill="none" stroke="#000000" stroke-width="0.1">')

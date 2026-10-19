@@ -1,9 +1,9 @@
 """Independent check of the exported cut file: parse paths, rebuild parts, re-run fabrication checks."""
-import sys, re, json
+import sys
 import numpy as np
 import xml.etree.ElementTree as ET
 from svgpathtools import parse_path
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from shapely import affinity
 
@@ -54,5 +54,14 @@ for i, k in enumerate(keys):
     ps = layers[k]; ov = sum(ps[a].intersection(ps[b]).area for a in range(len(ps)) for b in range(a+1, len(ps)))
     line += f"  part_overlap={ov:.2f}"
     print(line)
+short = []
+for g in svg.findall('s:g', NS):
+    for sg in g.findall('s:g', NS):
+        if 'score' in sg.get('id'):
+            for p in sg.findall('s:path', NS):
+                L = parse_path(p.get('d')).length()
+                if L < 1.0:
+                    short.append((sg.get('id'), round(L, 3)))
+print('score paths shorter than 1 mm:', short or 'none')
 minx, miny, maxx, maxy = geo[keys[0]].bounds
 print(f"finished size {maxx-minx:.1f} x {maxy-miny:.1f} mm = {(maxx-minx)/25.4:.2f} x {(maxy-miny)/25.4:.2f} in")
