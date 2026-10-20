@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Brain Gate Quest — a retro side-scrolling platformer where you unlock gates by answering multiplication and general knowledge questions. Made for ages 9–10.">
+  <meta name="theme-color" content="#1b1d3a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Brain Gate">
+  <title>Brain Gate Quest</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- ============ Game stage: canvas + HUD, scaled to fit the screen ============ -->
+  <main id="stage" aria-label="Brain Gate Quest game">
+    <canvas id="game" width="400" height="240" aria-label="Game world"></canvas>
+
+    <div id="hud" class="hud hidden">
+      <div class="hud-group">
+        <div class="hud-item" title="Score">
+          <span class="hud-label">Score</span>
+          <span id="hud-score" class="hud-value">000000</span>
+        </div>
+        <div class="hud-item" title="Coins">
+          <span class="icon-coin" aria-hidden="true"></span>
+          <span id="hud-coins" class="hud-value" aria-label="Coins">×00</span>
+        </div>
+        <div class="hud-item" title="Lives">
+          <span class="icon-heart" aria-hidden="true"></span>
+          <span id="hud-lives" class="hud-value" aria-label="Lives">×3</span>
+        </div>
+      </div>
+      <div class="hud-group">
+        <div class="hud-item" title="Brain Gates unlocked">
+          <span class="hud-label">Gates</span>
+          <span id="hud-gates" class="hud-gates"></span>
+        </div>
+        <div class="hud-item" title="Time">
+          <span class="hud-label">Time</span>
+          <span id="hud-time" class="hud-value">0:00</span>
+        </div>
+        <button id="btn-mute" class="icon-btn" type="button" aria-label="Turn sound off" title="Sound on (M)">
+          <svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button id="btn-fullscreen" class="icon-btn" type="button" aria-label="Toggle fullscreen" title="Fullscreen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="btn-pause" class="icon-btn" type="button" aria-label="Pause" title="Pause (P)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <!-- ============ Touch controls (shown on phones and tablets) ============ -->
+  <div id="touch-controls" class="touch-controls" aria-hidden="true">
+    <div class="dpad">
+      <button class="pad-btn" type="button" data-action="left" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7z"/></svg>
+      </button>
+      <button class="pad-btn" type="button" data-action="right" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7z"/></svg>
+      </button>
+    </div>
+    <button class="pad-btn jump-btn" type="button" data-action="jump" tabindex="-1">
+      <svg viewBox="0 0 24 24"><path d="M12 4l7 8h-4v7H9v-7H5z"/></svg>
+      <span>JUMP</span>
+    </button>
+  </div>
+
+  <!-- ============ Title screen ============ -->
+  <section id="screen-title" class="overlay screen-title hidden" aria-labelledby="title-heading">
+    <div class="panel title-panel scrollable">
+      <div class="logo-row">
+        <canvas id="title-pip" class="mascot" width="16" height="16" aria-hidden="true"></canvas>
+        <h1 id="title-heading" class="logo"><span>Brain Gate</span><span class="logo-sub">Quest</span></h1>
+        <canvas id="title-owl" class="mascot mascot-owl" width="16" height="20" aria-hidden="true"></canvas>
+      </div>
+      <p class="tagline">Run, jump and collect coins on your way to the castle. Professor Hoot guards <strong>3 Brain Gates</strong> — answer his questions to unlock them!</p>
+      <button id="btn-play" class="btn btn-primary btn-big" type="button">▶ Play</button>
+      <p class="howto-compact">
+        <span class="only-touch">Use the arrow buttons to run and the big <strong>JUMP</strong> button to jump — hold it to jump higher!</span>
+        <span class="only-keys">Arrow keys or A/D to run, Space to jump (hold it to jump higher), P to pause.</span>
+      </p>
+      <div class="howto">
+        <div class="howto-col">
+          <h2>Keyboard</h2>
+          <p><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> move</p>
+          <p><kbd>Space</kbd> <kbd>↑</kbd> or <kbd>W</kbd> jump</p>
+          <p><kbd>P</kbd> pause · <kbd>M</kbd> sound · <kbd>1</kbd>–<kbd>4</kbd> answer</p>
+        </div>
+        <div class="howto-col">
+          <h2>Touch</h2>
+          <p>Left &amp; right buttons — bottom left</p>
+          <p>Big JUMP button — bottom right</p>
+          <p>Hold jump longer to jump higher!</p>
+        </div>
+      </div>
+      <p id="title-best" class="best hidden"></p>
+    </div>
+  </section>
+
+  <!-- ============ Pause menu ============ -->
+  <section id="screen-pause" class="overlay hidden" aria-labelledby="pause-heading">
+    <div class="panel menu-panel scrollable" tabindex="-1">
+      <h2 id="pause-heading" class="panel-title">Paused</h2>
+      <button id="btn-resume" class="btn btn-primary" type="button">▶ Resume</button>
+      <button id="btn-pause-mute" class="btn" type="button">Sound: On</button>
+      <button id="btn-restart" class="btn btn-quiet" type="button">↺ Restart level</button>
+    </div>
+  </section>
+
+  <!-- ============ Game over ============ -->
+  <section id="screen-gameover" class="overlay hidden" aria-labelledby="gameover-heading">
+    <div class="panel menu-panel scrollable" tabindex="-1">
+      <h2 id="gameover-heading" class="panel-title">Oops! Out of lives</h2>
+      <p class="panel-text">Every hero takes a tumble. Score so far: <strong id="gameover-score">0</strong></p>
+      <button id="btn-continue" class="btn btn-primary" type="button">Keep going from the last gate</button>
+      <button id="btn-startover" class="btn btn-quiet" type="button">↺ Start over</button>
+    </div>
+  </section>
+
+  <!-- ============ Victory ============ -->
+  <section id="screen-victory" class="overlay hidden" aria-labelledby="victory-heading">
+    <div class="panel menu-panel victory-panel scrollable" tabindex="-1">
+      <h2 id="victory-heading" class="panel-title">Course Clear!</h2>
+      <div id="victory-stars" class="stars" role="img"></div>
+      <p id="victory-message" class="panel-text"></p>
+      <dl class="stats">
+        <div><dt>Score</dt><dd id="victory-score">0</dd></div>
+        <div><dt>Coins</dt><dd id="victory-coins">0</dd></div>
+        <div><dt>Time</dt><dd id="victory-time">0:00</dd></div>
+      </dl>
+      <p id="victory-best" class="new-best hidden">New high score!</p>
+      <button id="btn-again" class="btn btn-primary" type="button">↺ Play again</button>
+    </div>
+  </section>
+
+  <!-- ============ Brain Gate question ============ -->
+  <section id="quiz" class="overlay quiz-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="quiz-question">
+    <div id="quiz-card" class="panel quiz-card scrollable" tabindex="-1">
+      <div id="quiz-confetti" class="confetti-layer" aria-hidden="true"></div>
+      <div class="quiz-head">
+        <canvas id="quiz-owl" class="quiz-owl" width="16" height="20" aria-hidden="true"></canvas>
+        <div class="quiz-title">
+          <div class="quiz-meta">
+            <span id="quiz-gate" class="quiz-gate">Brain Gate 1 of 3</span>
+            <span id="quiz-cat" class="badge">Multiplication</span>
+          </div>
+          <h2 id="quiz-question" class="quiz-question">What is 7 × 8?</h2>
+        </div>
+      </div>
+      <div id="quiz-choices" class="quiz-choices"></div>
+      <p id="quiz-feedback" class="quiz-feedback" aria-live="polite"></p>
+      <button id="quiz-continue" class="btn btn-primary quiz-continue hidden" type="button">Open the gate ▶</button>
+    </div>
+  </section>
+
+  <!-- ============ Rotate prompt for phones held upright ============ -->
+  <div id="rotate" class="overlay rotate hidden" role="alert">
+    <div class="rotate-phone" aria-hidden="true"></div>
+    <p>Turn your device sideways to play!</p>
+  </div>
+
+  <noscript>
+    <div class="overlay"><div class="panel menu-panel"><p class="panel-text">Brain Gate Quest needs JavaScript turned on to play.</p></div></div>
+  </noscript>
+
+  <script src="js/config.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
