@@ -799,6 +799,182 @@ body:not(.touch) .only-touch {
   animation: pulse 1.2s ease-in-out infinite;
 }
 
+/* ---------------------------------------------------------- Level select */
+
+.levels-panel {
+  width: min(720px, 100%);
+  padding-top: clamp(10px, 2.5vh, 20px);
+}
+
+.levels-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-bottom: clamp(6px, 2vh, 12px);
+}
+
+.levels-head .panel-title {
+  margin: 0;
+  font-size: clamp(22px, 5.5vh, 32px);
+}
+
+.btn-small {
+  position: absolute;
+  left: 0;
+  min-height: 40px;
+  padding: 0.3em 0.9em;
+  font-size: 15px;
+}
+
+.level-grid {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.6vh, 10px);
+}
+
+.world-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 1.3fr) repeat(4, 1fr);
+  align-items: stretch;
+  gap: clamp(6px, 1.5vw, 10px);
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 6px solid var(--world, #43c443);
+}
+
+.world-meadow { --world: #43c443; }
+.world-desert { --world: #f2b84a; }
+.world-snow { --world: #9fd0ff; }
+.world-cave { --world: #a493d6; }
+.world-volcano { --world: #ff6a1a; }
+
+.world-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 4px;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.world-num {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--world);
+}
+
+.world-name {
+  font-size: clamp(12px, 3vh, 15px);
+  font-weight: 800;
+  color: #fff;
+}
+
+.level-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: clamp(46px, 11vh, 64px);
+  padding: 4px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--sun);
+  box-shadow: 0 4px 0 var(--sun-dark);
+  color: var(--ink);
+  transition: transform 0.08s, box-shadow 0.08s, filter 0.15s;
+}
+
+.level-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.level-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--sun-dark);
+}
+
+.level-btn.done {
+  background: #fff3c4;
+}
+
+.level-btn.current {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.level-btn.locked {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+}
+
+.level-num {
+  font-family: var(--font-display);
+  font-size: clamp(17px, 4.5vh, 24px);
+  line-height: 1;
+}
+
+.level-btn.locked .level-num {
+  width: 18px;
+  height: 22px;
+  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22'%3E%3Cpath d='M4 10V7a5 5 0 0 1 10 0v3' fill='none' stroke='%23ffffff' stroke-opacity='.5' stroke-width='2.5'/%3E%3Crect x='1' y='10' width='16' height='12' rx='3' fill='%23ffffff' fill-opacity='.5'/%3E%3C/svg%3E");
+}
+
+.level-stars {
+  display: flex;
+  gap: 1px;
+  font-size: clamp(10px, 2.6vh, 13px);
+  line-height: 1;
+}
+
+.level-stars i {
+  font-style: normal;
+  color: rgba(27, 29, 58, 0.25);
+}
+
+.level-stars i.on {
+  color: #e07b00;
+}
+
+.level-btn.locked .level-stars {
+  visibility: hidden;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  width: min(420px, 100%);
+}
+
+.menu-panel .btn-row .btn,
+.btn-row .btn {
+  width: auto;
+  flex: 1;
+  padding-left: 0.6em;
+  padding-right: 0.6em;
+}
+
+@media (max-width: 560px) {
+  .world-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .world-label {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    gap: 8px;
+    align-items: baseline;
+  }
+}
+
 /* --------------------------------------------------------- Rotate prompt */
 
 .rotate {
@@ -828,6 +1004,23 @@ body:not(.touch) .only-touch {
 
   .howto-compact {
     display: block;
+  }
+
+  .level-grid {
+    gap: 5px;
+  }
+
+  .world-row {
+    padding: 4px;
+  }
+
+  .level-btn {
+    min-height: 40px;
+  }
+
+  .levels-head {
+    min-height: 36px;
+    margin-bottom: 6px;
   }
 
   .panel {

@@ -28,10 +28,13 @@
   /** All mutable game state lives here (also handy for debugging in the console). */
   const G = (BGQ.game = {
     state: 'title',
+    levelIndex: 0,
     level: null,
+    art: null,
     player: null,
     enemies: [],
     platforms: [],
+    springs: [],
     items: [],
     particles: [],
     popups: [],
@@ -49,31 +52,50 @@
     flagY: 0,
     castleFlag: 0,
     finish: null,
-    deathT: 0,
-    runCount: 0
+    deathT: 0
   });
 
   let rotateBlocked = false;
 
   /* ------------------------------------------------------------------ *
+   * Saved progress: highest unlocked level, best stars and best score
+   * for each level. Stored in the browser (see BGQ.storage).
+   * ------------------------------------------------------------------ */
+
+  function loadProgress() {
+    const saved = BGQ.storage.get('progress', null);
+    const p = { unlocked: 1, stars: [], best: [] };
+    if (saved && typeof saved === 'object') {
+      p.unlocked = BGQ.clamp(parseInt(saved.unlocked, 10) || 1, 1, BGQ.Levels.count);
+      if (Array.isArray(saved.stars)) p.stars = saved.stars.slice(0, BGQ.Levels.count);
+      if (Array.isArray(saved.best)) p.best = saved.best.slice(0, BGQ.Levels.count);
+    }
+    return p;
+  }
+
+  let progress = loadProgress();
+
+  /* ------------------------------------------------------------------ *
    * Setup and flow between screens
    * ------------------------------------------------------------------ */
 
-  function newGame() {
-    const L = BGQ.Level.build();
+  function loadLevel(index) {
+    const L = BGQ.Levels.build(index);
+    G.levelIndex = index;
     G.level = L;
+    G.art = BGQ.Tiles.build(L.theme);
 
-    // Brain Gates alternate between multiplication and general knowledge.
-    // The starting type flips every run, so across replays exactly half of
-    // the challenges are multiplication and half are general knowledge.
-    const mathFirst = G.runCount % 2 === 1;
+    // Brain Gates alternate between multiplication and general knowledge
+    // across the whole game (level 1: math, knowledge, math; level 2:
+    // knowledge, math, knowledge; ...), so exactly half are multiplication.
     L.gates.forEach(function (g, i) {
-      g.type = (i % 2 === 0) === mathFirst ? 'math' : 'knowledge';
+      g.type = (index * L.gates.length + i) % 2 === 0 ? 'math' : 'knowledge';
     });
 
     G.player = E.createPlayer(L.start.x, L.start.y);
     G.enemies = L.enemies.map(E.createEnemy);
     G.platforms = L.platforms;
+    G.springs = L.springs;
     G.items = [];
     G.particles = [];
     G.popups = [];
@@ -91,6 +113,7 @@
     G.finish = null;
     G.cam.x = 0;
     UI.resetHud();
+    UI.setLevel(index, L.name);
   }
 
   function startPlaying() {
@@ -103,16 +126,38 @@
     Audio.startMusic();
   }
 
-  function play() {
-    G.runCount++;
-    newGame();
+  function startLevel(index) {
+    Audio.stopMusic();
+    loadLevel(index);
     startPlaying();
-    UI.toast('Reach the castle — unlock 3 Brain Gates on the way!');
+    UI.clearToasts();
+    UI.toast('Level ' + (index + 1) + ': ' + G.level.name);
+    if (G.level.tip) UI.toast(G.level.tip);
+  }
+
+  /** The Play button: first-time players jump straight into level 1. */
+  function play() {
+    const fresh = progress.unlocked === 1 && !progress.stars.some(function (s) { return s > 0; });
+    if (fresh) startLevel(0);
+    else showLevels();
+  }
+
+  function showLevels() {
+    Audio.stopMusic();
+    Audio.suspend(false);
+    G.state = 'title';
+    Input.capture = false;
+    Input.releaseAll();
+    UI.setPlaying(false);
+    UI.showLevelSelect(progress);
   }
 
   function restart() {
-    Audio.stopMusic();
-    play();
+    startLevel(G.levelIndex);
+  }
+
+  function nextLevel() {
+    startLevel(Math.min(G.levelIndex + 1, BGQ.Levels.count - 1));
   }
 
   function pause() {
@@ -158,19 +203,22 @@
     UI.showGameOver(G);
   }
 
-  function victory() {
+  /** Saves stars/score, unlocks the next level and shows the results. */
+  function levelComplete() {
     G.state = 'victory';
     Input.capture = false;
     UI.setPlaying(false);
-    const best = BGQ.storage.get('best', null);
-    const isBest = !best || G.score > best.score;
-    const record = {
-      score: best ? Math.max(best.score, G.score) : G.score,
-      time: best && best.time ? Math.min(best.time, G.time) : G.time
-    };
-    BGQ.storage.set('best', record);
-    UI.setBest(record);
-    UI.showVictory(G, isBest);
+    const i = G.levelIndex;
+    const isBest = !progress.best[i] || G.score > progress.best[i];
+    progress.best[i] = Math.max(progress.best[i] || 0, G.score);
+    progress.stars[i] = Math.max(progress.stars[i] || 0, G.stars);
+    progress.unlocked = Math.min(BGQ.Levels.count, Math.max(progress.unlocked, i + 2));
+    BGQ.storage.set('progress', progress);
+    UI.showLevelComplete(G, {
+      isBest: isBest,
+      isLast: i === BGQ.Levels.count - 1,
+      totalStars: progress.stars.reduce(function (a, b) { return a + (b || 0); }, 0)
+    });
   }
 
   /* ------------------------------------------------------------------ *
@@ -347,6 +395,15 @@
   function checkHazards() {
     const p = G.player;
     const L = G.level;
+    // Lava: touching the glowing surface of a volcano pit.
+    if (L.lava && p.y + p.h > BGQ.GROUND_ROW * TILE + 10) {
+      for (let i = 0; i < 12; i++) {
+        addParticle({ x: p.x + BGQ.rand(0, p.w), y: p.y + p.h, vx: BGQ.rand(-40, 40), vy: BGQ.rand(-160, -60), gravity: 400, life: 0.7, maxLife: 0.7, size: 2, color: i % 2 ? '#ffd23f' : '#ff6a1a' });
+      }
+      Audio.play('sizzle');
+      killPlayer(false);
+      return;
+    }
     if (p.y > L.height + 8) {
       killPlayer(true);
       return;
@@ -368,9 +425,16 @@
       const e = G.enemies[i];
       if (!e.alive || !e.active || !BGQ.overlap(p, e)) continue;
       const feetAboveHead = p.y + p.h - e.y < 9;
-      if (p.vy > 0 && feetAboveHead) {
+      // Spikeshells can't be stomped: landing on them hurts.
+      if (p.vy > 0 && feetAboveHead && e.type !== 'spiky') {
         e.alive = false;
-        e.squish = 0.45;
+        if (e.type === 'flyer') {
+          e.flipped = true; // knocked out of the air
+          e.vy = 0;
+          e.vx = 0;
+        } else {
+          e.squish = 0.45;
+        }
         p.vy = -(Input.jumpHeld() ? BGQ.PHYS.stompBounceHold : BGQ.PHYS.stompBounce);
         p.onGround = false;
         p.stompChain = Math.min(p.stompChain + 1, 8);
@@ -453,7 +517,7 @@
     Audio.play('gateAppear');
     Audio.duck(true);
 
-    UI.showQuiz(BGQ.Questions.make(g.type), g.index + 1, G.level.gates.length, {
+    UI.showQuiz(BGQ.Questions.make(g.type, G.levelIndex), g.index + 1, G.level.gates.length, {
       onCorrect: function (firstTry) {
         const pts = firstTry ? BGQ.SCORE.gateFirstTry : BGQ.SCORE.gateRetry;
         G.score += pts;
@@ -556,7 +620,7 @@
         firework(castle.x + BGQ.rand(-20, 100), BGQ.rand(30, 80));
         fin.fireworks++;
       }
-      if (fin.t > 3.4) victory();
+      if (fin.t > 3.4) levelComplete();
     }
   }
 
@@ -599,12 +663,16 @@
       case 'playing': {
         G.time += dt;
         G.platforms.forEach(function (m) {
-          const before = m.x;
-          m.x += m.speed * m.dir * dt;
-          if (m.x > m.maxX) { m.x = m.maxX; m.dir = -1; }
-          if (m.x < m.minX) { m.x = m.minX; m.dir = 1; }
-          m.dx = m.x - before;
+          // Platforms glide between min and max along their axis ('x' or 'y').
+          const key = m.axis === 'y' ? 'y' : 'x';
+          const before = m[key];
+          m[key] += m.speed * m.dir * dt;
+          if (m[key] > m.max) { m[key] = m.max; m.dir = -1; }
+          if (m[key] < m.min) { m[key] = m.min; m.dir = 1; }
+          m.dx = key === 'x' ? m.x - before : 0;
+          m.dy = key === 'y' ? m.y - before : 0;
         });
+        G.springs.forEach(function (s) { if (s.squash > 0) s.squash -= dt; });
         E.updatePlayer(G, G.player, dt, {
           left: Input.left(),
           right: Input.right(),
@@ -713,13 +781,21 @@
       onRestart: restart,
       onContinue: continueAfterGameOver,
       onPause: togglePause,
-      onMute: toggleMute
+      onMute: toggleMute,
+      onLevels: showLevels,
+      onNext: nextLevel,
+      onSelectLevel: startLevel,
+      onTitle: function () { UI.showScreen('title'); }
     });
     Input.onPause = togglePause;
     Input.onMute = toggleMute;
-    UI.setBest(BGQ.storage.get('best', null));
+    UI.setProgress(progress);
 
-    newGame();
+    // Lets automated tests fast-forward the fixed-step simulation.
+    G.tick = update;
+
+    // The title screen previews the newest level the player has unlocked.
+    loadLevel(progress.unlocked - 1);
     G.state = 'title';
     layout();
     UI.showScreen('title');
