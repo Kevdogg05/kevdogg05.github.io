@@ -129,16 +129,19 @@
     if (dir !== 0) p.facing = dir;
     p.skidding = false;
 
+    // Icy levels: less grip when speeding up, turning and stopping.
+    const grip = L.slippery ? P.iceGrip : 1;
+
     if (p.onGround) {
       if (dir !== 0) {
         if (p.vx !== 0 && Math.sign(p.vx) !== dir) {
-          p.vx += dir * P.skid * dt;
+          p.vx += dir * P.skid * grip * dt;
           p.skidding = Math.abs(p.vx) > 40;
         } else {
-          p.vx += dir * P.accelGround * dt;
+          p.vx += dir * P.accelGround * (L.slippery ? 0.6 : 1) * dt;
         }
       } else {
-        p.vx -= Math.sign(p.vx) * Math.min(Math.abs(p.vx), P.friction * dt);
+        p.vx -= Math.sign(p.vx) * Math.min(Math.abs(p.vx), P.friction * grip * dt);
       }
     } else if (dir !== 0) {
       const opposing = p.vx !== 0 && Math.sign(p.vx) !== dir;
@@ -200,6 +203,23 @@
         }
       }
     }
+    // Springs launch the player high into the air when landed on or run over.
+    if (p.vy >= 0) {
+      for (let i = 0; i < G.springs.length; i++) {
+        const s = G.springs[i];
+        const center = p.x + p.w / 2;
+        const feet = p.y + p.h;
+        if (center > s.x + 1 && center < s.x + s.w - 1 && feet >= s.top && feet <= s.y + s.w) {
+          p.y = s.top - p.h;
+          p.vy = -(inp.jumpHeld ? P.springHold : P.spring);
+          p.onGround = false;
+          standingOn = null;
+          s.squash = 0.18;
+          BGQ.Audio.play('spring');
+          break;
+        }
+      }
+    }
     p.platform = standingOn;
 
     if (p.onGround) {
@@ -225,21 +245,35 @@
    * Enemies ("Grumblobs")
    * ------------------------------------------------------------------ */
 
+  /**
+   * Enemy types:
+   *   walker - Grumblob: walks, turns at walls, can be stomped
+   *   spiky  - Spikeshell: walks, hurts if stomped (jump over it instead)
+   *   flyer  - Buzzer: hovers back and forth through the air, can be stomped
+   */
+  function speedOf(type) {
+    return type === 'spiky' ? BGQ.SPIKY_SPEED : type === 'flyer' ? BGQ.FLYER_SPEED : BGQ.ENEMY_SPEED;
+  }
+
   function createEnemy(spawn) {
+    const type = spawn.type || 'walker';
     return {
-      x: spawn.x, y: spawn.y, w: 14, h: 13,
+      type: type,
+      x: spawn.x, y: spawn.y, w: 14, h: type === 'flyer' ? 10 : 13,
       spawnX: spawn.x, spawnY: spawn.y,
-      vx: -BGQ.ENEMY_SPEED, vy: 0,
+      range: spawn.range || 40,
+      vx: -speedOf(type), vy: 0,
       alive: true, active: false,
       squish: 0, flipped: false, gone: false,
-      anim: Math.random() * 2
+      anim: Math.random() * 2,
+      t: Math.random() * 6
     };
   }
 
   function resetEnemy(e) {
     e.x = e.spawnX;
     e.y = e.spawnY;
-    e.vx = -BGQ.ENEMY_SPEED;
+    e.vx = -speedOf(e.type);
     e.vy = 0;
     e.active = false;
   }
@@ -272,6 +306,18 @@
       }
 
       e.anim += dt * 5;
+
+      if (e.type === 'flyer') {
+        // Buzzers ignore walls: patrol around their spawn point and bob up and down.
+        e.anim += dt * 7;
+        e.t += dt;
+        e.x += e.vx * dt;
+        if (e.x < e.spawnX - e.range) e.vx = Math.abs(e.vx);
+        else if (e.x > e.spawnX + e.range) e.vx = -Math.abs(e.vx);
+        e.y = e.spawnY + Math.sin(e.t * 2.6) * 10;
+        continue;
+      }
+
       e.vy = Math.min(e.vy + BGQ.ENEMY_GRAVITY * dt, P.maxFall);
       if (moveX(L, e, e.vx * dt)) e.vx = -e.vx;
       const res = moveY(L, e, e.vy * dt);
@@ -282,13 +328,13 @@
     // Enemies bounce off each other instead of overlapping.
     for (let i = 0; i < list.length; i++) {
       const a = list[i];
-      if (!a.alive || !a.active) continue;
+      if (!a.alive || !a.active || a.type === 'flyer') continue;
       for (let j = i + 1; j < list.length; j++) {
         const b = list[j];
-        if (!b.alive || !b.active || !BGQ.overlap(a, b)) continue;
+        if (!b.alive || !b.active || b.type === 'flyer' || !BGQ.overlap(a, b)) continue;
         const aLeft = a.x < b.x;
-        a.vx = aLeft ? -BGQ.ENEMY_SPEED : BGQ.ENEMY_SPEED;
-        b.vx = aLeft ? BGQ.ENEMY_SPEED : -BGQ.ENEMY_SPEED;
+        a.vx = (aLeft ? -1 : 1) * speedOf(a.type);
+        b.vx = (aLeft ? 1 : -1) * speedOf(b.type);
       }
     }
   }

@@ -18,6 +18,8 @@
   let usingKeyboard = false; // auto-focus buttons only for keyboard players
   let hudCache = {};
   let toastTimer = null;
+  let toastQueue = [];
+  let handlersRef = null;   // game callbacks, used by dynamically built buttons
 
   function $(id) {
     return document.getElementById(id);
@@ -145,8 +147,12 @@
         title: $('screen-title'),
         pause: $('screen-pause'),
         gameover: $('screen-gameover'),
-        victory: $('screen-victory')
+        victory: $('screen-victory'),
+        levels: $('screen-levels')
       };
+      el.level = $('hud-level');
+      el.levelGrid = $('level-grid');
+      handlersRef = handlers;
       el.quiz = $('quiz');
       el.quizCard = $('quiz-card');
       el.quizOwl = $('quiz-owl');
@@ -175,6 +181,11 @@
       bind('btn-continue', handlers.onContinue);
       bind('btn-startover', handlers.onRestart);
       bind('btn-again', handlers.onRestart);
+      bind('btn-next', handlers.onNext);
+      bind('btn-pause-levels', handlers.onLevels);
+      bind('btn-gameover-levels', handlers.onLevels);
+      bind('btn-victory-levels', handlers.onLevels);
+      bind('btn-levels-back', handlers.onTitle);
       bind('btn-pause', handlers.onPause);
       bind('btn-pause-mute', handlers.onMute);
       $('btn-mute').addEventListener('click', function () {
@@ -230,7 +241,7 @@
       });
       const screen = el.screens[name];
       if (screen) {
-        const first = screen.querySelector('button:not(.hidden)');
+        const first = screen.querySelector('.btn-primary:not(.hidden)') || screen.querySelector('button:not(.hidden)');
         // The title's Play button is always focused so Enter/Space starts the game.
         if (name === 'title' && first) window.setTimeout(function () { first.focus({ preventScroll: true }); }, 50);
         else focusFor(first, screen.querySelector('.panel'));
@@ -247,14 +258,83 @@
       document.body.classList.toggle('playing', on);
     },
 
-    setBest: function (best) {
+    /** Shows overall progress on the title screen. */
+    setProgress: function (progress) {
       const box = $('title-best');
-      if (best && best.score) {
-        box.textContent = 'Best score: ' + best.score.toLocaleString() + ' · Fastest finish: ' + formatTime(best.time);
+      const stars = progress.stars.reduce(function (a, b) { return a + (b || 0); }, 0);
+      const cleared = progress.stars.filter(function (s) { return s !== undefined && s !== null; }).length;
+      if (cleared > 0) {
+        box.textContent = 'Levels cleared: ' + cleared + ' of ' + BGQ.Levels.count + ' · Brain Stars: ★ ' + stars + ' of ' + BGQ.Levels.count * 3;
         box.classList.remove('hidden');
       } else {
         box.classList.add('hidden');
       }
+    },
+
+    /** Updates the HUD's level number. */
+    setLevel: function (index, name) {
+      el.level.textContent = String(index + 1);
+      el.level.parentNode.title = 'Level ' + (index + 1) + ': ' + name;
+    },
+
+    /** Builds and shows the level select grid, grouped by world. */
+    showLevelSelect: function (progress) {
+      const grid = el.levelGrid;
+      grid.innerHTML = '';
+      const perWorld = BGQ.Levels.perWorld;
+      for (let w = 0; w * perWorld < BGQ.Levels.count; w++) {
+        const first = BGQ.Levels.list[w * perWorld];
+        const row = document.createElement('div');
+        row.className = 'world-row world-' + first.theme;
+        const label = document.createElement('div');
+        label.className = 'world-label';
+        label.innerHTML = '<span class="world-num">World ' + (w + 1) + '</span>';
+        const wname = document.createElement('span');
+        wname.className = 'world-name';
+        wname.textContent = BGQ.THEMES[first.theme].world;
+        label.appendChild(wname);
+        row.appendChild(label);
+
+        for (let i = w * perWorld; i < Math.min(BGQ.Levels.count, (w + 1) * perWorld); i++) {
+          const def = BGQ.Levels.list[i];
+          const locked = i >= progress.unlocked;
+          const earned = progress.stars[i] || 0;
+          const done = progress.stars[i] !== undefined && progress.stars[i] !== null;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'level-btn' + (locked ? ' locked' : '') + (done ? ' done' : '') + (i === progress.unlocked - 1 ? ' current' : '');
+          btn.disabled = locked;
+          btn.setAttribute('aria-label', locked
+            ? 'Level ' + (i + 1) + ', locked'
+            : 'Level ' + (i + 1) + ': ' + def.name + (done ? ', ' + earned + ' of 3 stars' : ''));
+          btn.title = locked ? 'Finish the level before to unlock' : def.name;
+          const num = document.createElement('span');
+          num.className = 'level-num';
+          num.textContent = locked ? '' : String(i + 1);
+          const stars = document.createElement('span');
+          stars.className = 'level-stars';
+          stars.setAttribute('aria-hidden', 'true');
+          for (let s = 0; s < 3; s++) {
+            const st = document.createElement('i');
+            st.textContent = '★';
+            if (s < earned) st.className = 'on';
+            stars.appendChild(st);
+          }
+          btn.appendChild(num);
+          btn.appendChild(stars);
+          btn.addEventListener('click', function () {
+            BGQ.Audio.unlock();
+            BGQ.Audio.play('click');
+            handlersRef.onSelectLevel(i);
+          });
+          row.appendChild(btn);
+        }
+        grid.appendChild(row);
+      }
+      this.setProgress(progress);
+      this.showScreen('levels');
+      const current = grid.querySelector('.level-btn.current') || grid.querySelector('.level-btn:not(.locked)');
+      if (current) window.setTimeout(function () { current.scrollIntoView({ block: 'nearest' }); }, 30);
     },
 
     updateMute: function () {
@@ -295,11 +375,33 @@
       hudCache = {};
     },
 
+    /** Shows short messages one after another near the top of the screen. */
     toast: function (text) {
+      toastQueue.push(text);
+      if (!toastTimer) this.nextToast();
+    },
+
+    nextToast: function () {
+      const self = this;
+      const text = toastQueue.shift();
+      if (text === undefined) {
+        el.toast.classList.remove('show');
+        toastTimer = null;
+        return;
+      }
       el.toast.textContent = text;
       el.toast.classList.add('show');
+      toastTimer = window.setTimeout(function () {
+        el.toast.classList.remove('show');
+        toastTimer = window.setTimeout(function () { self.nextToast(); }, 250);
+      }, 2400);
+    },
+
+    clearToasts: function () {
+      toastQueue = [];
       window.clearTimeout(toastTimer);
-      toastTimer = window.setTimeout(function () { el.toast.classList.remove('show'); }, 2200);
+      toastTimer = null;
+      el.toast.classList.remove('show');
     },
 
     /**
@@ -360,6 +462,19 @@
     showGameOver: function (G) {
       $('gameover-score').textContent = G.score.toLocaleString();
       this.showScreen('gameover');
+    },
+
+    /**
+     * Results screen after the castle. info: { isBest, isLast, totalStars }.
+     */
+    showLevelComplete: function (G, info) {
+      $('victory-heading').textContent = info.isLast ? 'You beat all ' + BGQ.Levels.count + ' levels!' : 'Level ' + (G.levelIndex + 1) + ' Clear!';
+      $('btn-next').classList.toggle('hidden', info.isLast);
+      this.showVictory(G, info.isBest);
+      if (info.isLast) {
+        $('victory-message').textContent = 'Amazing! You are a true Brain Gate champion with ' + info.totalStars + ' of ' + BGQ.Levels.count * 3 + ' Brain Stars. Replay any level to collect more!';
+      }
+      BGQ.Audio.play('levelUp');
     },
 
     showVictory: function (G, isBest) {

@@ -294,48 +294,6 @@
    * Tiles (16x16)
    * ------------------------------------------------------------------ */
 
-  const DIRT_SPECKS = [[2, 7], [9, 5], [13, 9], [5, 11], [11, 13], [1, 14], [7, 9], [14, 3], [4, 2], [10, 1]];
-
-  function dirt(g) {
-    rect(g, '#c87b3c', 0, 0, 16, 16);
-    DIRT_SPECKS.forEach(function (p, i) {
-      rect(g, i % 2 ? '#a35d26' : '#dc9456', p[0], p[1], 2, 1);
-    });
-  }
-
-  function makeGroundTop() {
-    const c = makeCanvas(16, 16);
-    const g = c.getContext('2d');
-    dirt(g);
-    rect(g, '#43c443', 0, 0, 16, 4);
-    rect(g, '#8ef06a', 0, 0, 16, 1);
-    rect(g, '#2f9a3a', 0, 4, 16, 1);
-    [1, 5, 8, 12, 14].forEach(function (x) { rect(g, '#2f9a3a', x, 5, 2, 1); });
-    [3, 10].forEach(function (x) { rect(g, '#6edc58', x, 1, 2, 1); });
-    return c;
-  }
-
-  function makeGround() {
-    const c = makeCanvas(16, 16);
-    dirt(c.getContext('2d'));
-    return c;
-  }
-
-  function makeBrick() {
-    const c = makeCanvas(16, 16);
-    const g = c.getContext('2d');
-    rect(g, '#d2642c', 0, 0, 16, 16);
-    rect(g, '#f29a62', 0, 0, 16, 1);
-    rect(g, '#f29a62', 0, 8, 16, 1);
-    rect(g, '#6b2a12', 0, 7, 16, 1);
-    rect(g, '#6b2a12', 0, 15, 16, 1);
-    rect(g, '#6b2a12', 15, 0, 1, 7);
-    rect(g, '#6b2a12', 7, 8, 1, 7);
-    rect(g, '#f29a62', 0, 1, 1, 6);
-    rect(g, '#f29a62', 8, 9, 1, 6);
-    return c;
-  }
-
   const QUESTION_GLYPH = [
     '.XXXX.',
     'XX..XX',
@@ -370,20 +328,6 @@
     rect(g, '#5e3010', 0, 15, 16, 1);
     rect(g, '#5e3010', 15, 0, 1, 16);
     [[2, 2], [13, 2], [2, 13], [13, 13]].forEach(function (p) { rect(g, '#5e3010', p[0], p[1], 1, 1); });
-    return c;
-  }
-
-  function makeHard() {
-    const c = makeCanvas(16, 16);
-    const g = c.getContext('2d');
-    rect(g, '#8f9aa6', 0, 0, 16, 16);
-    rect(g, '#d5dde5', 0, 0, 16, 2);
-    rect(g, '#d5dde5', 0, 0, 2, 16);
-    rect(g, '#56606b', 0, 14, 16, 2);
-    rect(g, '#56606b', 14, 0, 2, 16);
-    rect(g, '#a6b0bb', 4, 4, 8, 8);
-    rect(g, '#c3cbd3', 4, 4, 8, 1);
-    rect(g, '#76808b', 4, 11, 8, 1);
     return c;
   }
 
@@ -434,95 +378,6 @@
   /* ------------------------------------------------------------------ *
    * Scenery
    * ------------------------------------------------------------------ */
-
-  function makeCloud(w) {
-    const h = Math.round(w * 0.5);
-    const c = makeCanvas(w, h);
-    const g = c.getContext('2d');
-    const r = Math.round(h * 0.42);
-    const parts = [
-      [w * 0.28, h * 0.62, r * 0.9],
-      [w * 0.5, h * 0.45, r * 1.15],
-      [w * 0.72, h * 0.62, r * 0.9]
-    ];
-    parts.forEach(function (p) { pixelEllipse(g, '#c9e3ff', p[0], p[1] + 1, Math.round(p[2] * 1.15) + 1, Math.round(p[2]) + 1); });
-    parts.forEach(function (p) { pixelEllipse(g, '#ffffff', p[0], p[1], Math.round(p[2] * 1.15), Math.round(p[2])); });
-    rect(g, '#ffffff', Math.round(w * 0.2), Math.round(h * 0.62), Math.round(w * 0.6), Math.round(r * 0.8));
-    return c;
-  }
-
-  function makeBush(w) {
-    const h = 16;
-    const c = makeCanvas(w, h);
-    const g = c.getContext('2d');
-    const bumps = Math.max(2, Math.round(w / 14));
-    for (let i = 0; i < bumps; i++) {
-      const cx = 7 + (i * (w - 14)) / (bumps - 1);
-      pixelEllipse(g, '#1d7a2c', cx, 10, 8, 8);
-    }
-    for (let i = 0; i < bumps; i++) {
-      const cx = 7 + (i * (w - 14)) / (bumps - 1);
-      pixelEllipse(g, '#3fbf4a', cx, 10, 7, 7);
-      rect(g, '#8ef06a', Math.round(cx) - 3, 5, 3, 2);
-    }
-    rect(g, '#3fbf4a', 1, 12, w - 2, 4);
-    return c;
-  }
-
-  /** A far-away mountain range strip that tiles horizontally. */
-  function makeMountains() {
-    const w = 480;
-    const c = makeCanvas(w, BGQ.VIEW_H);
-    const g = c.getContext('2d');
-    const peaks = [[60, 110, 70], [170, 130, 55], [270, 95, 80], [390, 125, 60]];
-    // Each peak is also drawn one strip-width to the left and right so the
-    // strip repeats without a visible seam.
-    const wrapped = [];
-    peaks.forEach(function (p) { [-w, 0, w].forEach(function (dx) { wrapped.push([p[0] + dx, p[1], p[2]]); }); });
-    wrapped.forEach(function (p) {
-      const px = p[0], top = p[1], half = p[2];
-      for (let y = top; y < BGQ.VIEW_H; y++) {
-        const spread = Math.round(((y - top) / 1.1));
-        const x0 = px - Math.min(spread, half * 3);
-        const x1 = px + Math.min(spread, half * 3);
-        rect(g, '#7a9fd6', x0, y, Math.round((x1 - x0) / 2), 1);
-        rect(g, '#6488c2', px, y, x1 - px, 1);
-        if (y - top < 14) {
-          rect(g, '#eef6ff', x0, y, x1 - x0, 1);
-        }
-      }
-    });
-    return c;
-  }
-
-  /** Rolling green hills that tile horizontally. */
-  function makeHills() {
-    const w = 384;
-    const c = makeCanvas(w, BGQ.VIEW_H);
-    const g = c.getContext('2d');
-    const hills = [[40, 180, 56], [190, 165, 72], [320, 185, 48]];
-    const wrapped = [];
-    hills.forEach(function (h) { [-w, 0, w].forEach(function (dx) { wrapped.push([h[0] + dx, h[1], h[2]]); }); });
-    wrapped.forEach(function (h) {
-      pixelEllipse(g, '#2f8f3a', h[0], h[1] + 36, h[2] + 1, 37);
-      pixelEllipse(g, '#5ccf5c', h[0], h[1] + 36, h[2], 36);
-      pixelEllipse(g, '#79dc6c', h[0] - Math.round(h[2] * 0.25), h[1] + 18, Math.round(h[2] * 0.35), 10);
-      rect(g, '#2f8f3a', h[0] - 6, h[1] + 14, 2, 4);
-      rect(g, '#2f8f3a', h[0] + 6, h[1] + 14, 2, 4);
-    });
-    return c;
-  }
-
-  function makeCloudStrip() {
-    const w = 512;
-    const c = makeCanvas(w, 120);
-    const g = c.getContext('2d');
-    g.drawImage(makeCloud(64), 30, 22);
-    g.drawImage(makeCloud(40), 170, 54);
-    g.drawImage(makeCloud(52), 300, 14);
-    g.drawImage(makeCloud(36), 430, 66);
-    return c;
-  }
 
   function makeCastle() {
     const c = makeCanvas(80, 96);
@@ -609,6 +464,85 @@
   }
 
   /* ------------------------------------------------------------------ *
+   * Enemy "Buzzer" — a flying bug (16x16, drawn facing left)
+   * ------------------------------------------------------------------ */
+
+  const BUZZ_PALETTE = {
+    Y: '#ffcf3f', K: '#2a1a0a', W: '#e8f6ff', w: '#8ab8e0', E: '#ffffff', P: '#111111', S: '#2a1a0a'
+  };
+
+  const BUZZ_BODY = [
+    '...KYYYKYYKYK...',
+    '..KEPYYKYYKYYK..',
+    '..KEEYYKYYKYYKS.',
+    '..KYYYYKYYKYYK..',
+    '...KYYYKYYKYK...',
+    '....KKKKKKKK....'
+  ];
+
+  const BUZZ_WINGS_UP = [
+    '................',
+    '.....ww..ww.....',
+    '....wWWwwWWw....',
+    '....wWWWWWWw....',
+    '.....wwYYww.....'
+  ];
+
+  const BUZZ_WINGS_DOWN = [
+    '................',
+    '................',
+    '................',
+    '....wwwwwwww....',
+    '.....wWYYWw.....'
+  ];
+
+  /* ------------------------------------------------------------------ *
+   * Enemy "Spikeshell" — cannot be stomped (16x16, drawn facing left)
+   * ------------------------------------------------------------------ */
+
+  const SPIKY_PALETTE = {
+    R: '#e53950', r: '#8f1a2e', W: '#ffe0e6', B: '#f0a050', b: '#a8622a', E: '#111111', F: '#5a3010'
+  };
+
+  const SPIKY_TOP = [
+    '................',
+    '................',
+    '................',
+    '................',
+    '......W...W.....',
+    '...W..R..RR..W..',
+    '...RR.RR.RRR.RR.',
+    '..WRRRRRRRRRRRR.',
+    '..rRRRRRRRRRRRRW',
+    '.BBrRRRRRRRRRRr.',
+    'BEBBrrrrrrrrrrr.',
+    'BBBBBbbbbbbbbbb.',
+    '.BBBBBBBBBBBBBb.',
+    '..bbbbbbbbbbbb..'
+  ];
+
+  const SPIKY_FEET_A = ['...FF......FF...', '..FFF.....FFF...'];
+  const SPIKY_FEET_B = ['....FF....FF....', '...FFF....FFF...'];
+
+  /** Spring: frame 0 is relaxed, frame 1 is squashed after a bounce. */
+  function makeSpring(squashed) {
+    const c = makeCanvas(16, 16);
+    const g = c.getContext('2d');
+    const plateY = squashed ? 9 : 4;
+    rect(g, '#3e444c', 1, 13, 14, 3);
+    rect(g, '#8a949f', 2, 13, 12, 1);
+    // Zig-zag coil between the base and the plate
+    for (let y = plateY + 3, i = 0; y < 13; y += 2, i++) {
+      rect(g, '#c3cbd3', i % 2 ? 4 : 6, y, 6, 1);
+      rect(g, '#6a737d', i % 2 ? 4 : 6, y + 1, 6, 1);
+    }
+    rect(g, '#8f1a2e', 0, plateY, 16, 3);
+    rect(g, '#ff4f5e', 1, plateY, 14, 2);
+    rect(g, '#ffb3bb', 2, plateY, 6, 1);
+    return c;
+  }
+
+  /* ------------------------------------------------------------------ *
    * Build everything once
    * ------------------------------------------------------------------ */
 
@@ -635,26 +569,29 @@
         fromPixels(BLOB_TOP.concat(BLOB_FEET_B), BLOB_PALETTE)
       ];
       this.blobSquished = fromPixels(BLOB_SQUISHED, BLOB_PALETTE);
+      const buzz = [
+        fromPixels(BUZZ_WINGS_UP.concat(BUZZ_BODY), BUZZ_PALETTE),
+        fromPixels(BUZZ_WINGS_DOWN.concat(BUZZ_BODY), BUZZ_PALETTE)
+      ];
+      this.buzz = { left: buzz, right: buzz.map(mirror) };
+      const spiky = [
+        fromPixels(SPIKY_TOP.concat(SPIKY_FEET_A), SPIKY_PALETTE),
+        fromPixels(SPIKY_TOP.concat(SPIKY_FEET_B), SPIKY_PALETTE)
+      ];
+      this.spiky = { left: spiky, right: spiky.map(mirror) };
+      this.spring = [makeSpring(false), makeSpring(true)];
       this.owl = owl;
       this.owlBlink = fromPixels(owlBlinkRows(), OWL_PALETTE);
       this.owlCheer = owlCheer(owl);
       this.heart = fromPixels(HEART, { R: '#ff3b5c', r: '#a3122e', W: '#ffd1da' });
       this.coin = makeCoinFrames();
       this.tiles = {
-        groundTop: makeGroundTop(),
-        ground: makeGround(),
-        brick: makeBrick(),
         question: [makeQuestion('#f8b830'), makeQuestion('#ffcf5a'), makeQuestion('#e89a1c')],
         used: makeUsed(),
-        hard: makeHard(),
         pipeTop: makePipeTop(),
         pipeBody: makePipeBody(),
         spikes: makeSpikes()
       };
-      this.bushes = { small: makeBush(32), medium: makeBush(48), large: makeBush(64) };
-      this.mountains = makeMountains();
-      this.hills = makeHills();
-      this.clouds = makeCloudStrip();
       this.castle = makeCastle();
       this.flag = makeFlag();
       this.castleFlag = makeCastleFlag();
@@ -662,5 +599,15 @@
       this.bubble = makeBubble();
       this.pixelEllipse = pixelEllipse;
     }
+  };
+
+  /** Drawing helpers shared with the themed tile painter (tiles.js). */
+  BGQ.Art = {
+    makeCanvas: makeCanvas,
+    fromPixels: fromPixels,
+    mirror: mirror,
+    rect: rect,
+    pixelEllipse: pixelEllipse,
+    brickWall: brickWall
   };
 })();

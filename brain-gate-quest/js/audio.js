@@ -148,6 +148,15 @@
         [88, 0.14], [91, 0.6]
       ], 'square', 0.09);
     },
+    spring: function () {
+      tone({ type: 'square', freq: 180, toFreq: 900, dur: 0.22, vol: 0.08 });
+      tone({ type: 'triangle', freq: 90, toFreq: 300, dur: 0.18, vol: 0.2 });
+    },
+    sizzle: function () {
+      noise(0.6, 0.3);
+      tone({ type: 'square', freq: 400, toFreq: 120, dur: 0.4, vol: 0.06 });
+    },
+    levelUp: function () { arpeggio([[72, 0.07], [76, 0.07], [79, 0.07], [84, 0.07], [88, 0.2]], 'triangle', 0.25); },
     click: function () { tone({ freq: 660, dur: 0.05, vol: 0.06 }); },
     pause: function () { arpeggio([[79, 0.06], [76, 0.06], [79, 0.06], [76, 0.08]], 'square', 0.06); }
   };

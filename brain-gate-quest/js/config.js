@@ -44,10 +44,15 @@
     coyoteTime: 0.09,     // grace period to jump after walking off a ledge
     jumpBuffer: 0.12,     // a jump pressed slightly early still counts
     stompBounce: 250,     // bounce after stomping an enemy
-    stompBounceHold: 360  // bigger bounce if jump is held during the stomp
+    stompBounceHold: 360, // bigger bounce if jump is held during the stomp
+    spring: 600,          // launch speed from a spring
+    springHold: 720,      // launch speed from a spring while holding jump
+    iceGrip: 0.45         // fraction of normal friction/skid grip on icy ground
   };
 
-  BGQ.ENEMY_SPEED = 30;
+  BGQ.ENEMY_SPEED = 30;                 // Grumblob walking speed
+  BGQ.SPIKY_SPEED = 22;                 // Spikeshells are a little slower
+  BGQ.FLYER_SPEED = 28;                 // Buzzers patrol slowly
   BGQ.ENEMY_GRAVITY = 1500;
   BGQ.START_LIVES = 3;
   BGQ.INVULN_TIME = 1.6;               // blinking safety time after respawning
