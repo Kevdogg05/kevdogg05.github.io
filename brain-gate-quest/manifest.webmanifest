@@ -1,0 +1,14 @@
+{
+  "name": "Brain Gate Quest",
+  "short_name": "Brain Gate",
+  "description": "A retro platformer where you unlock gates with multiplication and general knowledge questions.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#1b1d3a",
+  "theme_color": "#1b1d3a",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
