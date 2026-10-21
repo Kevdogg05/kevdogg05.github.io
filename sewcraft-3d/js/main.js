@@ -206,6 +206,21 @@ $$('[data-unit]').forEach((b) =>
 );
 syncUnitButtons();
 
+const QR_URL = 'https://kevdogg05.github.io/sewcraft-3d/';
+$('#btn-qr').addEventListener('click', () => $('#qr-dialog').showModal());
+$('#qr-dialog').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.close();
+});
+$('#qr-copy').addEventListener('click', async (e) => {
+  try {
+    await navigator.clipboard.writeText(QR_URL);
+    e.target.textContent = 'Copied ✓';
+  } catch {
+    e.target.textContent = 'Copy failed — long-press the link';
+  }
+  setTimeout(() => (e.target.textContent = 'Copy link'), 2500);
+});
+
 $('#btn-print').addEventListener('click', () => {
   if (!app.plan) return;
   renderPrint($('#print-root'), app.plan, snapshots());

@@ -488,7 +488,7 @@ details.thinking summary { cursor: pointer; }
   .viewer { height: 52vh; min-height: 280px; }
   .viewer-tools { top: 8px; left: 8px; right: 8px; gap: 6px; }
   .check.speed { display: none; }
-  #btn-print span { display: none; }
+  #btn-print span, #btn-qr span { display: none; }
   .tabs { padding: 6px 8px 0; }
   .tabs button { padding: 8px 10px; font-size: 14px; }
 }
@@ -532,3 +532,21 @@ details.thinking summary { cursor: pointer; }
 .grid-2 > *, .grid-3 > *, .card { min-width: 0; }
 table.spec td { overflow-wrap: anywhere; }
 .table-scroll table.spec td { overflow-wrap: normal; }
+
+/* QR quick-access dialog */
+.qr-dialog {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text);
+  padding: 20px;
+  width: min(360px, calc(100vw - 32px));
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.qr-dialog::backdrop { background: rgba(4, 10, 18, 0.7); }
+.qr-dialog h2 { margin: 0 0 4px; font-size: 19px; }
+.qr-dialog img { display: block; width: 100%; max-width: 260px; height: auto; margin: 12px auto 8px; border-radius: 10px; border: 4px solid var(--cyan); background: #fff; }
+.qr-dialog .qr-url { word-break: break-all; margin: 0 0 12px; color: var(--muted); }
+.qr-close { position: absolute; top: 10px; right: 10px; margin: 0; }
+.qr-close .icon-btn { width: 32px; height: 32px; font-size: 14px; }

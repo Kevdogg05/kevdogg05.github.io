@@ -36,6 +36,10 @@
         <button type="button" data-unit="in" aria-pressed="true">in</button>
         <button type="button" data-unit="cm" aria-pressed="false">cm</button>
       </div>
+      <button type="button" class="btn ghost" id="btn-qr" title="QR code — open SewCraft 3D on your phone" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM16 16h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6.5 6.5h1v1h-1zM16.5 6.5h1v1h-1zM6.5 16.5h1v1h-1z" fill="currentColor"/></svg>
+        <span>QR</span>
+      </button>
       <button type="button" class="btn ghost" id="btn-print" title="Print the blueprint, setup sheet and steps">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M8 14h8v7H8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
         <span>Print</span>
@@ -99,6 +103,18 @@
       <section id="tab-ai" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-ai" hidden></section>
     </main>
   </div>
+
+  <dialog id="qr-dialog" class="qr-dialog" aria-labelledby="qr-title">
+    <form method="dialog" class="qr-close"><button class="icon-btn" aria-label="Close">✕</button></form>
+    <h2 id="qr-title">Open on your phone</h2>
+    <p class="muted small">Scan to bring SewCraft 3D to the machine — the step card and threading guide fit a phone screen.</p>
+    <img src="qr-code.svg" width="260" height="260" alt="QR code linking to https://kevdogg05.github.io/sewcraft-3d/">
+    <p class="mono small qr-url">https://kevdogg05.github.io/sewcraft-3d/</p>
+    <div class="chips" style="justify-content:center;gap:8px">
+      <button type="button" class="btn" id="qr-copy">Copy link</button>
+      <a class="btn" href="qr-code.png" download="sewcraft-3d-qr.png">Download QR card</a>
+    </div>
+  </dialog>
 
   <div id="print-root" class="print-only" aria-hidden="true"></div>
 
