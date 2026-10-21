@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="SewCraft 3D — turn a sewing project into a blueprint, a machine setup sheet for the Consew 315R and 2206RB-14-7DD-1, and an animated 3D step-by-step assembly.">
+  <meta name="theme-color" content="#0b1724">
+  <title>SewCraft 3D</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="SewCraft 3D home">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="2" y="2" width="36" height="36" rx="9" fill="#14304a" stroke="#39b7e6" stroke-width="2"/>
+        <path d="M11 27c5-12 13-12 18 0" fill="none" stroke="#39b7e6" stroke-width="2" stroke-dasharray="3 3"/>
+        <path d="M20 8v16" stroke="#e8f1fa" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="20" cy="26" r="2.6" fill="#ffb547"/>
+      </svg>
+      <span class="brand-text"><strong>SewCraft 3D</strong><small>Industrial sewing planner · Consew 315R &amp; 2206RB-14-7DD-1</small></span>
+    </a>
+    <div class="top-actions">
+      <div class="seg" role="group" aria-label="Units">
+        <button type="button" data-unit="in" aria-pressed="true">in</button>
+        <button type="button" data-unit="cm" aria-pressed="false">cm</button>
+      </div>
+      <button type="button" class="btn ghost" id="btn-print" title="Print the blueprint, setup sheet and steps">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M8 14h8v7H8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span>Print</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="SewCraft stages">
+    <button role="tab" type="button" data-tab="project" id="tabbtn-project">Project</button>
+    <button role="tab" type="button" data-tab="blueprint" id="tabbtn-blueprint"><span class="stage">1</span>Blueprint</button>
+    <button role="tab" type="button" data-tab="setup" id="tabbtn-setup"><span class="stage">2</span>Material &amp; Machine</button>
+    <button role="tab" type="button" data-tab="assembly" id="tabbtn-assembly"><span class="stage">3</span>3D Assembly</button>
+    <button role="tab" type="button" data-tab="training" id="tabbtn-training"><span class="stage">4</span>Machine Training</button>
+    <button role="tab" type="button" data-tab="ai" id="tabbtn-ai"><span class="stage ai">✦</span>Ask SewCraft AI</button>
+  </nav>
+
+  <div class="layout">
+    <aside id="tab-project" class="tab-panel project-panel" role="tabpanel" aria-labelledby="tabbtn-project"></aside>
+    <main class="main">
+      <section id="tab-blueprint" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-blueprint" hidden></section>
+      <section id="tab-setup" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-setup" hidden></section>
+      <section id="tab-assembly" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-assembly" hidden>
+        <div class="assembly">
+          <div class="viewer-wrap">
+            <div id="viewer" class="viewer"></div>
+            <div class="viewer-tools" role="toolbar" aria-label="View">
+              <div class="seg small" role="group" aria-label="Camera">
+                <button type="button" data-view="front">Front</button>
+                <button type="button" data-view="side">Side</button>
+                <button type="button" data-view="iso">Iso</button>
+                <button type="button" data-view="top">Top</button>
+              </div>
+              <label class="check"><input type="checkbox" id="opt-labels" checked> Labels</label>
+              <label class="check"><input type="checkbox" id="opt-autocam" checked> Auto camera</label>
+              <label class="check speed">Speed
+                <select id="opt-speed">
+                  <option value="0.5">0.5×</option>
+                  <option value="1" selected>1×</option>
+                  <option value="1.6">1.6×</option>
+                  <option value="2.5">2.5×</option>
+                </select>
+              </label>
+            </div>
+            <div class="viewer-error" id="viewer-error" hidden></div>
+            <div class="transport">
+              <button type="button" class="icon-btn" id="btn-prev" aria-label="Previous step"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5l-10 7 10 7z" fill="currentColor"/></svg></button>
+              <button type="button" class="icon-btn primary" id="btn-play" aria-label="Play all steps"><svg class="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg><svg class="i-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor"/></svg></button>
+              <button type="button" class="icon-btn" id="btn-next" aria-label="Next step"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5l10 7-10 7z" fill="currentColor"/></svg></button>
+              <button type="button" class="icon-btn" id="btn-replay" aria-label="Replay this step"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <div class="progress" aria-hidden="true"><div class="progress-fill" id="step-progress"></div></div>
+              <span class="step-count" id="step-count"></span>
+            </div>
+          </div>
+          <div class="step-side">
+            <article class="step-card" id="step-card" aria-live="polite"></article>
+            <ol class="step-list" id="step-list"></ol>
+          </div>
+        </div>
+      </section>
+      <section id="tab-training" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-training" hidden></section>
+      <section id="tab-ai" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-ai" hidden></section>
+    </main>
+  </div>
+
+  <div id="print-root" class="print-only" aria-hidden="true"></div>
+
+  <noscript><p class="noscript">SewCraft 3D needs JavaScript and WebGL.</p></noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
