@@ -22,7 +22,7 @@ from pathlib import Path
 from config import Settings
 from services import media
 from services.audio import TTSProvider
-from services.common import PipelineError
+from services.common import PipelineError, ProgressCallback
 from services.video import LipSyncEngine
 
 logger = logging.getLogger(__name__)
@@ -147,11 +147,13 @@ class Pipeline:
         job = self._store.get(job_id)
         assert job is not None
 
-        # 1. Script
-        self._enter(job_id, Stage.SCRIPT, "Preparing script")
+        # 1. Script (and the avatar it will be spoken by)
+        self._enter(job_id, Stage.SCRIPT, "Preparing script and avatar")
         text = normalize_script(job.script)
         if not text:
             raise PipelineError("The script is empty")
+        avatar = work_dir / "avatar.png"
+        media.prepare_avatar(avatar_path, avatar)
 
         # 2. Audio
         self._enter(job_id, Stage.AUDIO, f"Generating voice ({self._tts.name})")
@@ -163,7 +165,7 @@ class Pipeline:
         # 3. Lip-sync
         self._enter(job_id, Stage.LIPSYNC, f"Animating avatar ({self._engine.name})")
         rendered = self._engine.render(
-            avatar_path, audio_path, work_dir, self._stage_progress(job_id, Stage.LIPSYNC)
+            avatar, audio_path, work_dir, self._stage_progress(job_id, Stage.LIPSYNC)
         )
 
         # 4. Video file
@@ -200,10 +202,12 @@ class Pipeline:
             message=message,
         )
 
-    def _stage_progress(self, job_id: str, stage: Stage):
+    def _stage_progress(self, job_id: str, stage: Stage) -> ProgressCallback:
         start, end = STAGE_RANGES[stage]
 
-        def report(fraction: float) -> None:
-            self._store.update(job_id, progress=int(start + (end - start) * max(0.0, min(1.0, fraction))))
+        def report(fraction: float, message: str | None = None) -> None:
+            progress = int(start + (end - start) * max(0.0, min(1.0, fraction)))
+            changes = {"message": message} if message else {}
+            self._store.update(job_id, progress=progress, **changes)
 
         return report

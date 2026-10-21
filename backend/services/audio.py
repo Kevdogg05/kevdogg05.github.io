@@ -4,7 +4,7 @@ Providers:
   placeholder  Offline, dependency-free. Synthesises a speech-paced hum whose
                length and rhythm follow the script, so the rest of the pipeline
                (lip-sync, muxing, progress) can be developed without a model.
-  coqui        Open-source Coqui TTS (`pip install coqui-tts`), runs locally.
+  coqui        Open-source Coqui TTS, runs locally (scripts/setup_coqui.sh).
   elevenlabs   ElevenLabs REST API (set ELEVENLABS_API_KEY).
 
 Pick one with OAS_TTS_PROVIDER. Every provider writes a 16-bit PCM WAV file.
@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import array
 import hashlib
+import importlib.util
+import logging
 import math
 import random
 import re
@@ -29,6 +31,8 @@ from config import Settings
 from services import media
 from services.common import PipelineError, ProviderStatus, ProviderUnavailableError
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass(frozen=True)
 class Voice:
@@ -41,6 +45,10 @@ class TTSProvider(Protocol):
     name: str
 
     def status(self) -> ProviderStatus: ...
+
+    def warm_up(self) -> None:
+        """Optionally load models ahead of the first request."""
+        ...
 
     def list_voices(self) -> list[Voice]: ...
 
@@ -80,6 +88,9 @@ class PlaceholderTTS:
 
     def status(self) -> ProviderStatus:
         return ProviderStatus(True, "Built-in placeholder voice (no real speech)")
+
+    def warm_up(self) -> None:
+        pass
 
     def list_voices(self) -> list[Voice]:
         return [v.voice for v in _PLACEHOLDER_VOICES]
@@ -133,44 +144,92 @@ class PlaceholderTTS:
 
 
 class CoquiTTS:
-    """Coqui TTS. The model is downloaded and loaded on first synthesis."""
+    """Coqui TTS, run in-process so the model stays loaded between jobs.
+
+    The model is downloaded on first load (to Coqui's cache, ~/.local/share/tts by
+    default) and loaded in the background at startup when OAS_COQUI_PRELOAD is on.
+    """
 
     name = "coqui"
 
     def __init__(self, settings: Settings):
         self._model_name = settings.coqui_model
-        self._speakers = settings.coqui_speakers
+        self._voices = [_parse_speaker(entry, settings.coqui_model) for entry in settings.coqui_speakers]
+        self._language = settings.coqui_language
         self._device = settings.coqui_device
+        self._preload = settings.coqui_preload
         self._tts = None
+        self._state = "idle"  # idle | loading | loaded | failed
+        self._load_error: str | None = None
         self._lock = threading.Lock()
 
     def status(self) -> ProviderStatus:
+        if importlib.util.find_spec("TTS") is None:
+            return ProviderStatus(False, "Coqui TTS is not installed: run backend/scripts/setup_coqui.sh")
+        if self._state == "loading":
+            return ProviderStatus(False, f"Loading {self._model_name}…")
+        if self._state == "failed":
+            return ProviderStatus(False, f"Could not load {self._model_name}: {self._load_error}")
+        when = "loaded" if self._state == "loaded" else "loads on first use"
+        return ProviderStatus(True, f"Coqui TTS {self._model_name} ({when}, {self._device})")
+
+    def warm_up(self) -> None:
+        """Load the model ahead of the first request (called on a background thread)."""
+        if not self._preload or importlib.util.find_spec("TTS") is None:
+            return
         try:
-            import TTS  # noqa: F401
-        except ImportError:
-            return ProviderStatus(False, "Coqui TTS is not installed: pip install coqui-tts")
-        return ProviderStatus(True, f"Coqui TTS ({self._model_name})")
+            with self._lock:
+                self._load()
+        except Exception:  # noqa: BLE001 - recorded in status(); the next job retries
+            logger.exception("Coqui TTS warm-up failed")
 
     def list_voices(self) -> list[Voice]:
-        # Listing must not trigger a multi-GB model download, so voices come from config.
-        return [Voice(s, s, f"{self._model_name} speaker") for s in self._speakers]
+        # Listing must not trigger a model download, so voices come from config.
+        return self._voices
 
     def synthesize(self, text: str, voice_id: str, out_path: Path) -> None:
         with self._lock:  # Coqui models are not thread-safe
             tts = self._load()
-            speaker = voice_id if getattr(tts, "is_multi_speaker", False) else None
-            tts.tts_to_file(text=text, speaker=speaker, file_path=str(out_path))
+            kwargs = {}
+            if getattr(tts, "is_multi_speaker", False):
+                speakers = tts.speakers or []
+                if voice_id not in speakers:
+                    raise PipelineError(
+                        f"Speaker '{voice_id}' is not in {self._model_name}. "
+                        f"Some valid speakers: {', '.join(map(str, speakers[:8]))}"
+                    )
+                kwargs["speaker"] = voice_id
+            if getattr(tts, "is_multi_lingual", False):
+                kwargs["language"] = self._language
+            tts.tts_to_file(text=text, file_path=str(out_path), **kwargs)
 
     def _load(self):
-        if self._tts is None:
-            try:
-                from TTS.api import TTS
-            except ImportError as exc:
-                raise ProviderUnavailableError(
-                    "Coqui TTS is not installed. Run `pip install coqui-tts` in the backend venv."
-                ) from exc
-            self._tts = TTS(self._model_name).to(self._device)
+        if self._tts is not None:
+            return self._tts
+        try:
+            from TTS.api import TTS
+        except ImportError as exc:
+            self._state, self._load_error = "failed", "not installed"
+            raise ProviderUnavailableError(
+                "Coqui TTS is not installed. Run backend/scripts/setup_coqui.sh."
+            ) from exc
+        self._state = "loading"
+        logger.info("Loading Coqui TTS model %s on %s", self._model_name, self._device)
+        try:
+            self._tts = TTS(self._model_name, progress_bar=False).to(self._device)
+        except Exception as exc:
+            self._state, self._load_error = "failed", str(exc)[:200]
+            raise ProviderUnavailableError(
+                f"Could not load Coqui model {self._model_name}: {exc}"
+            ) from exc
+        self._state, self._load_error = "loaded", None
         return self._tts
+
+
+def _parse_speaker(entry: str, model_name: str) -> Voice:
+    speaker, _, description = entry.partition("=")
+    speaker = speaker.strip()
+    return Voice(speaker, speaker, description.strip() or f"{model_name} speaker")
 
 
 # --------------------------------------------------------------------------- #
@@ -192,6 +251,9 @@ class ElevenLabsTTS:
         if not self._api_key:
             return ProviderStatus(False, "ELEVENLABS_API_KEY is not set")
         return ProviderStatus(True, f"ElevenLabs ({self._model})")
+
+    def warm_up(self) -> None:
+        pass
 
     def list_voices(self) -> list[Voice]:
         if self._voices is None:

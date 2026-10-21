@@ -6,6 +6,7 @@ Run with:  uvicorn main:app --reload --port 8000
 from __future__ import annotations
 
 import logging
+import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -49,6 +50,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
+        # Load the voice model in the background so the first job doesn't pay for it.
+        threading.Thread(target=tts.warm_up, name="oas-tts-warmup", daemon=True).start()
         yield
         pipeline.shutdown()
 

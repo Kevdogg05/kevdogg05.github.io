@@ -2,6 +2,7 @@
 backend/.venv/
 backend/.env
 backend/storage/
+backend/engines/Wav2Lip/
 __pycache__/
 *.py[cod]
 .pytest_cache/

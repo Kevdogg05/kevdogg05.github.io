@@ -140,6 +140,9 @@ export function AvatarUploader({ state, onSelect, onClear, disabled }: AvatarUpl
           {state.error}
         </p>
       )}
+      <p className="mt-2 text-xs text-zinc-500">
+        Only animate photos of yourself, or of people who have agreed to it.
+      </p>
     </Panel>
   );
 }

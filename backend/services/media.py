@@ -9,9 +9,15 @@ import tempfile
 import wave
 from pathlib import Path
 
+from PIL import Image, ImageOps, UnidentifiedImageError
+
 from services.common import PipelineError, ProgressCallback
 
 logger = logging.getLogger(__name__)
+
+# Every engine's output is framed onto this 16:9 canvas.
+CANVAS_WIDTH = 1280
+CANVAS_HEIGHT = 720
 
 def resolve_ffmpeg(configured: str = "") -> str | None:
     """Find an ffmpeg binary: explicit setting, then PATH, then the imageio-ffmpeg wheel."""
@@ -26,6 +32,37 @@ def resolve_ffmpeg(configured: str = "") -> str | None:
         return imageio_ffmpeg.get_ffmpeg_exe()
     except Exception:  # noqa: BLE001 - optional fallback, any failure means "not found"
         return None
+
+
+def prepare_avatar(src: Path, dst: Path) -> None:
+    """Normalise an uploaded portrait for the render engines.
+
+    Applies the EXIF orientation (phone photos are often stored sideways, which
+    defeats face detection), drops alpha and metadata, shrinks it to fit the
+    canvas and makes both sides even, as H.264 requires.
+    """
+    try:
+        with Image.open(src) as image:
+            image = ImageOps.exif_transpose(image).convert("RGB")
+    except (UnidentifiedImageError, OSError) as exc:
+        raise PipelineError("The avatar image could not be read; please upload it again") from exc
+    image.thumbnail((CANVAS_WIDTH, CANVAS_HEIGHT), Image.Resampling.LANCZOS)
+    width, height = image.width - image.width % 2, image.height - image.height % 2
+    if width < 64 or height < 64:
+        raise PipelineError("The avatar image is too small; use one at least 64×64 pixels")
+    image.crop((0, 0, width, height)).save(dst, format="PNG")
+
+
+def canvas_filter(source: str, output: str) -> str:
+    """ffmpeg filtergraph that centres `source` on a blurred, darkened copy of itself."""
+    w, h = CANVAS_WIDTH, CANVAS_HEIGHT
+    return ";".join([
+        f"[{source}]split=2[bgsrc][fgsrc]",
+        f"[bgsrc]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},"
+        "boxblur=24:2,eq=brightness=-0.18[bg]",
+        f"[fgsrc]scale={w}:{h}:force_original_aspect_ratio=decrease[fg]",
+        f"[bg][fg]overlay=(W-w)/2:(H-h)/2[{output}]",
+    ])
 
 
 def wav_duration(path: Path) -> float:
@@ -76,13 +113,14 @@ def to_web_mp4(
     expected_duration: float | None = None,
     on_progress: ProgressCallback | None = None,
 ) -> None:
-    """Transcode an engine's output into an MP4 every browser can play and seek."""
+    """Frame an engine's output on the canvas as an MP4 every browser can play and seek."""
     run_ffmpeg(
         ffmpeg,
         [
             "-i", str(src),
-            "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2",
-            "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p",
+            "-filter_complex", canvas_filter("0:v", "framed") + ";[framed]format=yuv420p[v]",
+            "-map", "[v]", "-map", "0:a?",
+            "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",
             "-c:a", "aac", "-b:a", "160k",
             "-movflags", "+faststart",
             str(dst),

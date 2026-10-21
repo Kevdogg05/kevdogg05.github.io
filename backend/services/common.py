@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Protocol
 
-ProgressCallback = Callable[[float], None]
-"""Receives a completion fraction between 0.0 and 1.0."""
+
+class ProgressCallback(Protocol):
+    def __call__(self, fraction: float, message: str | None = None) -> None:
+        """Report completion (0.0–1.0) and, optionally, a new status message."""
 
 
 class PipelineError(Exception):

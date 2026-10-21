@@ -26,7 +26,10 @@ fi
 
 trap 'trap - EXIT; kill 0' EXIT INT TERM
 
+# Only reload for our own code: not for pip installs, engine checkouts or renders.
+mkdir -p "$ROOT/backend/storage" "$ROOT/backend/engines"
 (cd "$ROOT/backend" && exec .venv/bin/uvicorn main:app --reload \
+  --reload-exclude .venv --reload-exclude engines --reload-exclude storage \
   --host "$BACKEND_HOST" --port "$BACKEND_PORT") &
 (cd "$ROOT/frontend" && exec npm run dev -- --port "$FRONTEND_PORT") &
 

@@ -31,6 +31,11 @@ def _env_int(name: str, default: int) -> int:
     return int(raw) if raw else default
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    raw = _env(name).lower()
+    return default if not raw else raw in ("1", "true", "yes", "on")
+
+
 def _env_list(name: str, default: list[str]) -> list[str]:
     raw = _env(name)
     if not raw:
@@ -62,18 +67,31 @@ class Settings:
     # Voice generation: placeholder | coqui | elevenlabs
     tts_provider: str = "placeholder"
     coqui_model: str = "tts_models/en/vctk/vits"
+    # Entries are "speaker_id" or "speaker_id=Description". The defaults are VCTK
+    # speakers spread across the pitch range, labelled by their measured median pitch.
     coqui_speakers: list[str] = field(
-        default_factory=lambda: ["p225", "p226", "p227", "p228", "p229", "p230"]
+        default_factory=lambda: [
+            "p241=Deep voice, ~94 Hz",
+            "p230=Low voice, ~105 Hz",
+            "p226=Mid-low voice, ~124 Hz",
+            "p227=Mid-high voice, ~193 Hz",
+            "p273=Bright voice, ~210 Hz",
+            "p259=High voice, ~228 Hz",
+        ]
     )
+    coqui_language: str = "en"  # only used by multilingual models such as XTTS
     coqui_device: str = "cpu"
+    coqui_preload: bool = True
     elevenlabs_api_key: str = ""
     elevenlabs_model: str = "eleven_multilingual_v2"
 
     # Lip-sync / rendering: placeholder | wav2lip | sadtalker
     lipsync_engine: str = "placeholder"
-    wav2lip_dir: Path | None = None
+    # scripts/setup_wav2lip.sh installs a patched checkout here.
+    wav2lip_dir: Path | None = BACKEND_DIR / "engines" / "Wav2Lip"
     wav2lip_checkpoint: Path | None = None
     wav2lip_python: str = sys.executable
+    wav2lip_batch_size: int = 32
     sadtalker_dir: Path | None = None
     sadtalker_python: str = sys.executable
     sadtalker_extra_args: str = "--still --preprocess full"
@@ -106,13 +124,16 @@ def load_settings() -> Settings:
         tts_provider=_env("OAS_TTS_PROVIDER", defaults.tts_provider).lower(),
         coqui_model=_env("OAS_COQUI_MODEL", defaults.coqui_model),
         coqui_speakers=_env_list("OAS_COQUI_SPEAKERS", defaults.coqui_speakers),
+        coqui_language=_env("OAS_COQUI_LANGUAGE", defaults.coqui_language),
         coqui_device=_env("OAS_COQUI_DEVICE", defaults.coqui_device),
+        coqui_preload=_env_bool("OAS_COQUI_PRELOAD", defaults.coqui_preload),
         elevenlabs_api_key=_env("ELEVENLABS_API_KEY"),
         elevenlabs_model=_env("OAS_ELEVENLABS_MODEL", defaults.elevenlabs_model),
         lipsync_engine=_env("OAS_LIPSYNC_ENGINE", defaults.lipsync_engine).lower(),
-        wav2lip_dir=_env_path("OAS_WAV2LIP_DIR"),
+        wav2lip_dir=_env_path("OAS_WAV2LIP_DIR", defaults.wav2lip_dir),
         wav2lip_checkpoint=_env_path("OAS_WAV2LIP_CHECKPOINT"),
         wav2lip_python=_env("OAS_WAV2LIP_PYTHON", defaults.wav2lip_python),
+        wav2lip_batch_size=_env_int("OAS_WAV2LIP_BATCH_SIZE", defaults.wav2lip_batch_size),
         sadtalker_dir=_env_path("OAS_SADTALKER_DIR"),
         sadtalker_python=_env("OAS_SADTALKER_PYTHON", defaults.sadtalker_python),
         sadtalker_extra_args=_env("OAS_SADTALKER_EXTRA_ARGS", defaults.sadtalker_extra_args),
