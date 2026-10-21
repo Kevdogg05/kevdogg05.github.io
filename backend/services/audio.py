@@ -1,0 +1,253 @@
+"""Voice generation (script -> speech WAV).
+
+Providers:
+  placeholder  Offline, dependency-free. Synthesises a speech-paced hum whose
+               length and rhythm follow the script, so the rest of the pipeline
+               (lip-sync, muxing, progress) can be developed without a model.
+  coqui        Open-source Coqui TTS (`pip install coqui-tts`), runs locally.
+  elevenlabs   ElevenLabs REST API (set ELEVENLABS_API_KEY).
+
+Pick one with OAS_TTS_PROVIDER. Every provider writes a 16-bit PCM WAV file.
+"""
+
+from __future__ import annotations
+
+import array
+import hashlib
+import math
+import random
+import re
+import threading
+import wave
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Protocol
+
+import requests
+
+from config import Settings
+from services import media
+from services.common import PipelineError, ProviderStatus, ProviderUnavailableError
+
+
+@dataclass(frozen=True)
+class Voice:
+    id: str
+    name: str
+    description: str
+
+
+class TTSProvider(Protocol):
+    name: str
+
+    def status(self) -> ProviderStatus: ...
+
+    def list_voices(self) -> list[Voice]: ...
+
+    def synthesize(self, text: str, voice_id: str, out_path: Path) -> None:
+        """Write speech for `text` to `out_path` as a WAV file."""
+        ...
+
+
+# --------------------------------------------------------------------------- #
+# Placeholder
+# --------------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class _PlaceholderVoice:
+    voice: Voice
+    pitch_hz: float
+    syllable_seconds: float
+
+
+_PLACEHOLDER_VOICES = [
+    _PlaceholderVoice(Voice("nova", "Nova", "Warm, friendly narrator"), 205.0, 0.17),
+    _PlaceholderVoice(Voice("atlas", "Atlas", "Deep and calm"), 110.0, 0.19),
+    _PlaceholderVoice(Voice("lumen", "Lumen", "Bright and upbeat"), 260.0, 0.15),
+    _PlaceholderVoice(Voice("echo", "Echo", "Neutral newsreader"), 150.0, 0.16),
+]
+
+_WORD_RE = re.compile(r"[A-Za-z0-9']+|[.,;:!?]")
+_VOWEL_GROUP_RE = re.compile(r"[aeiouy]+", re.IGNORECASE)
+
+
+class PlaceholderTTS:
+    """Generates a hum with one tone per syllable and pauses at punctuation."""
+
+    name = "placeholder"
+    sample_rate = 16_000
+
+    def status(self) -> ProviderStatus:
+        return ProviderStatus(True, "Built-in placeholder voice (no real speech)")
+
+    def list_voices(self) -> list[Voice]:
+        return [v.voice for v in _PLACEHOLDER_VOICES]
+
+    def synthesize(self, text: str, voice_id: str, out_path: Path) -> None:
+        preset = next((v for v in _PLACEHOLDER_VOICES if v.voice.id == voice_id), None)
+        if preset is None:
+            raise PipelineError(f"Unknown voice '{voice_id}' for the placeholder provider")
+
+        # Seeded from the text so the same script always renders the same audio.
+        rng = random.Random(hashlib.sha256(f"{voice_id}:{text}".encode()).digest())
+        samples = array.array("h")
+        self._silence(samples, 0.25)
+        for token in _WORD_RE.findall(text):
+            if token in ".!?":
+                self._silence(samples, 0.45)
+            elif token in ",;:":
+                self._silence(samples, 0.25)
+            else:
+                syllables = max(1, len(_VOWEL_GROUP_RE.findall(token)))
+                for _ in range(syllables):
+                    pitch = preset.pitch_hz * rng.uniform(0.88, 1.15)
+                    length = preset.syllable_seconds * rng.uniform(0.8, 1.25)
+                    self._syllable(samples, pitch, length)
+                self._silence(samples, 0.06)
+        self._silence(samples, 0.35)
+
+        with wave.open(str(out_path), "wb") as wav:
+            wav.setnchannels(1)
+            wav.setsampwidth(2)
+            wav.setframerate(self.sample_rate)
+            wav.writeframes(samples.tobytes())
+
+    def _silence(self, samples: array.array, seconds: float) -> None:
+        samples.extend([0] * int(seconds * self.sample_rate))
+
+    def _syllable(self, samples: array.array, pitch: float, seconds: float) -> None:
+        count = int(seconds * self.sample_rate)
+        step = 2 * math.pi * pitch / self.sample_rate
+        for i in range(count):
+            envelope = math.sin(math.pi * i / count)  # smooth attack and release
+            phase = step * i
+            # A few harmonics read as "voice-like" rather than a pure beep.
+            tone = math.sin(phase) + 0.5 * math.sin(2 * phase) + 0.25 * math.sin(3 * phase)
+            samples.append(int(7000 * envelope * tone / 1.75))
+
+
+# --------------------------------------------------------------------------- #
+# Coqui TTS (open source, local)
+# --------------------------------------------------------------------------- #
+
+
+class CoquiTTS:
+    """Coqui TTS. The model is downloaded and loaded on first synthesis."""
+
+    name = "coqui"
+
+    def __init__(self, settings: Settings):
+        self._model_name = settings.coqui_model
+        self._speakers = settings.coqui_speakers
+        self._device = settings.coqui_device
+        self._tts = None
+        self._lock = threading.Lock()
+
+    def status(self) -> ProviderStatus:
+        try:
+            import TTS  # noqa: F401
+        except ImportError:
+            return ProviderStatus(False, "Coqui TTS is not installed: pip install coqui-tts")
+        return ProviderStatus(True, f"Coqui TTS ({self._model_name})")
+
+    def list_voices(self) -> list[Voice]:
+        # Listing must not trigger a multi-GB model download, so voices come from config.
+        return [Voice(s, s, f"{self._model_name} speaker") for s in self._speakers]
+
+    def synthesize(self, text: str, voice_id: str, out_path: Path) -> None:
+        with self._lock:  # Coqui models are not thread-safe
+            tts = self._load()
+            speaker = voice_id if getattr(tts, "is_multi_speaker", False) else None
+            tts.tts_to_file(text=text, speaker=speaker, file_path=str(out_path))
+
+    def _load(self):
+        if self._tts is None:
+            try:
+                from TTS.api import TTS
+            except ImportError as exc:
+                raise ProviderUnavailableError(
+                    "Coqui TTS is not installed. Run `pip install coqui-tts` in the backend venv."
+                ) from exc
+            self._tts = TTS(self._model_name).to(self._device)
+        return self._tts
+
+
+# --------------------------------------------------------------------------- #
+# ElevenLabs (developer API)
+# --------------------------------------------------------------------------- #
+
+
+class ElevenLabsTTS:
+    name = "elevenlabs"
+    base_url = "https://api.elevenlabs.io/v1"
+
+    def __init__(self, settings: Settings):
+        self._api_key = settings.elevenlabs_api_key
+        self._model = settings.elevenlabs_model
+        self._ffmpeg = media.resolve_ffmpeg(settings.ffmpeg_path)
+        self._voices: list[Voice] | None = None
+
+    def status(self) -> ProviderStatus:
+        if not self._api_key:
+            return ProviderStatus(False, "ELEVENLABS_API_KEY is not set")
+        return ProviderStatus(True, f"ElevenLabs ({self._model})")
+
+    def list_voices(self) -> list[Voice]:
+        if self._voices is None:
+            data = self._request("GET", "/voices").json()
+            self._voices = [
+                Voice(
+                    v["voice_id"],
+                    v.get("name", v["voice_id"]),
+                    ", ".join(str(x) for x in (v.get("labels") or {}).values()) or v.get("category", ""),
+                )
+                for v in data.get("voices", [])
+            ]
+        return self._voices
+
+    def synthesize(self, text: str, voice_id: str, out_path: Path) -> None:
+        if not self._ffmpeg:
+            raise ProviderUnavailableError("ffmpeg is required to decode ElevenLabs audio")
+        response = self._request(
+            "POST",
+            f"/text-to-speech/{voice_id}",
+            params={"output_format": "mp3_44100_128"},
+            json={"text": text, "model_id": self._model},
+            headers={"Accept": "audio/mpeg"},
+        )
+        mp3_path = out_path.with_suffix(".mp3")
+        mp3_path.write_bytes(response.content)
+        media.to_wav(self._ffmpeg, mp3_path, out_path)
+
+    def _request(self, method: str, path: str, **kwargs) -> requests.Response:
+        if not self._api_key:
+            raise ProviderUnavailableError("ELEVENLABS_API_KEY is not set")
+        headers = {"xi-api-key": self._api_key, **kwargs.pop("headers", {})}
+        try:
+            response = requests.request(
+                method, f"{self.base_url}{path}", headers=headers, timeout=120, **kwargs
+            )
+        except requests.RequestException as exc:
+            raise PipelineError(f"Could not reach ElevenLabs: {exc}") from exc
+        if not response.ok:
+            raise PipelineError(f"ElevenLabs returned {response.status_code}: {response.text[:300]}")
+        return response
+
+
+# --------------------------------------------------------------------------- #
+
+
+def create_tts_provider(settings: Settings) -> TTSProvider:
+    providers = {
+        "placeholder": lambda: PlaceholderTTS(),
+        "coqui": lambda: CoquiTTS(settings),
+        "elevenlabs": lambda: ElevenLabsTTS(settings),
+    }
+    try:
+        return providers[settings.tts_provider]()
+    except KeyError:
+        raise ValueError(
+            f"Unknown OAS_TTS_PROVIDER '{settings.tts_provider}'. "
+            f"Choose one of: {', '.join(providers)}"
+        ) from None

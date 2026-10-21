@@ -1,0 +1,13 @@
+# Core API
+fastapi==0.159.1
+uvicorn[standard]==0.54.0
+python-multipart==0.0.32
+requests==2.34.2
+python-dotenv>=1.0
+# Bundled ffmpeg binary, used when ffmpeg is not on PATH
+imageio-ffmpeg==0.6.0
+
+# Optional engines (install into this venv or point OAS_*_PYTHON at their own env):
+#   coqui-tts      -> OAS_TTS_PROVIDER=coqui
+#   Wav2Lip        -> OAS_LIPSYNC_ENGINE=wav2lip    (git clone, see README)
+#   SadTalker      -> OAS_LIPSYNC_ENGINE=sadtalker  (git clone, see README)

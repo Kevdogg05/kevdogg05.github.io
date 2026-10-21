@@ -1,0 +1,12 @@
+# OpenAvatarStudio backend
+backend/.venv/
+backend/.env
+backend/storage/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
