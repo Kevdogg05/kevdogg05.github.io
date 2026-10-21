@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Doodle Pals</title>
+<meta name="description" content="Doodle Pals: learn to draw 54 cartoon characters step by step with an animated pencil guide and a practice sketchpad.">
+<meta name="theme-color" content="#fff6ea">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%8F%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.18/dist/index.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.541.0/dist/umd/lucide.min.js"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --font-display: "Fredoka", "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  }
+</style>
+<style>
+  :root { --ink: #2b2340; --bg: #fff6ea; --paper: #fffdf9; --sq: min(calc(100vw - 40px), 520px); }
+  [hidden] { display: none !important; }
+  @layer base {
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: "Fredoka", "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; touch-action: manipulation; }
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(circle at 10% 14%, #ffe2f1 0 110px, transparent 111px),
+      radial-gradient(circle at 90% 8%, #e3f2ff 0 140px, transparent 141px),
+      radial-gradient(circle at 94% 80%, #fff0c4 0 120px, transparent 121px),
+      radial-gradient(circle at 4% 88%, #e4f8e9 0 110px, transparent 111px),
+      radial-gradient(#f1d9bf 1.4px, transparent 1.6px) 0 0 / 26px 26px;
+  }
+  button:disabled { cursor: default; opacity: .4; }
+  button:focus-visible, a:focus-visible { outline: 4px solid #7c6cff; outline-offset: 3px; }
+  .lucide { width: 1.2em; height: 1.2em; flex: none; }
+
+  /* chunky "3D" buttons */
+  .btn3d { box-shadow: 0 5px 0 var(--sh, #eadccb); transition: transform .08s ease, box-shadow .08s ease; }
+  .btn3d:not(:disabled):active { transform: translateY(4px); box-shadow: 0 1px 0 var(--sh, #eadccb); }
+  .icon-btn { width: 52px; height: 52px; border-radius: 18px; display: grid; place-items: center; background: #fff; font-size: 24px; }
+
+  /* logo */
+  .logo-word span { display: inline-block; animation: letterBob 2.6s ease-in-out infinite; }
+  @keyframes letterBob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(-3deg); } }
+  .logo-pencil { animation: logoWiggle 1.6s ease-in-out infinite; transform-origin: 30% 80%; }
+  @keyframes logoWiggle { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg) translateY(-3px); } }
+  .logo-squiggle { stroke-dasharray: 120; animation: squiggle 2.4s ease-in-out infinite; }
+  @keyframes squiggle { 0% { stroke-dashoffset: 120; } 55%, 80% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -120; } }
+
+  /* progress + chips */
+  .prog-track { height: 18px; border-radius: 999px; background: #f2e8db; overflow: hidden; box-shadow: inset 0 2px 0 rgba(0,0,0,.06); }
+  .prog-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ffd23f, #ff9f43, #ff6fb5); transition: width .8s cubic-bezier(.3,1.4,.5,1); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; background: #fff; font-weight: 600; font-size: 17px; white-space: nowrap; --sh: #eadccb; }
+  .chip[aria-pressed="true"] { background: var(--c); color: #fff; --sh: var(--csh); }
+  .chip-row { scrollbar-width: none; }
+  .chip-row::-webkit-scrollbar { display: none; }
+
+  /* character cards */
+  .pal-grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .pal-grid.big { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+  @media (max-width: 440px) { .pal-grid, .pal-grid.big { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+  .pal-card {
+    position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 10px 10px 12px; border-radius: 26px; background: #fff; border: 3px solid #fff;
+    box-shadow: 0 6px 0 var(--cat-sh), 0 14px 24px -12px rgba(43,35,64,.35);
+    transition: transform .2s cubic-bezier(.3,1.6,.5,1), box-shadow .1s;
+  }
+  .pal-card:hover { transform: translateY(-4px) rotate(-1.2deg); }
+  .pal-card:active { transform: translateY(4px) scale(.97); box-shadow: 0 2px 0 var(--cat-sh); }
+  .pal-card.done { border-color: #ffd23f; }
+  .pal-art { width: 100%; aspect-ratio: 1; border-radius: 20px; background: var(--tint); display: grid; place-items: center; overflow: hidden; }
+  .pal-art svg { width: 88%; height: 88%; overflow: visible; }
+  .pal-name { margin-top: 8px; font-size: 21px; font-weight: 700; line-height: 1.1; }
+  .pal-what { font-size: 14px; font-weight: 500; color: #7a6e93; }
+  .pal-star { position: absolute; top: -12px; right: -10px; width: 42px; height: 42px; border-radius: 50%; background: #ffd23f; color: #fff; display: grid; place-items: center; box-shadow: 0 3px 0 #dda600; animation: starPop .6s cubic-bezier(.3,1.8,.5,1) both; }
+  .pal-star .lucide { fill: #fff; width: 24px; height: 24px; }
+  .ribbon { position: absolute; top: 14px; left: -7px; z-index: 2; display: flex; gap: 4px; align-items: center; background: var(--cat); color: #fff; font-size: 13px; font-weight: 700; padding: 3px 12px 3px 9px; border-radius: 0 999px 999px 0; box-shadow: 0 3px 0 var(--cat-sh); }
+  @keyframes starPop { 0% { transform: scale(0) rotate(-90deg); } 100% { transform: scale(1) rotate(0); } }
+  .pal-card:not(.inview) .art * { animation-play-state: paused !important; }
+
+  /* ---------- character idle loops (every icon is alive) ---------- */
+  .idle { transform-origin: 100px 185px; animation: 2.8s ease-in-out infinite; }
+  .idle-bounce { animation-name: iBounce; animation-duration: 1.7s; }
+  @keyframes iBounce { 0%, 100% { transform: translateY(0) scale(1, 1); } 35% { transform: translateY(-8px) scale(.97, 1.03); } 60% { transform: translateY(0) scale(1.04, .96); } 75% { transform: translateY(0) scale(1, 1); } }
+  .idle-float { animation-name: iFloat; animation-duration: 3.2s; }
+  @keyframes iFloat { 0%, 100% { transform: translateY(3px) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+  .idle-sway { animation-name: iSway; animation-duration: 3s; }
+  @keyframes iSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+  .idle-jelly { animation-name: iJelly; animation-duration: 1.9s; }
+  @keyframes iJelly { 0%, 100% { transform: scale(1, 1); } 20% { transform: scale(1.07, .93); } 40% { transform: scale(.95, 1.05); } 60% { transform: scale(1.03, .97); } 80% { transform: scale(.99, 1.01); } }
+  .idle-wobble { transform-origin: 100px 110px; animation-name: iWobble; animation-duration: 2.4s; }
+  @keyframes iWobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+  .idle-hop { animation-name: iHop; animation-duration: 1.5s; }
+  @keyframes iHop { 0%, 55%, 100% { transform: translateY(0) scale(1, 1); } 10% { transform: translateY(0) scale(1.07, .93); } 28% { transform: translateY(-16px) scale(.95, 1.06); } 45% { transform: translateY(0) scale(1.06, .94); } }
+  .idle-swim { animation-name: iSwim; animation-duration: 3s; }
+  @keyframes iSwim { 0%, 100% { transform: translate(-5px, 0) rotate(-3deg); } 50% { transform: translate(5px, -6px) rotate(3deg); } }
+  .idle-spin { transform-origin: 105px 100px; animation-name: iSpin; animation-duration: 2.6s; }
+  @keyframes iSpin { 0%, 100% { transform: rotate(-10deg) scale(1); } 50% { transform: rotate(10deg) scale(1.05); } }
+  .idle-tilt { transform-origin: 100px 130px; animation-name: iTilt; animation-duration: 3.4s; }
+  @keyframes iTilt { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+  .idle-rock { transform-origin: 100px 100px; animation-name: iRock; animation-duration: 3.6s; }
+  @keyframes iRock { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(6deg); } }
+  .idle-hover { animation-name: iHover; animation-duration: 1.3s; }
+  @keyframes iHover { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  .idle-scuttle { animation-name: iScuttle; animation-duration: 1.3s; }
+  @keyframes iScuttle { 0%, 100% { transform: translateX(-7px); } 25% { transform: translate(0, -3px); } 50% { transform: translateX(7px); } 75% { transform: translate(0, -3px); } }
+  .idle-pulse { transform-origin: 96px 104px; animation-name: iPulse; animation-duration: 1.7s; }
+  @keyframes iPulse { 0%, 100% { transform: scale(.93); } 50% { transform: scale(1.06); } }
+  .idle-waddle { animation-name: iWaddle; animation-duration: 1.1s; }
+  @keyframes iWaddle { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) translateY(-3px); } }
+  .idle-inch { transform-origin: 40px 160px; animation-name: iInch; animation-duration: 2.2s; }
+  @keyframes iInch { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.07) translateY(-2px); } }
+  .idle-bob { animation-name: iBob; animation-duration: 2.4s; }
+  @keyframes iBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  .idle-jfloat { animation-name: iJFloat; animation-duration: 2.4s; }
+  @keyframes iJFloat { 0%, 100% { transform: translateY(0) scale(1, 1); } 30% { transform: translateY(-9px) scale(.95, 1.05); } 60% { transform: translateY(-4px) scale(1.04, .96); } }
+  .idle-none { animation: none; }
+
+  /* ---------- body-part loops ---------- */
+  .pa { animation: 1.6s ease-in-out infinite; }
+  .pa-bob { animation-name: pBob; }
+  @keyframes pBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .pa-wag { animation-name: pWag; animation-duration: .9s; }
+  @keyframes pWag { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+  .pa-flapL { animation-name: pFlapL; animation-duration: .55s; }
+  @keyframes pFlapL { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-15deg); } }
+  .pa-flapR { animation-name: pFlapR; animation-duration: .55s; }
+  @keyframes pFlapR { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(15deg); } }
+  .pa-bfly { animation-name: pBfly; animation-duration: .7s; }
+  @keyframes pBfly { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.55); } }
+  .pa-twinkle { transform-box: fill-box; transform-origin: center; animation-name: pTw; }
+  @keyframes pTw { 0%, 100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(.55) rotate(25deg); opacity: .55; } }
+  .pa-flicker { animation-name: pFl; animation-duration: .45s; }
+  @keyframes pFl { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(.9, 1.16); } }
+  .pa-floatup { transform-box: fill-box; transform-origin: center; animation-name: pUp; animation-duration: 2.6s; animation-timing-function: ease-out; }
+  @keyframes pUp { 0% { transform: translateY(8px) scale(.5); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-18px) scale(1); opacity: 0; } }
+  .pa-spin { animation: pSpin 16s linear infinite; }
+  @keyframes pSpin { to { transform: rotate(360deg); } }
+  .pa-wave { animation-name: pWave; animation-duration: 1s; }
+  @keyframes pWave { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(14deg); } }
+  .pa-tent { animation-name: pTent; animation-duration: 1.4s; }
+  @keyframes pTent { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+  .pa-drip { transform-box: fill-box; transform-origin: 50% 0; animation-name: pDrip; animation-duration: 2.2s; animation-timing-function: ease-in; }
+  @keyframes pDrip { 0% { transform: translateY(-6px) scale(.3); opacity: 0; } 30% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(12px) scale(1); opacity: 0; } }
+  .pa-snapL { animation-name: pSnapL; animation-duration: 1.1s; }
+  @keyframes pSnapL { 0%, 55%, 100% { transform: rotate(0); } 70% { transform: rotate(-16deg); } }
+  .pa-snapR { animation-name: pSnapR; animation-duration: 1.1s; }
+  @keyframes pSnapR { 0%, 55%, 100% { transform: rotate(0); } 70% { transform: rotate(16deg); } }
+  .pa-steam { transform-box: fill-box; transform-origin: center; animation-name: pSteam; animation-duration: 2.4s; }
+  @keyframes pSteam { 0% { transform: translateY(5px); opacity: 0; } 40% { opacity: .9; } 100% { transform: translateY(-9px); opacity: 0; } }
+  .pa-beam { animation-name: pBeam; animation-duration: 1.8s; }
+  @keyframes pBeam { 0%, 100% { opacity: .35; } 50% { opacity: .85; } }
+  .pa-zzz { transform-box: fill-box; transform-origin: center; animation-name: pZ; animation-duration: 2.4s; }
+  @keyframes pZ { 0% { transform: translate(-5px, 7px) scale(.5); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(5px, -9px) scale(1.1); opacity: 0; } }
+  .pa-swayx { animation-name: pSx; animation-duration: 2.4s; }
+  @keyframes pSx { 0%, 100% { transform: translateX(-5px); } 50% { transform: translateX(5px); } }
+  .pa-flop { animation-name: pFlop; animation-duration: 1.4s; }
+  @keyframes pFlop { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(7deg); } }
+  .pa-flopR { animation-name: pFlopR; animation-duration: 1.4s; }
+  @keyframes pFlopR { 0%, 100% { transform: rotate(5deg); } 50% { transform: rotate(-7deg); } }
+  .pa-earL { animation-name: pEarL; animation-duration: 2.2s; }
+  @keyframes pEarL { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(-9deg); } 90% { transform: rotate(3deg); } }
+  .pa-earR { animation-name: pEarR; animation-duration: 2.2s; }
+  @keyframes pEarR { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(9deg); } 90% { transform: rotate(-3deg); } }
+  .pa-spout { transform-box: fill-box; transform-origin: 50% 100%; animation-name: pSpout; animation-duration: 1.4s; }
+  @keyframes pSpout { 0%, 100% { transform: scale(.8); } 50% { transform: scale(1.12); } }
+  .blink { animation: blink 4.2s infinite; animation-delay: var(--bd, 0s); }
+  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  .art.still * { animation: none !important; }
+
+  /* ---------- guide screen ---------- */
+  #guide { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+  .tip-card { display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 24px; padding: 10px 12px 10px 10px; border: 3px solid var(--cat); box-shadow: 0 5px 0 var(--cat-sh); }
+  .tip-pop { animation: tipPop .5s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes tipPop { 0% { transform: scale(.9) rotate(-1deg); opacity: .4; } 100% { transform: none; opacity: 1; } }
+  .step-badge { flex: none; width: 56px; height: 56px; border-radius: 18px; background: var(--cat); color: #fff; display: grid; place-items: center; font-size: 32px; font-weight: 700; box-shadow: 0 4px 0 var(--cat-sh); }
+  .panels { display: grid; grid-template-columns: var(--sq); justify-content: center; gap: 14px 20px; }
+  @media (min-width: 760px) {
+    :root { --sq: max(250px, min(calc((100vw - 84px) / 2), calc(100dvh - 366px), 620px)); }
+    .panels { grid-template-columns: var(--sq) var(--sq); }
+  }
+  .panel { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .panel-bar { display: flex; align-items: center; gap: 8px; min-height: 48px; flex-wrap: wrap; }
+  .panel-title { font-size: 20px; font-weight: 700; margin-right: auto; display: flex; align-items: center; gap: 6px; }
+  .paper {
+    position: relative; width: var(--sq); height: var(--sq); border-radius: 26px; overflow: hidden;
+    background-color: var(--paper);
+    background-image: radial-gradient(#d6def0 1.4px, transparent 1.6px);
+    background-size: calc(var(--sq) / 10) calc(var(--sq) / 10);
+    background-position: calc(var(--sq) / 20 - 5px) calc(var(--sq) / 20 - 5px);
+    box-shadow: inset 0 0 0 3px #efe2d0, 0 6px 0 #eadccb;
+  }
+  .paper > svg, .paper > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #stage { overflow: visible; }
+  #pad { touch-action: none; cursor: crosshair; }
+  #stage .g-past path { fill: none; stroke: #8ec5ff; stroke-width: 3.4; }
+  #stage .g-past path.ink { fill: #8ec5ff; }
+  #stage .g-ghost path { fill: none; stroke: #2b2340; stroke-opacity: .16; stroke-width: 3; stroke-dasharray: .1 7; }
+  #stage .g-cur path { fill: none; stroke: #1c1830; stroke-width: 4.6; }
+  #stage .g-cur path.ink { fill: #1c1830; fill-opacity: 0; transition: fill-opacity .15s; }
+  #stage .g-cur.flash path { animation: flashP .5s ease-in-out 3; }
+  #stage .g-cur.flash path.ink { animation-name: flashI; }
+  @keyframes flashP { 50% { stroke: #ff3d9a; stroke-width: 6.4; } }
+  @keyframes flashI { 50% { stroke: #ff3d9a; stroke-width: 6.4; fill: #ff3d9a; } }
+  .aim-ring { fill: none; stroke: #ff3d9a; stroke-width: 2.5; transform-box: fill-box; transform-origin: center; animation: aim .7s ease-out infinite; }
+  @keyframes aim { 0% { transform: scale(.4); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+  #trace path { fill: none; stroke: #cfd8ea; stroke-width: 3.4; }
+  .legend { position: absolute; left: 10px; bottom: 10px; display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,.9); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: #6b5f86; pointer-events: none; }
+  .legend i { display: inline-block; width: 18px; height: 5px; border-radius: 4px; margin-right: 5px; vertical-align: middle; }
+  .pad-hint { position: absolute; left: 0; right: 0; bottom: 14px; text-align: center; font-weight: 600; font-size: 16px; color: #a99fbd; pointer-events: none; }
+  .peek { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255,253,249,.97); animation: fadeIn .25s ease; cursor: pointer; --hole: #fffdf9; }
+  .peek svg { width: 80%; height: 80%; overflow: visible; }
+  .peek-tag { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--cat); color: #fff; font-weight: 700; padding: 4px 14px; border-radius: 999px; white-space: nowrap; }
+  @keyframes fadeIn { from { opacity: 0; } }
+  .tool { width: 42px; height: 42px; border-radius: 14px; background: #fff; display: grid; place-items: center; font-size: 20px; --sh: #eadccb; }
+  .tool[aria-pressed="true"] { background: var(--cat); color: #fff; --sh: var(--cat-sh); }
+  .swatch { width: 30px; height: 30px; border-radius: 50%; background: var(--c); border: 3px solid #fff; box-shadow: 0 0 0 2px #e3d7c6; transition: transform .15s; flex: none; }
+  .swatch[aria-pressed="true"] { transform: scale(1.18); box-shadow: 0 0 0 3px var(--ink); }
+  .size-dot { display: block; border-radius: 50%; background: currentColor; }
+  .speed { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: #fff; --sh: #eadccb; font-weight: 700; font-size: 15px; }
+  .sp-track { position: relative; width: 46px; height: 26px; border-radius: 999px; background: #c9efd6; transition: background .2s; }
+  .sp-knob { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.25); transition: transform .3s cubic-bezier(.3,1.6,.5,1); }
+  .speed[aria-checked="true"] .sp-track { background: #ffc2de; }
+  .speed[aria-checked="true"] .sp-knob { transform: translateX(20px); }
+  .speed .sp-slow { color: #18a35a; }
+  .speed .sp-fast { color: #b9b0c9; }
+  .speed[aria-checked="true"] .sp-slow { color: #b9b0c9; }
+  .speed[aria-checked="true"] .sp-fast { color: #f0509b; }
+  .guide-nav { position: sticky; bottom: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding: 14px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(rgba(255,246,234,0), var(--bg) 35%); }
+  .nav-btn { min-width: 128px; height: 62px; border-radius: 22px; padding: 0 22px; font-size: 22px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .nav-next { background: var(--cat); color: #fff; --sh: var(--cat-sh); }
+  .nav-next.finish { background: #ffc61a; color: #5a3b00; --sh: #d99a00; animation: finishGlow 1.2s ease-in-out infinite; }
+  .nav-next.finish .lucide { fill: currentColor; }
+  @keyframes finishGlow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+  .dot { width: 16px; height: 16px; border-radius: 50%; background: #e7dccd; transition: transform .2s, background .2s; }
+  .dot.past { background: #8ec5ff; }
+  .dot.now { background: var(--cat); transform: scale(1.35); }
+  @media (max-width: 480px) {
+    .nav-btn { min-width: 0; height: 56px; padding: 0 16px; font-size: 19px; border-radius: 20px; }
+    .dot { width: 12px; height: 12px; }
+    #dots { gap: 6px; }
+    .panel-title { font-size: 18px; }
+    #speedLabel { display: none; }
+    .tip-card { gap: 10px; }
+    .c-art, .c-mine img { width: 132px; height: 132px; }
+  }
+
+  /* celebration + toast */
+  .celebrate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(43,35,64,.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); animation: fadeIn .3s ease; }
+  .c-card { position: relative; width: min(560px, 100%); max-height: calc(100dvh - 32px); overflow: auto; background: #fff; border-radius: 32px; padding: 22px; text-align: center; box-shadow: 0 10px 0 var(--cat-sh); border: 4px solid var(--cat); animation: cardIn .6s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes cardIn { 0% { transform: scale(.6) rotate(-6deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  .c-art { width: 180px; height: 180px; margin: 0 auto; border-radius: 28px; background: var(--tint); display: grid; place-items: center; --hole: var(--tint); animation: happyJump 1.2s ease-in-out infinite; }
+  .c-art svg { width: 86%; height: 86%; overflow: visible; }
+  @keyframes happyJump { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+  .c-mine img { width: 180px; height: 180px; border-radius: 28px; box-shadow: inset 0 0 0 3px #efe2d0; background: var(--paper); border: 3px solid #efe2d0; }
+  .big-star { width: 76px; height: 76px; margin: 0 auto 8px; border-radius: 50%; background: #ffd23f; color: #fff; display: grid; place-items: center; box-shadow: 0 5px 0 #dda600; animation: starPop .8s cubic-bezier(.3,1.8,.5,1) .2s both; }
+  .big-star .lucide { width: 44px; height: 44px; fill: #fff; }
+  .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 60; }
+  .confetto { position: absolute; top: -24px; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translate(var(--dx), 110vh) rotate(var(--r)); } }
+  .toast { position: fixed; left: 50%; top: 16px; z-index: 70; transform: translate(-50%, -160%); background: #fff; border: 3px solid var(--cat, #7c6cff); color: var(--ink); font-weight: 700; font-size: 22px; padding: 10px 22px; border-radius: 999px; box-shadow: 0 5px 0 var(--cat-sh, #5b4bd6); pointer-events: none; white-space: nowrap; }
+  .toast.show { animation: toast 1.7s cubic-bezier(.3,1.6,.5,1) forwards; }
+  @keyframes toast { 0% { transform: translate(-50%, -160%) scale(.8); } 18%, 78% { transform: translate(-50%, 0) scale(1); } 100% { transform: translate(-50%, -160%) scale(.9); } }
+</style>
+</head>
+<body class="font-display antialiased">
+
+<!-- ================= LIBRARY ================= -->
+<section id="library" class="mx-auto max-w-6xl px-4 sm:px-6 pb-16">
+  <header class="flex items-center justify-between gap-3 pt-5 pb-4">
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+      <svg class="logo-pencil w-12 h-12 sm:w-20 sm:h-20 shrink-0" viewBox="0 0 80 80" aria-hidden="true">
+        <path class="logo-squiggle" d="M6 70q8-10 16 0t16 0 16 0 16 0" fill="none" stroke="#ff6fb5" stroke-width="4" stroke-linecap="round"/>
+        <g transform="rotate(35 40 40)" stroke="#2b2340" stroke-width="2.5" stroke-linejoin="round">
+          <rect x="31" y="6" width="18" height="44" rx="3" fill="#ffcf3f"/>
+          <rect x="31" y="2" width="18" height="9" rx="3" fill="#ff8fb3"/>
+          <path d="M31 50h18l-9 18z" fill="#f6d2a8"/>
+          <path d="M37.5 63h5l-2.5 5z" fill="#2b2340"/>
+        </g>
+      </svg>
+      <div>
+        <h1 class="logo-word text-4xl sm:text-6xl font-bold leading-none tracking-tight" aria-label="Doodle Pals">
+          <span style="color:#7c6cff">D</span><span style="color:#f35fae;animation-delay:.1s">o</span><span style="color:#ff9334;animation-delay:.2s">o</span><span style="color:#22b866;animation-delay:.3s">d</span><span style="color:#1ea5e0;animation-delay:.4s">l</span><span style="color:#e0a800;animation-delay:.5s">e</span>
+          <span style="color:#2b2340;animation-delay:.6s">Pals</span>
+        </h1>
+        <p class="mt-1 text-base sm:text-xl font-medium text-[#6b5f86]">Pick a pal and let's draw together!</p>
+      </div>
+    </div>
+    <button id="soundBtn" class="icon-btn btn3d shrink-0" aria-label="Sound on" title="Sound on/off"></button>
+  </header>
+
+  <div class="rounded-[28px] bg-white p-4 sm:p-5 shadow-[0_6px_0_#eadccb] flex flex-wrap items-center gap-4">
+    <div class="grid place-items-center w-16 h-16 rounded-2xl bg-[#ffd23f] text-white shadow-[0_4px_0_#dda600] text-3xl shrink-0" aria-hidden="true" data-ico="trophy"></div>
+    <div class="flex-1 min-w-[200px]">
+      <div class="flex flex-wrap items-baseline gap-x-3">
+        <span class="text-2xl font-bold"><span id="progCount">0 of 54</span> pals drawn</span>
+        <span id="rank" class="text-lg font-semibold text-[#f35fae]"></span>
+      </div>
+      <div class="prog-track mt-2" role="progressbar" aria-label="Pals drawn" aria-valuemin="0" id="progBarWrap"><div id="progBar" class="prog-fill" style="width:0"></div></div>
+    </div>
+    <button id="surpriseBtn" class="btn3d rounded-2xl bg-[#7c6cff] text-white font-bold text-lg px-5 h-14 inline-flex items-center gap-2" style="--sh:#5b4bd6"><span data-ico="shuffle"></span> Surprise me!</button>
+  </div>
+
+  <nav class="sticky top-0 z-20 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 mt-3 bg-[var(--bg)]/90 backdrop-blur" aria-label="Character groups">
+    <div id="chips" class="chip-row flex gap-3 overflow-x-auto pb-2 pt-1"></div>
+  </nav>
+
+  <div id="featured" class="mt-2"></div>
+  <div id="sections"></div>
+
+  <footer class="mt-14 text-center text-[#8d82a6] font-medium">
+    <p>Tip: tap any pal, watch the pencil, then try it yourself on the sketchpad! ✏️</p>
+    <button id="resetBtn" class="mt-3 underline underline-offset-4 decoration-2 text-sm">Reset my stars</button>
+  </footer>
+</section>
+
+<!-- ================= DRAWING GUIDE ================= -->
+<section id="guide" hidden>
+  <header class="flex items-center gap-3 px-3 sm:px-5 pt-3">
+    <button id="homeBtn" class="icon-btn btn3d shrink-0" aria-label="Back to all pals" title="All pals" data-ico="house"></button>
+    <div id="gIcon" class="w-14 h-14 rounded-2xl shrink-0 grid place-items-center bg-[var(--tint)] [&>svg]:w-[86%] [&>svg]:h-[86%] [&>svg]:overflow-visible" style="--hole:var(--tint)"></div>
+    <div class="min-w-0">
+      <h2 id="gName" class="text-xl sm:text-2xl font-bold leading-tight truncate"></h2>
+      <p id="gCat" class="text-sm sm:text-base font-semibold text-[var(--cat)] truncate"></p>
+    </div>
+    <div class="ml-auto flex items-center gap-2 shrink-0">
+      <span id="gDone" class="hidden sm:inline-flex items-center gap-1 rounded-full bg-[#ffd23f] text-[#5a3b00] font-bold px-3 py-1 shadow-[0_3px_0_#dda600]" hidden><span data-ico="star"></span> Drawn!</span>
+      <button id="soundBtn2" class="icon-btn btn3d" aria-label="Sound on" title="Sound on/off"></button>
+    </div>
+  </header>
+
+  <div class="px-3 sm:px-5 mt-3">
+    <div id="tipCard" class="tip-card" aria-live="polite">
+      <div id="stepBadge" class="step-badge">1</div>
+      <div class="min-w-0 flex-1">
+        <div id="stepOf" class="text-sm font-bold uppercase tracking-wide text-[var(--cat)]">Step 1 of 5</div>
+        <p id="tipText" class="text-xl sm:text-2xl font-semibold leading-snug"></p>
+      </div>
+      <button id="speakBtn" class="tool btn3d shrink-0" aria-label="Read it to me" title="Read it to me" data-ico="volume-2"></button>
+    </div>
+  </div>
+
+  <main class="panels px-3 sm:px-5 mt-3">
+    <div class="panel">
+      <div class="panel-bar">
+        <span class="panel-title"><span data-ico="eye"></span> Watch me!</span>
+        <button id="speedBtn" class="speed btn3d" role="switch" aria-checked="false" aria-label="Fast drawing" title="Slow down or speed up">
+          <span class="sp-slow" data-ico="turtle"></span>
+          <span class="sp-track"><span class="sp-knob"></span></span>
+          <span class="sp-fast" data-ico="rabbit"></span>
+          <span id="speedLabel" class="w-9 text-left">Slow</span>
+        </button>
+        <button id="playBtn" class="tool btn3d" aria-label="Pause the pencil" title="Pause / play"></button>
+        <button id="peekBtn" class="tool btn3d" aria-label="Peek at the finished pal" title="Sneak peek" data-ico="sparkles"></button>
+      </div>
+      <div class="paper" id="stageWrap">
+        <svg id="stage" viewBox="0 0 200 200" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Animated pencil showing how to draw this step"></svg>
+        <div class="legend"><span><i style="background:#8ec5ff"></i>done</span><span><i style="background:#1c1830"></i>draw now</span></div>
+        <div id="peek" class="peek" hidden></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-bar">
+        <span class="panel-title"><span data-ico="pencil"></span> Your turn!</span>
+        <button id="traceBtn" class="tool btn3d" aria-pressed="false" aria-label="Tracing paper" title="Tracing paper" data-ico="ghost"></button>
+        <button id="eraserBtn" class="tool btn3d" aria-pressed="false" aria-label="Eraser" title="Eraser" data-ico="eraser"></button>
+        <button id="undoBtn" class="tool btn3d" aria-label="Undo" title="Undo" data-ico="undo-2"></button>
+        <button id="clearBtn" class="tool btn3d" aria-label="Clear the page" title="Clear" data-ico="trash-2"></button>
+      </div>
+      <div class="paper" id="padWrap">
+        <svg id="trace" viewBox="0 0 200 200" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden></svg>
+        <canvas id="pad" aria-label="Practice sketchpad"></canvas>
+        <div id="padHint" class="pad-hint">Draw here with your finger or mouse!</div>
+      </div>
+      <div id="swatches" class="flex flex-wrap items-center gap-3 px-1 pt-1"></div>
+    </div>
+  </main>
+
+  <nav class="guide-nav" aria-label="Steps">
+    <button id="backBtn" class="nav-btn btn3d bg-white"></button>
+    <div id="dots" class="flex flex-wrap justify-center gap-2"></div>
+    <button id="nextBtn" class="nav-btn nav-next btn3d"></button>
+  </nav>
+</section>
+
+<!-- ================= CELEBRATION ================= -->
+<div id="celebrate" class="celebrate" role="dialog" aria-modal="true" aria-labelledby="cTitle" hidden>
+  <div class="c-card">
+    <div class="big-star" aria-hidden="true" data-ico="star"></div>
+    <h2 id="cTitle" class="text-3xl sm:text-4xl font-bold leading-tight"></h2>
+    <p id="cSub" class="mt-1 text-lg font-medium text-[#6b5f86]"></p>
+    <div class="mt-4 flex flex-wrap justify-center gap-5">
+      <figure><div id="cArt" class="c-art"></div><figcaption class="mt-2 font-semibold text-[#6b5f86]">The guide</figcaption></figure>
+      <figure id="cMine" class="c-mine" hidden><img id="cImg" alt="Your drawing"><figcaption class="mt-2 font-semibold text-[#6b5f86]">Your drawing!</figcaption></figure>
+    </div>
+    <div class="mt-5 flex flex-wrap justify-center gap-3">
+      <button id="cNext" class="nav-btn nav-next btn3d"></button>
+      <a id="cSave" class="nav-btn btn3d bg-white text-lg" download hidden><span data-ico="download"></span> Save it</a>
+      <button id="cAgain" class="nav-btn btn3d bg-white text-lg"><span data-ico="rotate-ccw"></span> Again</button>
+      <button id="cHome" class="nav-btn btn3d bg-white text-lg"><span data-ico="house"></span> All pals</button>
+    </div>
+  </div>
+</div>
+<div id="confetti" class="confetti" aria-hidden="true"></div>
+<div id="toast" class="toast" role="status"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   1. GEOMETRY HELPERS — every character lives in a 200 x 200 box
+   ===================================================================== */
+const INK = '#2b2340';
+const r1 = v => Math.round(v * 10) / 10;
+const P = (s, ...v) => s.reduce((a, x, i) => a + x + (i < v.length ? (typeof v[i] === 'number' ? r1(v[i]) : v[i]) : ''), '');
+const C = (x, y, r) => P`M${x} ${y - r}A${r} ${r} 0 1 0 ${x} ${y + r}A${r} ${r} 0 1 0 ${x} ${y - r}`;
+const E = (x, y, rx, ry) => P`M${x} ${y - ry}A${rx} ${ry} 0 1 0 ${x} ${y + ry}A${rx} ${ry} 0 1 0 ${x} ${y - ry}`;
+const ER = (x, y, rx, ry, a) => { const t = a * Math.PI / 180, sx = Math.sin(t) * ry, sy = Math.cos(t) * ry; return P`M${x + sx} ${y - sy}A${rx} ${ry} ${a} 1 0 ${x - sx} ${y + sy}A${rx} ${ry} ${a} 1 0 ${x + sx} ${y - sy}`; };
+const RR = (x, y, w, h, r) => P`M${x + r} ${y}H${x + w - r}Q${x + w} ${y} ${x + w} ${y + r}V${y + h - r}Q${x + w} ${y + h} ${x + w - r} ${y + h}H${x + r}Q${x} ${y + h} ${x} ${y + h - r}V${y + r}Q${x} ${y} ${x + r} ${y}Z`;
+const pol = (cx, cy, r, a) => [cx + r * Math.cos(a * Math.PI / 180), cy + r * Math.sin(a * Math.PI / 180)];
+/* S(path, fill, options): one pencil stroke.
+   options: z (layer), fd (fill-only path), ink (filled while drawing), deco (icon only), ns (no outline),
+            sc (stroke colour), w (stroke width), tw (thick tube line), fo (fill opacity), op (opacity),
+            a (part animation), o (animation origin), dl (animation delay), blink (eye centre) */
+const S = (d, f, o) => Object.assign({ d, f }, o);
+const lay = (arr, z, x = {}) => arr.map(s => ({ ...s, z, ...x }));
+
+function smooth(pts, closed) {
+  const n = pts.length; let d = P`M${pts[0][0]} ${pts[0][1]}`;
+  const segs = closed ? n : n - 1;
+  for (let i = 0; i < segs; i++) {
+    const p0 = closed ? pts[(i - 1 + n) % n] : pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[(i + 1) % n];
+    const p3 = closed ? pts[(i + 2) % n] : pts[Math.min(n - 1, i + 2)];
+    d += P`C${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]} ${p2[1]}`;
+  }
+  return closed ? d + 'Z' : d;
+}
+const wavy = (cx, cy, R, n, amp) => smooth(Array.from({ length: 72 }, (_, i) => { const t = i / 72 * Math.PI * 2 - Math.PI / 2, r = R + amp * Math.cos(n * t); return [cx + r * Math.cos(t), cy + r * Math.sin(t)]; }), true);
+const spiral = (cx, cy, r0, r1, turns) => { const N = Math.round(turns * 20); return smooth(Array.from({ length: N + 1 }, (_, i) => { const t = i / N, a = -Math.PI / 2 + t * turns * Math.PI * 2, r = r0 + (r1 - r0) * t; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }), false); };
+function scallop(cx, cy, rx, ry, n, bulge = 1) {
+  const pts = Array.from({ length: n + 1 }, (_, i) => { const a = (-90 + i * 360 / n) * Math.PI / 180; return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)]; });
+  let d = P`M${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i <= n; i++) { const r = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]) / 2 * bulge; d += P`A${r} ${r} 0 0 1 ${pts[i][0]} ${pts[i][1]}`; }
+  return d + 'Z';
+}
+function star(cx, cy, R, r, t = .22) {
+  const p = Array.from({ length: 10 }, (_, i) => pol(cx, cy, i % 2 ? r : R, -90 + i * 36));
+  let d = '';
+  for (let i = 0; i < 10; i += 2) {
+    const o = p[i], a = p[(i + 9) % 10], b = p[i + 1];
+    d += P`${i ? 'L' : 'M'}${o[0] + (a[0] - o[0]) * t} ${o[1] + (a[1] - o[1]) * t}Q${o[0]} ${o[1]} ${o[0] + (b[0] - o[0]) * t} ${o[1] + (b[1] - o[1]) * t}L${b[0]} ${b[1]}`;
+  }
+  return d + 'Z';
+}
+const sparkle = (x, y, s) => P`M${x} ${y - s}Q${x + s * .15} ${y - s * .15} ${x + s} ${y}Q${x + s * .15} ${y + s * .15} ${x} ${y + s}Q${x - s * .15} ${y + s * .15} ${x - s} ${y}Q${x - s * .15} ${y - s * .15} ${x} ${y - s}Z`;
+const heart = (x, y, s) => P`M${x} ${y + s * .9}C${x - s * 1.6} ${y - s * .1} ${x - s * .7} ${y - s * 1.15} ${x} ${y - s * .35}C${x + s * .7} ${y - s * 1.15} ${x + s * 1.6} ${y - s * .1} ${x} ${y + s * .9}Z`;
+const drop = (x, y, s) => P`M${x} ${y - 1.4 * s}C${x + .3 * s} ${y - .6 * s} ${x + s} ${y - .2 * s} ${x + s} ${y + .4 * s}A${s} ${s} 0 0 1 ${x - s} ${y + .4 * s}C${x - s} ${y - .2 * s} ${x - .3 * s} ${y - .6 * s} ${x} ${y - 1.4 * s}Z`;
+const zz = (x, y, s) => P`M${x} ${y}h${s}l${-s} ${s}h${s}`;
+function leaf(x, y, len, ang, w) {
+  const a = ang * Math.PI / 180, dx = Math.cos(a), dy = Math.sin(a), nx = -dy, ny = dx, tx = x + dx * len, ty = y + dy * len;
+  return P`M${x} ${y}C${x + dx * len * .3 + nx * w} ${y + dy * len * .3 + ny * w} ${x + dx * len * .8 + nx * w * .8} ${y + dy * len * .8 + ny * w * .8} ${tx} ${ty}C${x + dx * len * .8 - nx * w * .8} ${y + dy * len * .8 - ny * w * .8} ${x + dx * len * .3 - nx * w} ${y + dy * len * .3 - ny * w} ${x} ${y}Z`;
+}
+const spike = (cx, cy, r, len, a, h, closed) => { const [x1, y1] = pol(cx, cy, r, a - h), [x2, y2] = pol(cx, cy, r + len, a), [x3, y3] = pol(cx, cy, r, a + h); return P`M${x1} ${y1}L${x2} ${y2}L${x3} ${y3}` + (closed ? 'Z' : ''); };
+const petals = (cx, cy, r, n, R) => Array.from({ length: n }, (_, i) => { const a = -90 + i * 360 / n, [x1, y1] = pol(cx, cy, r, a - 17), [ax, ay] = pol(cx, cy, R, a - 26), [bx, by] = pol(cx, cy, R, a + 26), [x2, y2] = pol(cx, cy, r, a + 17); return P`M${x1} ${y1}C${ax} ${ay} ${bx} ${by} ${x2} ${y2}`; });
+
+/* Reusable body parts */
+const K = { cheek: '#ff9ec4', rose: '#ff6f91', yellow: '#ffe066', gold: '#ffc94d', red: '#ff6b6b', orange: '#ffb066', purple: '#c4a8ff', pink: '#ffb8d9', blue: '#9fd3ff', sky: '#d4efff', dark: '#3d3552' };
+function eye(x, y, r) {
+  const a = [S(E(x, y, r * .86, r), INK, { ink: 1, blink: [x, y], w: 2 }), S(C(x - r * .3, y - r * .38, r * .34), '#fff', { deco: 1, ns: 1, blink: [x, y] })];
+  if (r >= 6) a.push(S(C(x + r * .32, y + r * .38, r * .16), '#fff', { deco: 1, ns: 1, blink: [x, y] }));
+  return a;
+}
+const cheeks = (x, y, dx, k = 1) => [S(E(x - dx, y, 5 * k, 3.2 * k), K.cheek, { ns: 1, op: .9, w: 3 }), S(E(x + dx, y, 5 * k, 3.2 * k), K.cheek, { ns: 1, op: .9, w: 3 })];
+function face(x, y, o = {}) {
+  const k = o.k ?? 1, g = o.g ?? 14, out = [], ey = o.eyes ?? 'dot', my = y + (o.my ?? 8) * k;
+  if (ey === 'dot') out.push(...eye(x - g, y, 5 * k * (o.es ?? 1)), ...eye(x + g, y, 5 * k * (o.es ?? 1)));
+  else if (ey === 'happy') for (const s of [-1, 1]) out.push(S(P`M${x + s * g - 4.5 * k} ${y + 2 * k}Q${x + s * g} ${y - 5 * k} ${x + s * g + 4.5 * k} ${y + 2 * k}`, null, { w: 4 }));
+  else if (ey === 'sleepy') for (const s of [-1, 1]) out.push(S(P`M${x + s * g - 5 * k} ${y - k}Q${x + s * g} ${y + 5 * k} ${x + s * g + 5 * k} ${y - k}`, null, { w: 4 }));
+  const m = o.m ?? 'smile', smile = S(P`M${x - 5 * k} ${my}Q${x} ${my + 6 * k} ${x + 5 * k} ${my}`, null, { w: 3.5 });
+  if (m === 'smile') out.push(smile);
+  else if (m === 'open') out.push(S(P`M${x - 6.5 * k} ${my - k}Q${x} ${my + 13 * k} ${x + 6.5 * k} ${my - k}Z`, K.rose, { w: 3.5 }));
+  else if (m === 'cat') out.push(S(P`M${x - 7 * k} ${my - k}Q${x - 3.5 * k} ${my + 5 * k} ${x} ${my - k}Q${x + 3.5 * k} ${my + 5 * k} ${x + 7 * k} ${my - k}`, null, { w: 3.5 }));
+  else if (m === 'oh') out.push(S(E(x, my + 2 * k, 3.5 * k, 4.5 * k), K.rose, { w: 3.5 }));
+  else if (m === 'tongue') out.push(smile, S(P`M${x - 3 * k} ${my + 3 * k}Q${x} ${my + 11 * k} ${x + 3 * k} ${my + 3 * k}`, K.rose, { w: 3 }));
+  else if (m === 'fang') out.push(smile, S(P`M${x - 3.5 * k} ${my + 1.5 * k}L${x - 2.2 * k} ${my + 5.5 * k}L${x - .8 * k} ${my + 2.6 * k}`, '#fff', { w: 2.5 }));
+  else if (m === 'fangs') out.push(S(P`M${x - 6.5 * k} ${my - k}Q${x} ${my + 13 * k} ${x + 6.5 * k} ${my - k}Z`, K.rose, { w: 3.5 }),
+    S(P`M${x - 4.5 * k} ${my - k}L${x - 3 * k} ${my + 2.5 * k}L${x - 1.5 * k} ${my - k}`, '#fff', { w: 2 }), S(P`M${x + 1.5 * k} ${my - k}L${x + 3 * k} ${my + 2.5 * k}L${x + 4.5 * k} ${my - k}`, '#fff', { w: 2 }));
+  if (o.ch !== 0) out.push(...cheeks(x, my - k, g + 9 * k, k));
+  return out;
+}
+const SPR = ['#ffffff', '#7fd3ff', '#ffe066', '#9be27a', '#c4a8ff'];
+const spr = (x, y, a, c) => { const t = a * Math.PI / 180, dx = Math.cos(t) * 5, dy = Math.sin(t) * 5; return S(P`M${x - dx} ${y - dy}L${x + dx} ${y + dy}`, null, { sc: c, w: 5 }); };
+const bow = (x, y, s, f) => [S(P`M${x} ${y}C${x - s} ${y - s * 1.1} ${x - s * 1.5} ${y + s * .5} ${x} ${y}Z`, f), S(P`M${x} ${y}C${x + s} ${y - s * 1.1} ${x + s * 1.5} ${y + s * .5} ${x} ${y}Z`, f), S(C(x, y, s * .3), f)];
+const flower = (x, y, s, petal, mid) => [S(scallop(x, y, s, s, 5, 1), petal), S(C(x, y, s * .42), mid)];
+const snow = (x, y, s, dl = 0) => [90, 30, -30].map(a => { const [x1, y1] = pol(x, y, s, a), [x2, y2] = pol(x, y, s, a + 180); return S(P`M${x1} ${y1}L${x2} ${y2}`, null, { sc: '#7cc4ff', w: 3.5, a: 'twinkle', dl }); });
+
+/* =====================================================================
+   2. CHARACTER LIBRARY — 54 pals, 6 themes, every one fully drawable
+   ===================================================================== */
+const CATS = [
+  { id: 'space', name: 'Space Pals', emoji: '🚀', blurb: 'Out-of-this-world friends', c: '#7c6cff', t: '#efeaff', sh: '#5b4bd6' },
+  { id: 'myth', name: 'Mythical Beasts', emoji: '🦄', blurb: 'Magic, sparkles and dragons', c: '#f35fae', t: '#ffeaf5', sh: '#c93d88' },
+  { id: 'food', name: 'Food Friends', emoji: '🍩', blurb: 'Snacks with smiles', c: '#ff9334', t: '#fff1e2', sh: '#d8701a' },
+  { id: 'animals', name: 'Silly Animals', emoji: '🐸', blurb: 'Fluffy, floppy and funny', c: '#22b866', t: '#e4f8ec', sh: '#16904e' },
+  { id: 'ocean', name: 'Ocean Buddies', emoji: '🐙', blurb: 'Splashy pals from the sea', c: '#1ea5e0', t: '#e2f4fd', sh: '#1280b2' },
+  { id: 'garden', name: 'Garden Gang', emoji: '🌼', blurb: 'Bugs, blooms and sunshine', c: '#e0a800', t: '#fff7d6', sh: '#b98a00' },
+];
+const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+const CHARS = [];
+const add = (id, name, what, cat, idle, steps, x = {}) => CHARS.push({ id, name, what, cat, idle, steps: steps.map(([t, s]) => ({ t, s: s.flat() })), ...x });
+
+/* ---------------- SPACE PALS ---------------- */
+add('blip', 'Blip', 'UFO Alien', 'space', 'float', [
+  ['Draw a wide, flat oval — like a squished pancake! 🥞', [S(E(100, 136, 80, 20), '#b9c4ff', { z: 6 })]],
+  ['Add a dome on top, like half a soap bubble. 🫧', [S('M56 119.3A44 44 0 0 1 144 119.3', '#cdeeff', { z: 4, fo: .5 })]],
+  ['Inside the bubble, draw a gumdrop head for Blip.', [S('M78 117C76 80 124 80 122 117', '#9be89b', { z: 2 })]],
+  ['Give Blip two antennas with bouncy balls on top.', [S('M94.5 90.2L92.5 85.5', null, { z: 1, a: 'bob', o: [94, 90] }), S(C(92, 82, 3.5), K.gold, { z: 1, a: 'bob', o: [94, 90] }), S('M105.5 90.2L107.5 85.5', null, { z: 1, a: 'bob', o: [106, 90], dl: .3 }), S(C(108, 82, 3.5), K.gold, { z: 1, a: 'bob', o: [106, 90], dl: .3 })]],
+  ['Two shiny eyes, a tiny smile and rosy cheeks!', lay(face(100, 100, { g: 10, k: .85, my: 6.5 }), 3)],
+  ['Finish the ship: a bowl underneath and three round lights! ✨', [S('M66 154.1Q100 180 134 154.1', '#8f9cf0', { z: 5 }), S(C(62, 140, 5), K.yellow, { z: 7, a: 'twinkle' }), S(C(100, 147, 5), K.yellow, { z: 7, a: 'twinkle', dl: .4 }), S(C(138, 140, 5), K.yellow, { z: 7, a: 'twinkle', dl: .8 }), S('M84 160L64 198H136L116 160Z', '#fff59a', { deco: 1, ns: 1, z: 0, fo: .7, a: 'beam' })]],
+], { star: 1 });
+
+add('rocky', 'Rocky', 'Rocket', 'space', 'hover', [
+  ["Draw a tall jelly bean with a pointy top — that's the rocket! 🚀", [S('M100 24C128 46 132 92 128 140L72 140C68 92 72 46 100 24Z', '#eef1ff')]],
+  ['Draw a curvy stripe near the top, then a round window.', [S('M81 50Q100 58 119 50', '#ff7a8a', { fd: 'M100 24C112 32 117 40 119 50Q100 58 81 50C83 40 88 32 100 24Z' }), S(C(100, 76, 13), K.sky)]],
+  ['Add two fins on the sides, like little wings, and a nozzle at the bottom.', [S('M70 106Q46 116 48 150L72 140', '#ff7a8a', { z: -1 }), S('M130 106Q154 116 152 150L128 140', '#ff7a8a', { z: -1 }), S('M84 140L88 152H112L116 140', '#9aa3c7', { z: -1 })]],
+  ['Give Rocky a big happy face!', face(100, 106, { g: 12, k: .9 })],
+  ['Whoosh! Add a wiggly flame, like an upside-down candle flame. 🔥', [S('M88 152Q82 174 100 192Q118 174 112 152', K.orange, { z: -2, a: 'flicker', o: [100, 152] }), S('M94 152Q90 168 100 180Q110 168 106 152Z', K.yellow, { z: -1.9, deco: 1, ns: 1, a: 'flicker', o: [100, 152] })]],
+]);
+
+add('saturnina', 'Saturnina', 'Planet', 'space', 'tilt', [
+  ["Draw a big round ball — that's the planet!", [S(C(100, 98, 46), K.purple)]],
+  ['Add a ring around her middle, like a hula hoop! 🪐', [S('M18 108A82 20 0 0 0 182 108L170 106A70 13 0 0 1 30 106Z', K.gold),
+    S('M18 108A82 20 0 0 1 54 91.4', K.gold, { z: -1, fd: 'M18 108A82 20 0 0 1 54 91.4L54 96.2A70 13 0 0 0 30 106Z' }), S('M30 106A70 13 0 0 1 54 96.2', null, { z: -1 }),
+    S('M146 91.4A82 20 0 0 1 182 108', K.gold, { z: -1, fd: 'M146 91.4A82 20 0 0 1 182 108L170 106A70 13 0 0 0 146 96.2Z' }), S('M146 96.2A70 13 0 0 1 170 106', null, { z: -1 })]],
+  ['Give her a sweet face.', face(100, 92, { g: 14, k: 1.1 })],
+  ['Sprinkle some twinkly stars around her. ✨', [S(sparkle(32, 40, 10), K.yellow, { a: 'twinkle' }), S(sparkle(168, 42, 8), '#ffc2e0', { a: 'twinkle', dl: .5 }), S(sparkle(160, 166, 9), K.yellow, { a: 'twinkle', dl: 1 })]],
+]);
+
+add('twinkle', 'Twinkle', 'Shooting Star', 'space', 'spin', [
+  ['Draw a puffy star with five round points. ⭐', [S(star(110, 100, 60, 30), K.yellow)]],
+  ['Give Twinkle a happy face!', face(110, 104, { g: 12 })],
+  ["Add three swooshy lines behind her — she's zooming!", [S('M64 93Q42 102 20 104', '#ffd76b', { tw: 6, z: -1 }), S('M77 124Q54 140 30 146', '#ffd76b', { tw: 6, z: -1 }), S('M72 150Q60 168 44 180', '#ffd76b', { tw: 6, z: -1 })]],
+  ['Finish with little sparkles all around.', [S(sparkle(166, 26, 8), '#ffc2e0', { a: 'twinkle' }), S(sparkle(180, 150, 7), K.yellow, { a: 'twinkle', dl: .6 }), S(sparkle(34, 40, 6), '#c9b5ff', { a: 'twinkle', dl: 1.1 })]],
+]);
+
+add('cosmo', 'Cosmo', 'Astronaut', 'space', 'float', [
+  ["Draw a big round bubble — that's Cosmo's space helmet.", [S(C(100, 74, 46), '#ffffff')]],
+  ['Draw a wide oval window inside for the visor.', [S(E(100, 80, 32, 24), '#c8ebff')]],
+  ['Inside the window, draw a happy face.', face(100, 78, { g: 12, k: .95 })],
+  ['Add a marshmallow body and two boots.', [S('M70 109C62 128 62 158 74 164L126 164C138 158 138 128 130 109', '#f4f6ff', { z: -1 }), S('M80 164V178Q80 184 86 184H94Q98 184 98 178V164', '#dfe5f5', { z: -2 }), S('M102 164V178Q102 184 108 184H116Q120 184 120 178V164', '#dfe5f5', { z: -2 })]],
+  ['Add arms (one waving hi!), a control panel and an antenna. 👋', [S('M65 124Q46 128 46 146Q48 154 56 150Q60 144 64.5 141', '#f4f6ff', { z: -1.5 }), S('M135 128Q156 118 156 98Q152 90 146 96Q144 108 132 115', '#f4f6ff', { z: -1.5, a: 'wave', o: [134, 122] }),
+    S(RR(86, 126, 28, 20, 5), K.yellow, { z: -0.5 }), S(C(94, 136, 3), K.red, { z: -0.4 }), S(C(106, 136, 3), '#7fc4ff', { z: -0.4 }),
+    S('M130 39.1L142 22', null, { z: -1, a: 'bob', o: [130, 40] }), S(C(144, 19, 4.5), K.red, { z: -1, a: 'bob', o: [130, 40] })]],
+]);
+
+add('moonbeam', 'Moonbeam', 'Sleepy Moon', 'space', 'rock', [
+  ['Draw a big banana shape — a crescent moon! 🌙', [S('M120.5 43.6A60 60 0 1 0 156.4 120.5A50 50 0 0 1 120.5 43.6Z', '#ffe58a')]],
+  ['Draw sleepy eyes (like little smiles) and a tiny mouth.', face(76, 108, { g: 11, k: .9, eyes: 'sleepy' })],
+  ["Add floating Z's — Moonbeam is snoozing! 💤", [S(zz(122, 88, 10), null, { sc: '#8b7cff', a: 'zzz' }), S(zz(140, 62, 13), null, { sc: '#8b7cff', a: 'zzz', dl: .8 }), S(zz(158, 30, 16), null, { sc: '#8b7cff', a: 'zzz', dl: 1.6 })]],
+  ['Put twinkly stars around her.', [S(star(40, 40, 12, 6), K.yellow, { a: 'twinkle' }), S(star(174, 150, 10, 5), K.yellow, { a: 'twinkle', dl: .7 }), S(sparkle(62, 176, 7), '#c9b5ff', { a: 'twinkle', dl: 1.3 })]],
+]);
+
+add('gizmo', 'Gizmo', 'Robot', 'space', 'bounce', [
+  ['Draw a big square with round corners — a TV head! 📺', [S(RR(56, 44, 88, 70, 16), '#bfe0ff')]],
+  ['Add an antenna with a ball on top, and two ear bolts.', [S('M100 44V26', null, { z: -1, a: 'bob', o: [100, 44] }), S(C(100, 20, 6), K.red, { z: -1, a: 'bob', o: [100, 44] }), S('M56 66H50Q46 66 46 70V88Q46 92 50 92H56', '#8aa4c8', { z: -1 }), S('M144 66H150Q154 66 154 70V88Q154 92 150 92H144', '#8aa4c8', { z: -1 })]],
+  ['Draw two round robot eyes and a smile with teeth.', [S(C(80, 76, 11), '#fff'), ...eye(81, 77, 5), S(C(120, 76, 11), '#fff'), ...eye(119, 77, 5), S(RR(84, 94, 32, 10, 4), '#fff'), S('M95 94V104', null, { w: 3 }), S('M105 94V104', null, { w: 3 }), ...cheeks(100, 100, 34)]],
+  ['Draw a neck and a box body with a heart button. 💗', [S('M92 114V120'), S('M108 114V120'), S(RR(66, 120, 68, 50, 12), '#9ccfff'), S(heart(100, 143, 9), K.red)]],
+  ['Add noodle arms and two little feet.', [S('M66 132Q48 134 46 150', '#8aa4c8', { tw: 5, z: -1, a: 'wave', o: [66, 132] }), S(C(45, 156, 6), '#8aa4c8', { z: -1, a: 'wave', o: [66, 132] }), S('M134 132Q152 134 154 150', '#8aa4c8', { tw: 5, z: -1 }), S(C(155, 156, 6), '#8aa4c8', { z: -1 }),
+    S('M80 170V182Q80 186 84 186H92Q96 186 96 182V170', '#8aa4c8', { z: -1 }), S('M104 170V182Q104 186 108 186H116Q120 186 120 182V170', '#8aa4c8', { z: -1 })]],
+]);
+
+add('gloop', 'Gloop', 'Slime Alien', 'space', 'jelly', [
+  ['Draw a big gumdrop blob with a wiggly, drippy bottom.', [S('M100 46C146 46 154 100 154 140Q156 160 140 160Q130 172 118 162Q100 174 84 162Q70 172 60 160Q44 160 46 140C46 100 54 46 100 46Z', '#a6f0a6')]],
+  ['Add two wiggly antennae with balls on top.', [S('M87 47.5Q78 32 70 26', null, { z: -1, a: 'bob', o: [87, 48] }), S(C(68, 22, 5), K.purple, { z: -1, a: 'bob', o: [87, 48] }), S('M113 47.5Q122 32 130 26', null, { z: -1, a: 'bob', o: [113, 48], dl: .4 }), S(C(132, 22, 5), K.purple, { z: -1, a: 'bob', o: [113, 48], dl: .4 })]],
+  ['Draw ONE giant eye right in the middle! 👁️', [S(C(100, 94, 22), '#fff'), ...eye(103, 96, 10)]],
+  ['Give Gloop a big grin with one tooth, and rosy cheeks.', [S('M80 126Q100 150 120 126Q100 132 80 126Z', K.rose), S('M101 129L104 135L107 128.7', '#fff', { w: 2.5 }), ...cheeks(100, 122, 34, 1.2)]],
+  ['Add slimy spots and a falling drip — so gooey!', [S(E(64, 92, 6, 8), '#7fd88a'), S(C(138, 104, 6), '#7fd88a'), S(C(122, 64, 4), '#7fd88a'), S(drop(124, 186, 6), '#a6f0a6', { a: 'drip' })]],
+]);
+
+add('astrokitty', 'Astro Kitty', 'Space Cat', 'space', 'float', [
+  ['Draw a giant bubble — a space helmet! 🫧', [S(C(100, 94, 64), '#e6f7ff', { fo: .5, z: 5 })]],
+  ['Inside, draw a round kitty head.', [S(E(100, 108, 40, 34), K.purple)]],
+  ['Add two triangle ears, like pointy party hats. 🎉', [S('M66 90L68 60Q70 55 75 58L88 75.6', K.purple, { z: -1 }), S('M134 90L132 60Q130 55 125 58L112 75.6', K.purple, { z: -1 }), S('M71 82L72 64L83 74Z', K.pink, { deco: 1, ns: 1, z: -0.9 }), S('M129 82L128 64L117 74Z', K.pink, { deco: 1, ns: 1, z: -0.9 })]],
+  ['Draw a cat face with a "w" mouth and whiskers.', [...face(100, 108, { g: 15, m: 'cat' }), S('M62 112L46 108'), S('M62 120L46 122'), S('M138 112L154 108'), S('M138 120L154 122')]],
+  ['Add a collar ring, a shiny line and some stars.', [S(RR(66, 148, 68, 14, 7), K.gold, { z: 6 }), S('M56 70Q64 50 84 42', null, { sc: '#fff', w: 6, z: 6 }), S(sparkle(26, 34, 8), K.yellow, { a: 'twinkle' }), S(sparkle(178, 62, 7), '#ffc2e0', { a: 'twinkle', dl: .6 }), S(sparkle(172, 172, 8), K.yellow, { a: 'twinkle', dl: 1.2 })]],
+]);
+
+/* ---------------- MYTHICAL BEASTS ---------------- */
+add('luna', 'Luna', 'Unicorn', 'myth', 'sway', [
+  ["Draw a big bean shape for Luna's head — round on top and round at the bottom.", [S('M100 52C70 52 52 74 54 100C55 116 58 124 62 134C68 158 132 158 138 134C142 124 145 116 146 100C148 74 130 52 100 52Z', '#fff6fb')]],
+  ['Add two leaf-shaped ears on top. 🍃', [S('M70.3 61.4Q56 42 60 28Q76 34 83.5 54.5', '#fff6fb', { z: -1 }), S('M129.7 61.4Q144 42 140 28Q124 34 116.5 54.5', '#fff6fb', { z: -1 }), S('M71 55Q63 43 64 35Q73 40 79 52Z', '#ffc2de', { deco: 1, ns: 1, z: -0.9 }), S('M129 55Q137 43 136 35Q127 40 121 52Z', '#ffc2de', { deco: 1, ns: 1, z: -0.9 })]],
+  ['Now the magic part: a tall ice-cream-cone horn with two stripes! 🦄', [S('M91 52.6L100 12L109 52.6', '#ffd36e', { z: -1 }), S('M93.8 40Q100 38.5 104.9 34', null, { z: -0.9, w: 3.5 }), S('M96.5 28Q100 27 102.4 23', null, { z: -0.9, w: 3.5 })]],
+  ['Give her a fluffy cloud mane on the side and a swoopy bang.', [S('M137.3 68.9Q160 56 164 78Q180 90 166 106Q178 124 158 132Q150 142 140.2 126.2', '#c9a8ff', { z: -2 }), S('M111 53.5Q106 78 78 72Q80 65 73.3 59.4', '#ffb3dc', { fd: 'M111 53.5Q106 78 78 72Q80 65 73.3 59.4C84 54.5 98 53.5 111 56Z' })]],
+  ['Draw big sparkly eyes with lashes, two nose dots and a smile.', [...eye(80, 102, 7.5), ...eye(120, 102, 7.5), S('M74 97L68 92', null, { w: 3.5 }), S('M73.5 102L67 100', null, { w: 3.5 }), S('M126 97L132 92', null, { w: 3.5 }), S('M126.5 102L133 100', null, { w: 3.5 }),
+    S(E(91, 134, 2.5, 3.5), INK, { ink: 1 }), S(E(109, 134, 2.5, 3.5), INK, { ink: 1 }), S('M93 142Q100 148 107 142', null, { w: 3.5 }), ...cheeks(100, 120, 30, 1.3)]],
+  ["Add sparkles and a heart — she's magic! ✨", [S(sparkle(36, 50, 10), K.yellow, { a: 'twinkle' }), S(sparkle(168, 36, 8), '#ffb3dc', { a: 'twinkle', dl: .5 }), S(sparkle(34, 152, 8), '#c9a8ff', { a: 'twinkle', dl: 1 }), S(heart(170, 160, 7), '#ff8fc0', { a: 'twinkle', dl: 1.4 })]],
+], { star: 1 });
+
+add('ember', 'Ember', 'Baby Dragon', 'myth', 'bounce', [
+  ['Draw a big round head, a little wider than tall.', [S(E(100, 74, 44, 38), '#ff9e80')]],
+  ['Add two little horns, like curvy cones.', [S('M72 44.7Q66 30 64 18Q76 24 84 38.6', '#fff0c2', { z: -1 }), S('M128 44.7Q134 30 136 18Q124 24 116 38.6', '#fff0c2', { z: -1 })]],
+  ['Draw a pear-shaped body with a striped belly and two feet.', [S('M74 104.7C58 124 60 170 80 174L120 174C140 170 142 124 126 104.7', '#ff9e80', { z: -1 }), S(E(100, 142, 19, 20), '#ffe3a3', { z: -0.8 }), S('M84 134Q100 138 116 134', null, { z: -0.7, w: 3 }), S('M84 146Q100 150 116 146', null, { z: -0.7, w: 3 }),
+    S('M78 174Q78 162 89 162Q98 162 98 174', '#ff9e80', { z: -0.6 }), S('M102 174Q102 162 111 162Q122 162 122 174', '#ff9e80', { z: -0.6 })]],
+  ['Add two bat wings with zig-zag edges! 🦇', [S('M65.2 122.7Q38 96 24 108Q32 120 30 130Q40 128 44 138Q52 132 63.5 145', '#ffcf99', { z: -2, a: 'flapL', o: [64, 130] }), S('M134.8 122.7Q162 96 176 108Q168 120 170 130Q160 128 156 138Q148 132 136.5 145', '#ffcf99', { z: -2, a: 'flapR', o: [136, 130] })]],
+  ['Draw a happy face with a tiny fang.', face(100, 78, { g: 17, k: 1.1, m: 'fang' })],
+  ['Last: a curly tail with a heart on the tip! 💖', [S('M124 166C150 178 172 168 168 144', '#ff9e80', { tw: 8, z: -3, a: 'wag', o: [124, 166] }), S(heart(169, 134, 8), '#ffcf99', { z: -2.9, a: 'wag', o: [124, 166] })]],
+]);
+
+add('boo', 'Boo', 'Little Ghost', 'myth', 'float', [
+  ['Draw an upside-down U, then a wavy bottom like ocean waves. 🌊', [S('M50 96C50 56 74 34 100 34C126 34 150 56 150 96V158Q137.5 176 125 158Q112.5 176 100 158Q87.5 176 75 158Q62.5 176 50 158Z', '#f7f7ff')]],
+  ['Add two stubby arms — one waving hello!', [S('M50 108Q34 112 34 126Q40 134 50 124', '#f7f7ff', { z: -1 }), S('M150 108Q166 102 168 88Q164 80 156 86Q154 96 150 98', '#f7f7ff', { z: -1, a: 'wave', o: [150, 104] })]],
+  ['Draw a cute face with a big open mouth.', face(100, 90, { g: 17, k: 1.2, m: 'open' })],
+  ['Add a bow on top and some sparkles. 🎀', [...bow(126, 42, 13, '#ff8fc0'), S(sparkle(30, 48, 9), '#c9b5ff', { a: 'twinkle' }), S(sparkle(174, 140, 8), K.yellow, { a: 'twinkle', dl: .7 })]],
+]);
+
+add('nessie', 'Nessie', 'Lake Monster', 'myth', 'bob', [
+  ['Draw a long neck that curves up, with an oval head on top.', [S('M66 150C66 116 70 88 84 69.3', '#7fd6c2', { fd: 'M66 150C66 116 70 88 84 69.3L104 79.8C94 96 92 120 92 150Z' }), S('M92 150C92 120 94 96 104 79.8'), S(E(108, 58, 28, 22), '#7fd6c2')]],
+  ['Add two humps poking out of the water, like little rainbows. 🌈', [S('M104 150C108 116 136 116 140 150', '#7fd6c2'), S('M150 150C152 126 176 126 178 150', '#7fd6c2')]],
+  ['Give Nessie a sweet face.', face(114, 56, { g: 10, k: .85 })],
+  ['Draw pointy spikes down her back and add some spots.', [S('M66.5 130L56 124L67 116', '#5cc0ad', { z: -1 }), S('M68.5 106L57 100L71 96', '#5cc0ad', { z: -1 }), S('M88 42.6L82 32L95 38.5', '#5cc0ad', { z: -1 }), S(C(79, 124, 4), '#5cc0ad'), S(C(81, 104, 3), '#5cc0ad'), S(C(122, 136, 4), '#5cc0ad')]],
+  ['Draw wavy water lines across the bottom. 🌊', [S('M0 152H200V200H0Z', '#d9f2ff', { deco: 1, ns: 1, z: -5 }), S('M12 152Q22 144 32 152Q42 160 52 152Q62 144 72 152Q82 160 92 152Q102 144 112 152Q122 160 132 152Q142 144 152 152Q162 160 172 152Q180 146 188 152', null, { sc: '#4fb3ef', a: 'swayx' }), S('M40 172Q50 164 60 172Q70 180 80 172Q90 164 100 172Q110 180 120 172Q130 164 140 172Q150 180 160 172', null, { sc: '#4fb3ef', a: 'swayx', dl: .6 })]],
+]);
+
+add('gnomey', 'Gnomey', 'Garden Gnome', 'myth', 'sway', [
+  ['Draw a tall pointy hat, like a party hat with a bendy tip.', [S('M54 98Q76 70 92 22Q100 12 108 22Q124 70 146 98Q100 108 54 98Z', '#ff6b6b', { z: 2 })]],
+  ['Under the hat, draw a round potato nose and two dot eyes.', [S(E(100, 110, 40, 16), '#ffe0c8', { deco: 1, ns: 1, z: -0.5 }), ...eye(80, 109, 4), ...eye(120, 109, 4), ...cheeks(100, 118, 31), S(C(100, 116, 13), '#ffb59a', { z: 3 })]],
+  ['Draw a big fluffy cloud beard and a curly mustache.', [S('M56 100Q50 134 66 152Q76 170 88 162Q100 182 112 162Q124 170 134 152Q150 134 144 100', '#ffffff', { fd: 'M56 100Q50 134 66 152Q76 170 88 162Q100 182 112 162Q124 170 134 152Q150 134 144 100Q142 122 128 124Q100 130 72 124Q58 122 56 100Z' }), S('M100 128Q86 140 72 128', null, { z: 3 }), S('M100 128Q114 140 128 128', null, { z: 3 })]],
+  ['Add a little body and two round boots.', [S('M66 152Q58 170 62 182L138 182Q142 170 134 152', '#7cc4ff', { z: -1 }), S(E(82, 184, 15, 7), '#7a4b33', { z: -0.5 }), S(E(118, 184, 15, 7), '#7a4b33', { z: -0.5 })]],
+]);
+
+add('frosty', 'Frosty', 'Yeti', 'myth', 'bounce', [
+  ['Draw a big fluffy bean — make the edge bumpy like a cloud! ☁️', [S(scallop(100, 106, 56, 66, 18, 1.1), '#f6fbff')]],
+  ['Draw an oval face patch near the top.', [S(E(100, 90, 30, 24), '#cfe6ff')]],
+  ['Add a happy face with a tiny tooth.', face(100, 86, { g: 12, m: 'fang' })],
+  ['Give Frosty two little horns and arms up high — yay!', [S('M74 50Q62 34 68 20Q76 32 86 43', '#d9c7ff', { z: -1 }), S('M126 50Q138 34 132 20Q124 32 114 43', '#d9c7ff', { z: -1 }), S('M48 114Q20 106 16 78Q22 68 31 76Q34 96 48 98', '#f6fbff', { z: -1, a: 'wave', o: [48, 106] }), S('M152 114Q180 106 184 78Q178 68 169 76Q166 96 152 98', '#f6fbff', { z: -1, a: 'wave', o: [152, 106], dl: .5 })]],
+  ['Add big feet and some snowflakes. ❄️', [S(E(80, 174, 17, 9), '#cfe6ff'), S(E(120, 174, 17, 9), '#cfe6ff'), ...snow(30, 40, 9), ...snow(172, 40, 8, .6), ...snow(176, 146, 7, 1.2)]],
+]);
+
+add('blaze', 'Blaze', 'Phoenix', 'myth', 'float', [
+  ['Draw a round, chubby body — like a big egg lying down.', [S(E(100, 108, 46, 42), '#ff9a6b')]],
+  ['Add a flame crest on top — three swooshy flames! 🔥', [S('M86 68Q76 50 84 34Q90 50 98 50Q96 34 106 20Q110 40 114 46Q122 36 130 40Q120 54 114 68', K.gold, { z: -1, a: 'flicker', o: [100, 68] })]],
+  ['Draw two wings like flower petals on each side.', [S('M55.9 96Q28 84 24 110Q36 108 40 120Q48 114 57.5 124', '#ff7a59', { z: -1, a: 'flapL', o: [57, 110] }), S('M144.1 96Q172 84 176 110Q164 108 160 120Q152 114 142.5 124', '#ff7a59', { z: -1, a: 'flapR', o: [143, 110] })]],
+  ['Draw a round belly, then a face with a triangle beak.', [S(E(100, 132, 22, 14), '#ffd0a8'), ...face(100, 98, { g: 15, m: 'none' }), S('M94 106L106 106L100 115Z', K.gold)]],
+  ['Finish with a fiery tail at the bottom.', [S('M84 147.4Q74 166 62 172Q80 176 92 164Q96 180 104 188Q108 172 106 160Q116 176 132 174Q120 164 116 147.4', K.gold, { z: -2, a: 'flicker', o: [100, 150] })]],
+]);
+
+add('merkitty', 'Merkitty', 'Mermaid Cat', 'myth', 'swim', [
+  ['Draw a round kitty head.', [S(E(100, 64, 38, 32), '#ffd9a8')]],
+  ['Add two pointy ears on top.', [S('M68 46.7L70 20Q72 16 76 19L88 33.6', '#ffd9a8', { z: -1 }), S('M132 46.7L130 20Q128 16 124 19L112 33.6', '#ffd9a8', { z: -1 })]],
+  ['Draw a cat face with a "w" mouth.', face(100, 64, { g: 14, m: 'cat' })],
+  ['Draw a long fishy tail that swoops to the side, with a fin! 🧜‍♀️', [S('M78 90C66 124 80 162 120 164Q136 164 146 156', '#7fd8e8', { z: -1, fd: 'M78 90C66 124 80 162 120 164Q136 164 146 156Q138 146 130 140C118 132 124 112 122 90Z' }), S('M122 90C124 112 118 132 130 140Q138 146 146 156', null, { z: -1 }), S('M146 156Q160 126 180 136Q168 150 178 172Q158 168 146 156', '#b39bff', { z: -2, a: 'wag', o: [146, 156] })]],
+  ['Add scales, a starfish clip and some bubbles.', [S('M86 116Q92 122 98 116', null, { w: 3 }), S('M98 130Q104 136 110 130', null, { w: 3 }), S('M84 134Q90 140 96 134', null, { w: 3 }), S('M108 148Q114 154 120 148', null, { w: 3 }), S(star(134, 52, 9, 4.5), '#ffb3dc'), S(C(160, 60, 6), '#e3f4ff', { a: 'floatup' }), S(C(172, 36, 4), '#e3f4ff', { a: 'floatup', dl: .9 }), S(C(32, 84, 5), '#e3f4ff', { a: 'floatup', dl: 1.6 })]],
+]);
+
+add('kit', 'Kit', 'Kitsune Fox', 'myth', 'sway', [
+  ['Draw a fox head — round on top with fluffy pointy cheeks.', [S('M100 46C134 46 150 66 154 90Q140 104 128 104Q118 124 100 126Q82 124 72 104Q60 104 46 90C50 66 66 46 100 46Z', '#ffa45c')]],
+  ['Add two big pointy ears.', [S('M50 76.2L44 24Q46 18 52 20L77.7 49.5', '#ffa45c', { z: -1 }), S('M150 76.2L156 24Q154 18 148 20L122.3 49.5', '#ffa45c', { z: -1 }), S('M54 66L50 30L70 50Z', '#7a4b33', { deco: 1, ns: 1, z: -0.9 }), S('M146 66L150 30L130 50Z', '#7a4b33', { deco: 1, ns: 1, z: -0.9 })]],
+  ['Draw a swoopy line for the white muzzle, then happy eyes and a nose.', [S('M72 104Q86 90 100 98Q114 90 128 104', '#fff7ef', { fd: 'M72 104Q86 90 100 98Q114 90 128 104Q118 124 100 126Q82 124 72 104Z' }), ...face(100, 82, { g: 17, eyes: 'happy', m: 'none' }), S(E(100, 104, 4.5, 3.5), INK, { ink: 1 }), S('M94 110Q97 114 100 110Q103 114 106 110', null, { w: 3 })]],
+  ['Add a little sitting body.', [S('M78.7 114.4C66 134 68 168 82 176L118 176C132 168 134 134 121.3 114.4', '#ffa45c', { z: -1 })]],
+  ['Kitsunes are magic foxes with LOTS of tails! Draw three fluffy ones. 🦊', [S(leaf(124, 160, 64, -12, 22), '#ffa45c', { z: -2, a: 'wag', o: [124, 160] }), S(leaf(124, 158, 62, -42, 22), '#ffb877', { z: -2.1, a: 'wag', o: [124, 158], dl: .2 }), S(leaf(122, 156, 50, -66, 20), '#ffa45c', { z: -2.2, a: 'wag', o: [122, 156], dl: .4 })]],
+]);
+
+/* ---------------- FOOD FRIENDS ---------------- */
+add('boba', 'Bubbles', 'Boba Tea', 'food', 'jelly', [
+  ['Draw a cup shape — wide at the top, skinny at the bottom, like a flower pot. 🪴', [S('M50 80L61 168Q62 178 72 178L128 178Q138 178 139 168L150 80Z', '#f6d7b0')]],
+  ['Put a lid on it: a long flat rectangle, then a bubble dome on top.', [S(RR(44, 70, 112, 14, 7), '#ffa8cf', { z: 2 }), S('M54 70Q56 34 100 34Q144 34 146 70', '#eaf7ff', { z: 1, fo: .9 })]],
+  ['Poke a straw out of the top — two slanted lines with a flat end.', [S('M104 34L114 5L127 9L116.5 35.4', '#ff7eb6', { z: .5 })]],
+  ['Draw a cute face in the middle of the cup.', face(100, 120, { g: 17, k: 1.2 })],
+  ['Drop in boba pearls at the bottom — lots of little circles! ⚫', [[76, 163, 0], [93, 167, .2], [110, 165, .4], [125, 160, .6], [85, 150, .3], [118, 148, .5], [101, 153, .1]].map(([x, y, d]) => S(C(x, y, 6.5), '#5a3a2e', { ink: 1, a: 'bob', dl: d }))],
+  ['Draw a wavy tea line near the top, then add sparkles. ✨', [S('M50 80L52 96Q64 90 76 96Q88 102 100 96Q112 90 124 96Q136 102 148 96L150 80Z', '#fff6ea', { deco: 1, ns: 1 }), S('M52 96Q64 90 76 96Q88 102 100 96Q112 90 124 96Q136 102 148 96'),
+    S(sparkle(26, 60, 9), K.yellow, { a: 'twinkle' }), S(sparkle(174, 118, 8), '#ffb3dc', { a: 'twinkle', dl: .6 }), S(sparkle(176, 50, 6), '#9fd3ff', { a: 'twinkle', dl: 1.2 })]],
+], { star: 1 });
+
+add('sprinkles', 'Sprinkles', 'Donut', 'food', 'wobble', [
+  ["Draw a big circle — that's the donut! 🍩", [S(C(100, 104, 62), '#f2c58f')]],
+  ['Draw wavy icing inside, like a puddle of frosting.', [S(wavy(100, 100, 50, 9, 5), '#ff9ccf')]],
+  ['Add a small circle in the middle for the hole.', [S(C(100, 92, 15), 'bg')]],
+  ['Give Sprinkles a happy face with a tongue out!', face(100, 126, { g: 16, k: 1.1, m: 'tongue' })],
+  ['Add sprinkles — short little lines all over!', [[68, 78, 30], [90, 62, -25], [116, 62, 35], [136, 82, -55], [62, 108, 75], [140, 110, 15], [120, 150, -20], [82, 150, 25]].map(([x, y, a], i) => spr(x, y, a, SPR[i % SPR.length]))],
+]);
+
+add('avo', 'Avo', 'Avocado', 'food', 'sway', [
+  ['Draw a big pear shape — skinny on top, round at the bottom. 🍐', [S('M100 30C124 30 132 58 140 82C152 112 156 168 100 172C44 168 48 112 60 82C68 58 76 30 100 30Z', '#6fbf5e')]],
+  ['Draw a smaller pear inside it for the yummy middle.', [S('M100 42C118 42 124 64 130 86C140 114 142 160 100 162C58 160 60 114 70 86C76 64 82 42 100 42Z', '#d8f0a0')]],
+  ['Add a big round pit at the bottom, like a ball.', [S(C(100, 128, 22), '#b07a4f'), S('M88 118Q92 110 100 108', null, { sc: '#d9a77c', w: 4, deco: 1 })]],
+  ['Draw a happy face above the pit.', face(100, 82, { g: 13, k: .95 })],
+  ['Give Avo tiny stick arms and legs!', [S('M53.4 110Q40 116 40 130', '#6fbf5e', { tw: 5, z: -1 }), S('M146.6 110Q160 104 162 90', '#6fbf5e', { tw: 5, z: -1, a: 'wave', o: [147, 110] }), S('M86 171V186', '#6fbf5e', { tw: 5, z: -1 }), S('M114 171V186', '#6fbf5e', { tw: 5, z: -1 })]],
+]);
+
+add('scoop', 'Scoop', 'Ice Cream', 'food', 'wobble', [
+  ["Draw a big V shape — that's the cone! 🍦", [S('M69.4 112L100 184L130.6 112', '#f5c27a')]],
+  ['Draw criss-cross lines on the cone, like a waffle.', [S('M73.6 122L108.6 163.9', null, { w: 3 }), S('M96 118L117.2 143.5', null, { w: 3 }), S('M126.4 122L91.4 163.9', null, { w: 3 }), S('M104 118L82.8 143.5', null, { w: 3 })]],
+  ['Draw a big fluffy scoop on top with a drippy bottom.', [S('M60 112C44 108 44 84 62 74C62 46 86 36 100 38C114 36 138 46 138 74C156 84 156 108 140 112Q132 120 124 112Q116 124 108 114Q100 120 92 114Q84 124 76 112Q68 120 60 112Z', '#ffb0cf')]],
+  ['Give Scoop a sweet face.', face(100, 80, { g: 16, k: 1.1 })],
+  ['Add a cherry on top, sprinkles and a little drip!', [S(C(102, 30, 9), K.red), S('M104 21Q108 10 118 8', null, { w: 3.5 }), spr(72, 62, 30, '#7fd3ff'), spr(126, 58, -30, '#ffe066'), spr(138, 94, 60, '#9be27a'), spr(62, 96, -60, '#c4a8ff'), S(drop(130, 126, 5), '#ffb0cf', { a: 'drip' })]],
+]);
+
+add('berry', 'Berry', 'Strawberry', 'food', 'bounce', [
+  ['Draw a big rounded heart shape — a strawberry! 🍓', [S('M100 62C130 50 160 62 160 96C160 136 124 172 100 178C76 172 40 136 40 96C40 62 70 50 100 62Z', '#ff6b81')]],
+  ['Add a leafy crown on top, like a little green star.', [S('M66 64Q76 46 86 56Q90 38 100 50Q110 38 114 56Q124 46 134 64Q118 74 100 66Q82 74 66 64Z', '#7ed36b')]],
+  ['Draw a tiny stem poking up.', [S('M100 52Q97 38 104 30', '#7ed36b', { tw: 5, z: -1 })]],
+  ['Draw a cute face.', face(100, 106, { g: 17, k: 1.15 })],
+  ['Add little seeds — tiny ovals all over!', [[70, 90], [130, 90], [60, 122], [140, 122], [82, 150], [118, 150], [100, 162]].map(([x, y]) => S(E(x, y, 2.6, 3.6), '#ffe27a', { w: 2.5 }))],
+]);
+
+add('cuppy', 'Cuppy', 'Cupcake', 'food', 'jelly', [
+  ["Draw a cup shape like a flower pot — that's the wrapper.", [S('M54.8 120L66 178L134 178L145.2 120', '#8fd3ff')]],
+  ['Add two lines on the wrapper for the paper folds.', [S('M64 122L70 176', null, { w: 3 }), S('M136 122L130 176', null, { w: 3 })]],
+  ['Draw a big puffy cloud of frosting on top! ☁️', [S('M46 120C34 114 38 94 54 94C50 78 64 70 78 74C80 52 120 52 122 74C136 70 150 78 146 94C162 94 166 114 154 120Z', '#ffc2e0')]],
+  ['Draw a happy face on the wrapper.', face(100, 142, { g: 16, k: .95 })],
+  ['Add a cherry on top and some sprinkles. 🍒', [S(C(100, 47, 10), K.red), S('M102 37Q106 25 116 23', null, { w: 3.5 }), spr(70, 92, 30, '#7fd3ff'), spr(90, 70, -30, '#ffe066'), spr(124, 74, 50, '#9be27a'), spr(134, 100, -20, '#c4a8ff'), spr(80, 108, 70, '#ffffff'), spr(116, 104, 10, '#7fd3ff')]],
+]);
+
+add('pizzazz', 'Pizzazz', 'Pizza Slice', 'food', 'wobble', [
+  ['Draw a big V shape — a pizza slice! 🍕', [S('M46 58L100 182L154 58', '#ffd36b')]],
+  ['Add a puffy crust across the top, like a fat sausage.', [S('M40 58Q34 38 56 38Q100 30 144 38Q166 38 160 58Q100 68 40 58Z', '#e8a95e')]],
+  ['Draw three round pepperonis.', [S(C(76, 82, 10), '#e2574c'), S(C(124, 82, 10), '#e2574c'), S(C(100, 148, 9), '#e2574c')]],
+  ['Draw a happy face in the middle.', face(100, 104, { g: 13 })],
+  ["Add wiggly steam lines — it's hot! ♨️", [S('M74 28Q68 20 74 14Q80 8 74 2', null, { sc: '#b7b2c9', a: 'steam' }), S('M100 26Q94 18 100 12Q106 6 100 0', null, { sc: '#b7b2c9', a: 'steam', dl: .8 }), S('M126 28Q120 20 126 14Q132 8 126 2', null, { sc: '#b7b2c9', a: 'steam', dl: 1.6 })]],
+]);
+
+add('toasty', 'Toasty', 'Toast', 'food', 'bounce', [
+  ['Draw a bread shape: a square with a big puffy top, like a mushroom. 🍞', [S('M56 92C34 88 34 46 66 44C80 30 120 30 134 44C166 46 166 88 144 92L144 172Q144 180 136 180L64 180Q56 180 56 172Z', '#e8a95e')]],
+  ['Draw the same shape smaller inside — the soft part.', [S('M66 98C48 92 48 58 72 56C84 44 116 44 128 56C152 58 152 92 134 98L134 166Q134 170 130 170L70 170Q66 170 66 166Z', '#ffe2a8')]],
+  ['Add a square pat of butter on top. 🧈', [S(RR(84, 64, 32, 22, 5), '#fff3a3')]],
+  ['Draw a big happy face!', face(100, 122, { g: 18, k: 1.2, m: 'open' })],
+  ['Give Toasty little arms and legs.', [S('M56 128Q42 132 40 146', '#e8a95e', { tw: 5, z: -1 }), S('M144 128Q158 124 160 110', '#e8a95e', { tw: 5, z: -1, a: 'wave', o: [144, 128] }), S('M84 180V192', '#e8a95e', { tw: 5, z: -1 }), S('M116 180V192', '#e8a95e', { tw: 5, z: -1 })]],
+]);
+
+add('tito', 'Tito', 'Taco', 'food', 'rock', [
+  ["Draw a big bowl shape — half a circle with a flat top. That's the shell! 🌮", [S('M30 86A70 70 0 0 0 170 86Z', '#ffd36b')]],
+  ['Add wiggly lettuce on top, like a ruffly skirt.', [S('M30 86Q34 70 46 76Q54 62 66 72Q76 58 88 70Q100 56 112 70Q124 58 134 72Q146 62 154 76Q166 70 170 86', '#8edb6a', { z: -1 })]],
+  ['Add two round tomatoes peeking out.', [S('M58 70A12 12 0 0 1 82 70', '#ff6b6b', { z: -2, fd: C(70, 70, 12) }), S('M116 70A12 12 0 0 1 140 70', '#ff6b6b', { z: -2, fd: C(128, 70, 12) })]],
+  ['Draw a big happy face on the shell.', face(100, 110, { g: 18, k: 1.2, m: 'open' })],
+  ['Sprinkle little dots on the shell.', [[54, 102], [146, 102], [68, 140], [132, 140], [100, 150]].map(([x, y]) => S(C(x, y, 3), '#e8a03a', { w: 2.5 }))],
+]);
+
+/* ---------------- SILLY ANIMALS ---------------- */
+add('mochi', 'Mochi', 'Cat', 'animals', 'bounce', [
+  ["Draw a big wide circle — like a squished ball — for Mochi's head.", [S(E(100, 82, 54, 46), '#ffc78f')]],
+  ['Add two triangle ears on top, like pointy party hats. 🎉', [S('M58 53L60 20Q62 14 67 18L92 36.5', '#ffc78f', { z: -1 }), S('M142 53L140 20Q138 14 133 18L108 36.5', '#ffc78f', { z: -1 }), S('M65 46L66 26L84 39Z', '#ffb3cf', { deco: 1, ns: 1, z: -0.9 }), S('M135 46L134 26L116 39Z', '#ffb3cf', { deco: 1, ns: 1, z: -0.9 })]],
+  ['Draw a little bean-shaped body sitting under the head, with two paws.', [S('M70 120.2C60 140 58 176 78 178L122 178C142 176 140 140 130 120.2', '#ffc78f', { z: -1 }), S(E(100, 152, 18, 16), '#fff1dc', { deco: 1, ns: 1, z: -0.9 }), S('M80 178Q80 166 90 166Q98 166 98 178', '#ffc78f', { z: -0.8 }), S('M102 178Q102 166 110 166Q120 166 120 178', '#ffc78f', { z: -0.8 })]],
+  ['Big shiny eyes, a tiny triangle nose and a "w" mouth!', [...eye(78, 86, 7), ...eye(122, 86, 7), S('M95.5 96L104.5 96L100 101.5Z', '#ff7aa8'), S('M91 103Q95.5 108 100 103Q104.5 108 109 103', null, { w: 3.5 }), ...cheeks(100, 100, 36, 1.3)]],
+  ['Add whiskers on both cheeks and stripes on the forehead.', [S('M52 92L34 88'), S('M52 100L34 102'), S('M148 92L166 88'), S('M148 100L166 102'), S('M100 37V50'), S('M89 39.5L91 50'), S('M111 39.5L109 50')]],
+  ['Last, a curly tail peeking out the side, like a question mark! ❓', [S('M134.4 168.4C168 174 180 140 162 124C155 118 147 126 153 132C164 144 160 158 137.3 155.8', '#ffc78f', { z: -2, a: 'wag', o: [136, 162] })]],
+], { star: 1 });
+
+add('biscuit', 'Biscuit', 'Puppy', 'animals', 'bounce', [
+  ['Draw a big round head.', [S(E(100, 84, 48, 42), '#f3d2a2')]],
+  ['Add two floppy ears hanging down, like long jelly beans.', [S('M59 62C38 58 28 96 36 112C44 126 58 116 55.6 100', '#b9845a', { z: -1, a: 'flop', o: [58, 64] }), S('M141 62C162 58 172 96 164 112C156 126 142 116 144.4 100', '#b9845a', { z: -1, a: 'flopR', o: [142, 64] })]],
+  ['Draw a spot around one eye, then eyes, a round snout, a nose and a tongue! 👅', [S(E(120, 80, 14, 13), '#e2b07e'), ...eye(82, 82, 6), ...eye(118, 82, 6), S(E(100, 104, 18, 13), '#fff6e8'), S(E(100, 98, 7, 5), INK, { ink: 1 }), S('M100 103V108', null, { w: 3.5 }), S('M92 108Q96 113 100 108Q104 113 108 108', null, { w: 3.5 }), S('M96 111Q100 121 104 111', K.rose, { w: 3 }), ...cheeks(100, 100, 32, 1.1)]],
+  ['Draw a little body and two paws.', [S('M70 116.8C58 138 60 176 80 178L120 178C140 176 142 138 130 116.8', '#f3d2a2', { z: -1 }), S('M82 178Q82 166 91 166Q99 166 99 178', '#f3d2a2', { z: -0.8 }), S('M101 178Q101 166 109 166Q118 166 118 178', '#f3d2a2', { z: -0.8 })]],
+  ['Add a waggy tail!', [S('M136 160Q160 156 162 134', '#f3d2a2', { tw: 7, z: -2, a: 'wag', o: [136, 158] })]],
+]);
+
+add('hops', 'Hops', 'Bunny', 'animals', 'hop', [
+  ['Draw a round head, like a soft bun.', [S(E(100, 104, 46, 40), '#ffffff')]],
+  ['Add two tall ears, like long jelly beans standing up!', [S('M78 68.9C64 40 66 12 80 12C94 12 94 40 92 64.6', '#ffffff', { z: -1, a: 'earL', o: [85, 66] }), S('M108 64.6C106 40 106 12 120 12C134 12 136 40 122 68.9', '#ffffff', { z: -1, a: 'earR', o: [115, 66] }),
+    S('M81 60C74 40 75 22 80 22C86 22 87 40 86 60Z', '#ffc2de', { deco: 1, ns: 1, z: -0.9, a: 'earL', o: [85, 66] }), S('M114 60C113 40 114 22 120 22C125 22 126 40 119 60Z', '#ffc2de', { deco: 1, ns: 1, z: -0.9, a: 'earR', o: [115, 66] })]],
+  ['Draw a face: dot eyes, a pink nose, a "w" mouth and buck teeth.', [...face(100, 104, { g: 17, m: 'none' }), S(E(100, 112, 4.5, 3.2), '#ff8fb3'), S('M93 118Q96.5 123 100 118Q103.5 123 107 118', null, { w: 3.5 }), S('M96 121.5V127H104V121.5', '#fff', { w: 2.5 })]],
+  ['Draw a little body with two paws.', [S('M74 137C64 156 68 182 84 182L116 182C132 182 136 156 126 137', '#ffffff', { z: -1 }), S('M82 182Q82 172 90 172Q98 172 98 182', '#ffffff', { z: -0.8 }), S('M102 182Q102 172 110 172Q118 172 118 182', '#ffffff', { z: -0.8 })]],
+  ['Give Hops a crunchy carrot! 🥕', [S('M132 150Q144 138 156 146L140 186Q133 180 132 150Z', '#ffa24c'), S('M137 160L143 158', null, { w: 3 }), S('M137 170L142 168', null, { w: 3 }), S('M146 142Q144 128 150 124', '#7ed36b', { tw: 4, z: -0.5 }), S('M150 144Q158 132 166 132', '#7ed36b', { tw: 4, z: -0.5 })]],
+]);
+
+add('ribbit', 'Ribbit', 'Frog Prince', 'animals', 'jelly', [
+  ['Draw a wide squishy blob with two bumps on top, like a cloud with ears.', [S('M36 128C36 112 40 102 46 96A24 24 0 1 1 88 80Q100 78 112 80A24 24 0 1 1 154 96C160 102 164 112 164 128C164 158 140 170 100 170C60 170 36 158 36 128Z', '#8edb7a')]],
+  ['Draw two big round eyes inside the bumps. 👀', [S(C(64, 82, 13), '#fff'), ...eye(66, 84, 6.5), S(C(136, 82, 13), '#fff'), ...eye(134, 84, 6.5)]],
+  ['Add a giant smile, rosy cheeks and two nose dots.', [S('M62 118Q100 148 138 118', null, { w: 4 }), ...cheeks(100, 114, 46, 1.6), S(C(94, 104, 2), INK, { ink: 1 }), S(C(106, 104, 2), INK, { ink: 1 })]],
+  ['Draw two webbed feet at the bottom.', [S('M60 164Q44 182 58 186Q66 178 72 186Q86 186 80 169', '#7cc96a', { z: -1 }), S('M140 164Q156 182 142 186Q134 178 128 186Q114 186 120 169', '#7cc96a', { z: -1 })]],
+  ["Add a tiny crown — he's a frog prince! 👑 Then some spots.", [S('M86 80L84 58L94 68L100 54L106 68L116 58L114 80Z', K.gold, { z: -0.5 }), S(E(56, 142, 7, 5), '#6cbf5e'), S(E(146, 140, 6, 4), '#6cbf5e'), S(E(128, 156, 5, 3.5), '#6cbf5e')]],
+]);
+
+add('waddles', 'Waddles', 'Penguin', 'animals', 'waddle', [
+  ['Draw a tall egg shape for the body. 🥚', [S(E(100, 104, 52, 70), '#4b5a8f')]],
+  ['Draw a big white tummy inside — like a stretched-out heart.', [S('M100 62C112 48 140 52 138 84C136 104 140 120 136 140C130 166 70 166 64 140C60 120 64 104 62 84C60 52 88 48 100 62Z', '#ffffff')]],
+  ['Add dot eyes, a little diamond beak and cheeks.', [...eye(84, 88, 5.5), ...eye(116, 88, 5.5), S('M92 100Q100 94 108 100Q100 110 92 100Z', '#ffb066'), ...cheeks(100, 102, 26)]],
+  ['Draw two flippers on the sides, like little wings.', [S('M48.5 96Q26 114 30 138Q42 134 49.5 120', '#4b5a8f', { z: -1, a: 'flapL', o: [49, 100] }), S('M151.5 96Q174 114 170 138Q158 134 150.5 120', '#4b5a8f', { z: -1, a: 'flapR', o: [151, 100] })]],
+  ['Add orange feet and a silly hair tuft!', [S(E(80, 176, 15, 6), '#ffb066', { z: -2 }), S(E(120, 176, 15, 6), '#ffb066', { z: -2 }), S('M98 35Q92 22 100 16', null, { w: 4 }), S('M102 35Q108 22 116 22', null, { w: 4 })]],
+]);
+
+add('bamboo', 'Bamboo', 'Panda', 'animals', 'sway', [
+  ['Draw a wide round head.', [S(E(100, 90, 54, 46), '#ffffff')]],
+  ['Add two round ears on top, like mouse ears.', [S('M53.5 68.7A17 17 0 1 1 78 48.2', K.dark, { z: -1 }), S('M122 48.2A17 17 0 1 1 146.5 68.7', K.dark, { z: -1 })]],
+  ['Draw two tilted bean-shaped eye patches with shiny eyes inside.', [S(ER(78, 94, 11, 15, 30), K.dark), S(ER(122, 94, 11, 15, -30), K.dark), S(C(80, 92, 5), '#fff', { w: 2.5 }), S(C(81, 93, 2.4), INK, { ink: 1, blink: [80, 92] }), S(C(120, 92, 5), '#fff', { w: 2.5 }), S(C(119, 93, 2.4), INK, { ink: 1, blink: [120, 92] })]],
+  ['Add a little nose, a "w" mouth and pink cheeks.', [S(E(100, 108, 6, 4), INK, { ink: 1 }), S('M92 114Q96 119 100 114Q104 119 108 114', null, { w: 3.5 }), ...cheeks(100, 116, 36, 1.1)]],
+  ['Draw a round body, black feet and a bamboo stick to munch! 🎋', [S('M66 125.7C56 150 60 180 80 182L120 182C140 180 144 150 134 125.7', '#ffffff', { z: -1 }), S(E(82, 182, 13, 7), K.dark, { z: -0.8 }), S(E(118, 182, 13, 7), K.dark, { z: -0.8 }),
+    S('M158 192V118', '#8edb6a', { tw: 9 }), S('M152 140H164', null, { w: 3 }), S('M152 166H164', null, { w: 3 }), S(leaf(158, 124, 30, -40, 10), '#6fbf5e')]],
+]);
+
+add('oinkers', 'Oinkers', 'Piggy', 'animals', 'bounce', [
+  ['Draw a big round head.', [S(E(100, 98, 56, 50), '#ffc4d6')]],
+  ['Add two floppy triangle ears.', [S('M60 63L52 36Q54 30 60 33L86 49.6', '#ffaac4', { z: -1 }), S('M140 63L148 36Q146 30 140 33L114 49.6', '#ffaac4', { z: -1 })]],
+  ['Draw a big oval snout with two nostrils. 🐽', [S(E(100, 114, 22, 15), '#ff9fbd'), S(E(92, 114, 3, 5), INK, { ink: 1 }), S(E(108, 114, 3, 5), INK, { ink: 1 })]],
+  ['Add happy eyes, a smile and pink cheeks.', [...eye(76, 92, 5.5), ...eye(124, 92, 5.5), S('M92 136Q100 142 108 136', null, { w: 3.5 }), ...cheeks(100, 114, 38, 1.3)]],
+  ['Put a pretty flower on one ear! 🌸', flower(142, 42, 8, '#ffffff', K.yellow)],
+]);
+
+add('hoot', 'Hoot', 'Owl', 'animals', 'tilt', [
+  ['Draw a big round shape with two pointy ear tufts on top.', [S('M54 64L50 34L78 50Q100 44 122 50L150 34L146 64C160 110 150 170 100 170C50 170 40 110 54 64Z', '#b98a64')]],
+  ['Draw two BIG circles for eyes — like glasses! 👓 Then add pupils.', [S(C(78, 84, 20), '#fff'), ...eye(80, 86, 8), S(C(122, 84, 20), '#fff'), ...eye(120, 86, 8)]],
+  ['Add a tiny triangle beak between the eyes.', [S('M94 100L106 100L100 112Z', '#ffb066')]],
+  ['Draw an oval belly with little "v" feathers.', [S(E(100, 140, 30, 24), '#f3dcc0'), S('M86 130L90 134L94 130', null, { w: 3 }), S('M106 130L110 134L114 130', null, { w: 3 }), S('M96 144L100 148L104 144', null, { w: 3 })]],
+  ['Add leafy wings on the sides and two little feet.', [S(leaf(58, 104, 46, 82, 12), '#9a6f4f'), S(leaf(142, 104, 46, 98, 12), '#9a6f4f'), S(E(86, 171, 9, 5), '#ffb066', { z: -1 }), S(E(114, 171, 9, 5), '#ffb066', { z: -1 })]],
+]);
+
+add('peanut', 'Peanut', 'Hamster', 'animals', 'jelly', [
+  ['Draw a chubby dumpling shape — round on top, flat-ish on the bottom. 🥟', [S('M40 140C36 84 70 54 100 54C130 54 164 84 160 140C158 168 132 176 100 176C68 176 42 168 40 140Z', '#f6c48a')]],
+  ['Add two round ears on top.', [S('M53.8 80.4A16 16 0 1 1 77.4 59.6', '#f6c48a', { z: -1 }), S('M122.6 59.6A16 16 0 1 1 146.2 80.4', '#f6c48a', { z: -1 }), S(C(63, 66, 7), '#ffb3cf', { deco: 1, ns: 1, z: -0.9 }), S(C(137, 66, 7), '#ffb3cf', { deco: 1, ns: 1, z: -0.9 })]],
+  ['Draw a big oval for the white muzzle.', [S(E(100, 140, 42, 28), '#fff6ea')]],
+  ['Add eyes, a pink nose and BIG puffy cheeks.', [...eye(76, 108, 5.5), ...eye(124, 108, 5.5), S(E(100, 121, 4, 3), '#ff8fb3'), S('M93 126Q96.5 131 100 126Q103.5 131 107 126', null, { w: 3.5 }), ...cheeks(100, 130, 40, 1.8)]],
+  ['Give Peanut a seed to hold with two tiny paws.', [S('M100 140Q114 152 100 172Q86 152 100 140Z', '#57506b'), S('M100 147V164', null, { sc: '#ffffff', w: 3 }), S(E(86, 156, 7, 5), '#f6c48a'), S(E(114, 156, 7, 5), '#f6c48a')]],
+]);
+
+/* ---------------- OCEAN BUDDIES ---------------- */
+add('inky', 'Inky', 'Octopus', 'ocean', 'bob', [
+  ['Draw a big round head, like a hot-air balloon. 🎈', [S('M50 110C46 60 70 34 100 34C130 34 154 60 150 110')]],
+  ['Add four wiggly tentacles at the bottom — curly like noodles!', [S('M150 110C154 130 170 140 174 154C160 160 146 148 140 140C140 156 132 170 118 172C120 158 116 148 110 142C106 158 96 170 82 172C82 158 86 148 82 142C74 156 60 164 44 160C50 142 46 128 50 110', '#c99bff', { z: -1, fd: 'M50 110C46 60 70 34 100 34C130 34 154 60 150 110C154 130 170 140 174 154C160 160 146 148 140 140C140 156 132 170 118 172C120 158 116 148 110 142C106 158 96 170 82 172C82 158 86 148 82 142C74 156 60 164 44 160C50 142 46 128 50 110Z' })]],
+  ['Draw a happy face with an open mouth.', face(100, 82, { g: 17, k: 1.2, m: 'open' })],
+  ['Add polka-dot spots on her head.', [S(C(72, 54, 6), '#b282f0'), S(C(128, 50, 5), '#b282f0'), S(C(140, 74, 4), '#b282f0'), S(C(60, 76, 4), '#b282f0')]],
+  ['Blow some bubbles! 🫧', [S(C(166, 50, 7), '#e3f4ff', { a: 'floatup' }), S(C(180, 28, 4.5), '#e3f4ff', { a: 'floatup', dl: .9 }), S(C(30, 66, 5), '#e3f4ff', { a: 'floatup', dl: 1.7 })]],
+]);
+
+add('splash', 'Splash', 'Whale', 'ocean', 'swim', [
+  ['Draw a big round blob with a tail that flips up — like a waving jelly bean! 🐳', [S('M28 118C28 76 66 60 100 62C140 64 154 96 160 112C166 98 172 86 188 82C182 96 184 110 178 120C186 128 188 140 184 150C172 142 164 134 156 128C146 156 116 168 84 168C50 168 28 150 28 118Z', '#8fc7ff')]],
+  ['Draw a curvy line for the belly.', [S('M33.7 143C64 162 120 164 156 128', '#dff0ff', { fd: 'M33.7 143C64 162 120 164 156 128C146 156 116 168 84 168C56 168 40 158 33.7 143Z' })]],
+  ['Add a happy face near the front.', face(70, 106, { g: 15 })],
+  ['Draw a little flipper on the side.', [S('M100 128Q102 148 122 146Q116 134 110 128', '#6fb2f0')]],
+  ['Whoosh! A water spout on top, like a fountain. ⛲', [S('M90 62Q88 48 90 38', null, { sc: '#4fb3ef', a: 'spout' }), S('M90 40Q78 26 64 30', null, { sc: '#4fb3ef', a: 'spout' }), S('M90 40Q102 24 116 28', null, { sc: '#4fb3ef', a: 'spout' }), S(drop(62, 40, 4), '#bfe6ff', { a: 'drip' }), S(drop(118, 38, 4), '#bfe6ff', { a: 'drip', dl: .6 })]],
+]);
+
+add('goldie', 'Goldie', 'Goldfish', 'ocean', 'swim', [
+  ['Draw a big lemon shape lying on its side. 🍋', [S('M36 100C36 62 112 58 146 100C112 142 36 138 36 100Z', '#ffb347')]],
+  ['Add a tail like half a bow-tie.', [S('M140.6 94L174 68Q186 100 174 132L140.6 106', '#ff9a3c', { z: -1, a: 'wag', o: [142, 100] })]],
+  ['Draw a fin on top and a little fin on the bottom.', [S('M64 73.5Q88 36 110 75.5', '#ff9a3c', { z: -1 }), S('M84 129.5Q96 152 108 125.5', '#ff9a3c', { z: -1 })]],
+  ['Give Goldie a happy face.', face(72, 96, { g: 13 })],
+  ['Add scale lines like little "c"s, and some bubbles.', [S('M104 86Q112 92 104 100', null, { w: 3.5 }), S('M118 92Q126 100 118 108', null, { w: 3.5 }), S('M104 104Q112 110 104 118', null, { w: 3.5 }), S(C(22, 74, 6), '#e3f4ff', { a: 'floatup' }), S(C(30, 50, 4), '#e3f4ff', { a: 'floatup', dl: 1 })]],
+]);
+
+add('snappy', 'Snappy', 'Crab', 'ocean', 'scuttle', [
+  ['Draw a wide oval body, like a flat pebble.', [S(E(100, 124, 56, 38), '#ff8a7a')]],
+  ['Add two eye-stalks sticking up with round eyes on top. 👀', [S('M84 87.6L80 67', null, { z: -1 }), S(C(79, 58, 9), '#fff', { z: -1 }), ...lay(eye(80, 59, 4.5), -1), S('M116 87.6L120 67', null, { z: -1 }), S(C(121, 58, 9), '#fff', { z: -1 }), ...lay(eye(120, 59, 4.5), -1)]],
+  ['Draw two big claws — like the letter C with a notch! 🦀', [S('M47 112Q36 102 36 88', '#ff8a7a', { tw: 6, z: -1 }), S('M36 88C18 88 16 62 30 56L35 69L44 64C48 74 46 86 36 88Z', '#ff8a7a', { z: -1, a: 'snapL', o: [36, 88] }), S('M153 112Q164 102 164 88', '#ff8a7a', { tw: 6, z: -1 }), S('M164 88C182 88 184 62 170 56L165 69L156 64C152 74 154 86 164 88Z', '#ff8a7a', { z: -1, a: 'snapR', o: [164, 88] })]],
+  ['Add three little legs on each side.', ['M45.3 132L30 140', 'M50.7 142L34 154', 'M60.6 151L46 164', 'M154.7 132L170 140', 'M149.3 142L166 154', 'M139.4 151L154 164'].map(d => S(d, '#ff8a7a', { tw: 4, z: -1 }))],
+  ['Draw a big smile and rosy cheeks.', face(100, 116, { g: 16, eyes: 'none', m: 'open' })],
+]);
+
+add('shelly', 'Shelly', 'Turtle', 'ocean', 'bob', [
+  ['Draw a big dome, like half a ball. ⛑️', [S('M40 132C40 74 160 74 160 132Z', '#7fcf8a')]],
+  ['Draw a hexagon (6 sides!) on the shell, and lines out to the sides.', [S('M88 98L112 98L120 112L112 126L88 126L80 112Z', '#a6e3a1'), S('M80 112L47 112', null, { w: 3.5 }), S('M120 112L153 112', null, { w: 3.5 })]],
+  ['Add a long, skinny rim under the shell.', [S(RR(34, 128, 132, 12, 6), '#b8e8a0')]],
+  ['Pop out a round head with a sweet face!', [S(C(176, 110, 18), '#c8ef9a', { z: -1 }), ...lay(face(177, 106, { g: 7, k: .75 }), -0.9)]],
+  ['Draw stubby legs and a tiny pointy tail.', [S('M56 140V154Q56 158 62 158H70Q74 158 74 154V140', '#c8ef9a', { z: -1 }), S('M126 140V154Q126 158 132 158H140Q144 158 144 154V140', '#c8ef9a', { z: -1 }), S('M35 134Q24 136 20 142Q28 143 35 139', '#c8ef9a', { z: -1 })]],
+]);
+
+add('jelly', 'Jelly', 'Jellyfish', 'ocean', 'jfloat', [
+  ['Draw a big dome, like a mushroom cap, with a bumpy bottom. 🍄', [S('M44 108C44 56 76 34 100 34C124 34 156 56 156 108Q147 118 137 108Q128 118 119 108Q110 118 100 108Q90 118 81 108Q72 118 63 108Q53 118 44 108Z', '#ffb3e6')]],
+  ['Give Jelly a sweet face.', face(100, 78, { g: 16, k: 1.15 })],
+  ['Add four long, wiggly tentacles — like ribbons in the wind!', [['M66 114Q58 130 66 146Q74 162 66 178', 66, 0], ['M90 115Q82 133 90 151Q98 169 90 187', 90, .2], ['M110 115Q118 133 110 151Q102 169 110 187', 110, .4], ['M134 114Q142 130 134 146Q126 162 134 178', 134, .6]].map(([d, x, dl]) => S(d, '#ffd0f0', { tw: 5, z: -1, a: 'tent', o: [x, 112], dl }))],
+  ['Add a shiny line, some spots and bubbles.', [S('M60 74Q64 54 82 44', null, { sc: '#fff', w: 5 }), S(C(126, 52, 5), '#ff9ad8'), S(C(142, 70, 4), '#ff9ad8'), S(C(170, 40, 6), '#e3f4ff', { a: 'floatup' }), S(C(30, 52, 4.5), '#e3f4ff', { a: 'floatup', dl: 1.1 })]],
+]);
+
+add('noodle', 'Noodle', 'Narwhal', 'ocean', 'swim', [
+  ['Draw a big jelly-bean body with a tail that flips up.', [S('M28 116C28 78 64 64 100 66C136 68 150 92 156 108C164 96 172 86 186 84C180 98 182 110 176 118C184 126 186 136 182 148C170 140 162 132 154 126C144 152 116 166 84 166C50 166 28 150 28 116Z', '#b7c4ff')]],
+  ['Add a long pointy horn — like a twisty ice-cream cone! 🍦', [S('M36.7 88.1L12 44L46.5 78.5', '#fff3b0', { z: -1 }), S('M27.6 72.2L34.8 66.8', null, { w: 3, z: -0.9 }), S('M20.4 59.3L24.4 56.3', null, { w: 3, z: -0.9 })]],
+  ['Give Noodle a happy face.', face(66, 110, { g: 14 })],
+  ['Draw a little flipper and some spots.', [S('M92 130Q96 150 116 148Q110 136 102 128', '#9aa9f5'), S(C(108, 90, 4), '#9aa9f5'), S(C(124, 98, 5), '#9aa9f5'), S(C(118, 80, 3), '#9aa9f5')]],
+  ['Add sparkles — narwhals are the unicorns of the sea! ✨', [S(sparkle(150, 40, 9), K.yellow, { a: 'twinkle' }), S(sparkle(176, 58, 6), '#ffb3dc', { a: 'twinkle', dl: .6 }), S(sparkle(40, 178, 7), '#9fd3ff', { a: 'twinkle', dl: 1.2 })]],
+]);
+
+add('puffy', 'Puffy', 'Pufferfish', 'ocean', 'pulse', [
+  ['Draw a big round ball — Puffy is all puffed up! 🎈', [S(C(96, 104, 52), '#ffe07a')]],
+  ['Add little triangle spikes all around, like a crown.', [180, -145, -110, -75, -40, 40, 75, 110, 145].map(a => S(spike(96, 104, 52, 14, a, 8), '#ffc94d', { z: -1 }))],
+  ['Draw a tail like half a bow-tie and a tiny side fin.', [S('M146.6 92L170 76Q180 104 170 132L146.6 116', '#ffc94d', { z: -1, a: 'wag', o: [146, 104] }), S('M104 118Q122 120 120 138Q108 132 102 124', '#ffc94d')]],
+  ['Draw a surprised face with an "O" mouth! 😮', face(80, 96, { g: 16, k: 1.2, m: 'oh' })],
+  ['Add belly dots and bubbles.', [S(C(84, 142, 3), '#e8b93c', { w: 2.5 }), S(C(100, 148, 3), '#e8b93c', { w: 2.5 }), S(C(116, 142, 3), '#e8b93c', { w: 2.5 }), S(C(70, 132, 3), '#e8b93c', { w: 2.5 }), S(C(26, 60, 6), '#e3f4ff', { a: 'floatup' }), S(C(18, 38, 4), '#e3f4ff', { a: 'floatup', dl: 1 })]],
+]);
+
+add('finn', 'Finn', 'Shark', 'ocean', 'swim', [
+  ['Draw a long torpedo shape, like a giant pickle. 🥒', [S('M24 112C28 82 70 66 110 70C142 73 160 92 168 106C160 120 142 138 108 140C66 142 24 136 24 112Z', '#9fb8d8')]],
+  ['Add a triangle fin on top and a tail like a big "V".', [S('M82 70.4L104 32Q114 52 124 72.5', '#8aa6cc', { z: -1 }), S('M163.6 99.4L190 70Q182 104 192 136L163.8 112.5', '#8aa6cc', { z: -1, a: 'wag', o: [165, 106] })]],
+  ['Draw a curvy belly line.', [S('M25.2 118.6C60 138 120 140 157.9 119.2', '#f2f6ff', { fd: 'M25.2 118.6C60 138 120 140 157.9 119.2C146 132 130 139 108 140C66 142 30 136 25.2 118.6Z' })]],
+  ['Give Finn a big friendly grin with two tiny teeth! 🦈', face(60, 98, { g: 13, m: 'fangs' })],
+  ['Draw gill lines and a side fin.', [S('M92 94Q88 102 92 110', null, { w: 3.5 }), S('M100 94Q96 102 100 110', null, { w: 3.5 }), S('M90 124Q94 140 112 138Q106 130 100 124', '#8aa6cc')]],
+]);
+
+/* ---------------- GARDEN GANG ---------------- */
+add('dotty', 'Dotty', 'Ladybug', 'garden', 'wobble', [
+  ["Draw a big circle — the ladybug's back. 🐞", [S(C(100, 116, 58), '#ff6f6f')]],
+  ['Add a half-circle head on top and two antennae with dots.', [S('M74 64.2C72 30 128 30 126 64.2', K.dark, { z: -1 }), S('M88.4 41Q80 24 70 22', null, { z: -2, a: 'bob', o: [88, 41] }), S(C(68, 21, 4.5), K.dark, { z: -2, a: 'bob', o: [88, 41] }), S('M111.6 41Q120 24 130 22', null, { z: -2, a: 'bob', o: [112, 41], dl: .3 }), S(C(132, 21, 4.5), K.dark, { z: -2, a: 'bob', o: [112, 41], dl: .3 })]],
+  ['Draw a happy face on her back.', face(100, 92, { g: 16, k: 1.1 })],
+  ['Draw a line down the middle and add round spots!', [S('M100 114V174'), ...[[64, 112, 9], [136, 112, 9], [74, 148, 10], [126, 148, 10]].map(([x, y, r]) => S(C(x, y, r), K.dark, { ink: 1 }))]],
+  ['Add three little legs on each side.', ['M42.1 118L28 112', 'M45.6 136L30 142', 'M58 156L44 166', 'M157.9 118L172 112', 'M154.4 136L170 142', 'M142 156L156 166'].map(d => S(d, null, { z: -1 }))],
+]);
+
+add('buzzy', 'Buzzy', 'Bumblebee', 'garden', 'float', [
+  ['Draw a big oval body, like an egg lying down. 🥚', [S(E(100, 112, 54, 42), '#ffd94d')]],
+  ['Add two thick stripes on the back part of her body.', [S('M108 70.5Q114 112 108 153.5L122 150.4Q128 112 122 73.6Z', K.dark, { ink: 1 }), S('M134 79.4Q140 112 134 144.6L144 136.3Q150 112 144 87.7Z', K.dark, { ink: 1 })]],
+  ['Draw two see-through wings on top, like teardrops.', [S(leaf(98, 70, 48, -112, 22), '#e3f6ff', { z: -1, fo: .9, a: 'flapL', o: [100, 72] }), S(leaf(114, 71.4, 46, -66, 22), '#e3f6ff', { z: -1, fo: .9, a: 'flapR', o: [112, 72] })]],
+  ['Draw a cute face on the front.', face(76, 108, { g: 13 })],
+  ['Add two antennae and a pointy stinger. 🐝', [S('M62 82.2Q54 64 46 58', null, { z: -1 }), S(C(44, 56, 4.5), K.dark, { z: -1 }), S('M76 74.4Q74 56 70 48', null, { z: -1 }), S(C(69, 45, 4.5), K.dark, { z: -1 }), S('M153.4 106L168 112L153.4 118', K.dark, { z: -1 })]],
+]);
+
+add('slowpoke', 'Slowpoke', 'Snail', 'garden', 'inch', [
+  ['Draw a big circle for the shell.', [S(C(110, 96, 46), '#c9a7ff')]],
+  ['Draw a swirl inside — round and round like a cinnamon roll! 🌀', [S(spiral(110, 98, 3, 36, 2.6), null, { w: 4 })]],
+  ['Draw a long body under the shell, with a head that pops up on one side.', [S('M81.4 132L70 132C70 110 66 90 52 92C32 96 30 140 40 150Q42 156 52 156L160 156Q174 156 176 150C178 140 168 132 150 132L138.6 132', '#ffe0b8', { z: -1 })]],
+  ['Add a happy face on the head.', face(52, 110, { g: 8, k: .85 })],
+  ['Two antennae with little balls on top!', [S('M46.5 94.3Q40 76 34 70', null, { z: -2 }), S(C(32, 67, 4.5), '#ffe0b8', { z: -2 }), S('M57.6 92.5Q60 74 64 68', null, { z: -2 }), S(C(65, 65, 4.5), '#ffe0b8', { z: -2 })]],
+]);
+
+add('mushy', 'Mushy', 'Mushroom', 'garden', 'bounce', [
+  ['Draw a big umbrella shape — the mushroom cap! ☂️', [S('M30 104C30 50 66 30 100 30C134 30 170 50 170 104Q100 120 30 104Z', '#ff7a7a')]],
+  ['Draw a short, fat stem underneath, like a marshmallow.', [S('M68 110.3C62 140 62 168 72 176Q100 184 128 176C138 168 138 140 132 110.3', '#fff4dc', { z: -1 })]],
+  ['Add big round spots on the cap.', [S(C(62, 74, 11), '#fff'), S(C(102, 52, 12), '#fff'), S(C(140, 78, 10), '#fff'), S(C(92, 92, 6), '#fff')]],
+  ['Draw a cute face on the stem.', face(100, 138, { g: 13 })],
+  ['Draw zig-zag grass at the bottom. 🌱', [S('M42 186L48 172L54 186L60 170L66 186', null, { sc: '#4caf50' }), S('M134 186L140 170L146 186L152 172L158 186', null, { sc: '#4caf50' })]],
+]);
+
+add('spike', 'Spike', 'Cactus', 'garden', 'sway', [
+  ['Draw a tall pickle shape standing up. 🥒', [S('M76 150V60C76 34 124 34 124 60V150', '#7fd36b')]],
+  ['Add two arms that bend up like the letter L — waving hello!', [S('M76 112H60Q48 112 48 100V82Q48 72 56 72Q64 72 64 82V96H76', '#7fd36b', { z: -1 }), S('M124 100H136Q148 100 148 88V70Q148 60 140 60Q132 60 132 70V84H124', '#7fd36b', { z: -1 })]],
+  ['Draw a flower pot: a flat rectangle on top of a bucket shape.', [S('M62 162L70 190L130 190L138 162', '#e89a6b', { z: 1 }), S(RR(56, 146, 88, 16, 5), '#f0a878', { z: 2 })]],
+  ['Draw a happy face.', face(100, 86, { g: 13 })],
+  ['Add a flower on his head and some prickles. 🌸', [...flower(100, 38, 9, '#ff9ccf', K.yellow), S('M86 64L81 61', null, { w: 3 }), S('M114 62L119 59', null, { w: 3 }), S('M86 122L81 119', null, { w: 3 }), S('M114 128L119 125', null, { w: 3 })]],
+]);
+
+add('daisy', 'Daisy', 'Flower', 'garden', 'sway', [
+  ["Draw a circle for Daisy's sunny face.", [S(C(100, 76, 26), K.yellow)]],
+  ['Add 8 petals around it, like little loops. 🌼', petals(100, 76, 26, 8, 64).map((d, i) => S(d, i % 2 ? '#ffd1ea' : '#ffffff', { z: -1 }))],
+  ['Draw a sweet face in the middle.', face(100, 74, { g: 10, k: .85 })],
+  ['Draw a long stem with two leaves.', [S('M100 102Q94 140 100 188', '#6fbf5e', { tw: 6, z: -2 }), S(leaf(97, 142.5, 34, 200, 12), '#8edb6a', { z: -1.5 }), S(leaf(97.5, 160, 34, -25, 12), '#8edb6a', { z: -1.5 })]],
+  ['Add some grass at the bottom.', [S('M58 188L64 174L70 188L76 172L82 188', null, { sc: '#4caf50' }), S('M118 188L124 172L130 188L136 174L142 188', null, { sc: '#4caf50' })]],
+]);
+
+add('wiggles', 'Wiggles', 'Caterpillar', 'garden', 'none', [
+  ['Draw a circle for the head.', [S(C(152, 90, 26), '#9be27a', { z: 4, a: 'bob' })]],
+  ['Add three circles behind it in a row, each one a little smaller. 🟢', [S(C(110, 110, 22), '#c3f08f', { z: 3, a: 'bob', dl: -.2 }), S(C(70, 124, 20), '#9be27a', { z: 2, a: 'bob', dl: -.4 }), S(C(34, 130, 17), '#c3f08f', { z: 1, a: 'bob', dl: -.6 })]],
+  ['Draw a happy face on the head.', lay(face(152, 90, { g: 10, k: .9 }), 5, { a: 'bob' })],
+  ['Add two antennae with dots on top.', [S('M140 67Q134 50 126 46', null, { z: 3.5, a: 'bob' }), S(C(124, 44, 4.5), K.dark, { z: 3.5, a: 'bob' }), S('M160 65.3Q166 48 174 46', null, { z: 3.5, a: 'bob' }), S(C(176, 44, 4.5), K.dark, { z: 3.5, a: 'bob' })]],
+  ['Draw tiny feet under each body circle.', [['M104 131.2L102 140', -.2], ['M116 131.2L118 140', -.2], ['M64 143.1L62 152', -.4], ['M76 143.1L78 152', -.4], ['M30 146.5L28 154', -.6], ['M38 146.5L40 154', -.6]].map(([d, dl]) => S(d, null, { a: 'bob', dl }))],
+]);
+
+add('flutter', 'Flutter', 'Butterfly', 'garden', 'float', [
+  ['Draw a round head and a long skinny body, like a lollipop. 🍭', [S(C(100, 64, 16), '#9b88d8'), S(E(100, 118, 10, 36), '#7a68a6')]],
+  ['Add two big wings on top, like giant ears.', [S('M92.1 96C66 42 20 52 28 88C34 114 70 114 90.4 108', '#ffb0e0', { z: -1, a: 'bfly', o: [100, 104] }), S('M107.9 96C134 42 180 52 172 88C166 114 130 114 109.6 108', '#ffb0e0', { z: -1, a: 'bfly', o: [100, 104] })]],
+  ['Add two smaller wings below, like teardrops.', [S('M90.1 124C60 124 46 152 60 164C74 174 88 150 91.3 136', '#c9b5ff', { z: -1, a: 'bfly', o: [100, 128] }), S('M109.9 124C140 124 154 152 140 164C126 174 112 150 108.7 136', '#c9b5ff', { z: -1, a: 'bfly', o: [100, 128] })]],
+  ['Draw a tiny face and two curly antennae.', [...face(100, 63, { g: 7, k: .7, ch: 0 }), S('M94 49.2Q88 34 80 30', null, { z: -1 }), S(C(78, 28, 4), '#7a68a6', { z: -1 }), S('M106 49.2Q112 34 120 30', null, { z: -1 }), S(C(122, 28, 4), '#7a68a6', { z: -1 })]],
+  ['Decorate the wings with big polka dots!', [S(C(56, 82, 10), '#fff0f8', { z: -0.5, a: 'bfly', o: [100, 104] }), S(C(144, 82, 10), '#fff0f8', { z: -0.5, a: 'bfly', o: [100, 104] }), S(C(68, 148, 6), '#efe8ff', { z: -0.5, a: 'bfly', o: [100, 128] }), S(C(132, 148, 6), '#efe8ff', { z: -0.5, a: 'bfly', o: [100, 128] })]],
+]);
+
+add('sunny', 'Sunny', 'Sunshine', 'garden', 'bounce', [
+  ["Draw a big circle for Sunny's face. ☀️", [S(C(100, 100, 44), '#ffe066')]],
+  ['Add triangle rays all around, like pizza slices pointing out.', [0, 45, 90, 135, 180, 225, 270, 315].map(a => S(spike(100, 100, 52, 22, a - 90, 11, 1), '#ffb347', { z: -1, a: 'spin', o: [100, 100] }))],
+  ['Draw a big happy smile and rosy cheeks.', face(100, 104, { g: 18, k: 1.2, eyes: 'none', m: 'open' })],
+  ['Give Sunny cool sunglasses! 😎', [S(E(82, 92, 14, 10), K.dark, { ink: 1 }), S(E(118, 92, 14, 10), K.dark, { ink: 1 }), S('M96 90Q100 86 104 90', null, { w: 4 }), S('M68 90L58 86'), S('M132 90L142 86'), S('M74 88L80 84', null, { sc: '#ffffff', w: 3, deco: 1 }), S('M110 88L116 84', null, { sc: '#ffffff', w: 3, deco: 1 })]],
+]);
+
+/* index shapes; split multi-part paths so the pencil lifts between them */
+const byId = {};
+CHARS.forEach(ch => {
+  let i = 0;
+  ch.steps.forEach(st => {
+    st.s.forEach(s => { s._i = i++; });
+    st.g = st.s.filter(s => !s.deco).flatMap(s => s.d.split(/(?=M)/).map(d => ({ d: d.trim(), ink: s.ink })));
+  });
+  ch._layers = ch.steps.flatMap(st => st.s).sort((a, b) => (a.z || 0) - (b.z || 0) || a._i - b._i);
+  byId[ch.id] = ch;
+});
+
+/* =====================================================================
+   3. RENDERING
+   ===================================================================== */
+const FILLBOX = new Set(['twinkle', 'floatup', 'drip', 'steam', 'zzz', 'spout']);
+function shapeSVG(s) {
+  const o = s.o || s.blink;
+  const cls = s.a ? `pa pa-${s.a}` : s.blink ? 'blink' : '';
+  let st = '';
+  if (o && !FILLBOX.has(s.a)) st += `transform-origin:${o[0]}px ${o[1]}px;`;
+  if (s.dl != null) st += `animation-delay:${s.dl}s;`;
+  const at = (cls ? ` class="${cls}"` : '') + (st ? ` style="${st}"` : '') + (s.op != null ? ` opacity="${s.op}"` : '');
+  const fill = s.f === 'bg' ? 'var(--hole,#fff)' : (s.f || 'none');
+  const fo = s.fo != null ? ` fill-opacity="${s.fo}"` : '';
+  const stroke = s.ns ? 'none' : (s.sc || INK), sw = s.w || 4;
+  if (s.tw) return `<g${at}><path d="${s.d}" fill="none" stroke="${INK}" stroke-width="${s.tw + 7}"/><path d="${s.d}" fill="none" stroke="${s.f}" stroke-width="${s.tw}"/></g>`;
+  if (s.fd) return `<g${at}><path d="${s.fd}" fill="${fill}"${fo}/><path d="${s.d}" fill="none" stroke="${stroke}" stroke-width="${sw}"/></g>`;
+  return `<path${at} d="${s.d}" fill="${fill}"${fo} stroke="${stroke}" stroke-width="${sw}"/>`;
+}
+function artSVG(ch, still = false) {
+  ch._body ||= ch._layers.map(shapeSVG).join('');
+  const d = (Math.random() * 3).toFixed(2), bd = (Math.random() * 4).toFixed(2);
+  return `<svg viewBox="0 0 200 200" class="art${still ? ' still' : ''}" style="--bd:-${bd}s" aria-hidden="true"><g class="idle idle-${ch.idle}" style="animation-delay:-${d}s" stroke-linecap="round" stroke-linejoin="round">${ch._body}</g></svg>`;
+}
+const ICON_FB = { house: '🏠', star: '⭐', trophy: '🏆', shuffle: '🎲', eye: '👀', pencil: '✏️', turtle: '🐢', rabbit: '🐇', sparkles: '✨', ghost: '👻', eraser: '🧽', 'undo-2': '↩️', 'trash-2': '🗑️', 'volume-2': '🔊', 'volume-x': '🔇', play: '▶️', pause: '⏸️', 'arrow-left': '⬅️', 'arrow-right': '➡️', download: '💾', 'rotate-ccw': '🔁' };
+function ico(name) {
+  const node = window.lucide && window.lucide.icons && window.lucide.icons[name.replace(/(^|-)(\w)/g, (_, __, c) => c.toUpperCase())];
+  if (!node) return `<span aria-hidden="true">${ICON_FB[name] || ''}</span>`;
+  return `<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${node.map(([t, a]) => `<${t} ${Object.entries(a).map(([k, v]) => `${k}="${v}"`).join(' ')}/>`).join('')}</svg>`;
+}
+const $ = s => document.querySelector(s);
+const catVars = c => `--cat:${c.c};--tint:${c.t};--cat-sh:${c.sh};--hole:${c.t}`;
+
+/* =====================================================================
+   4. SAVED PROGRESS (stars), SOUND & VOICE
+   ===================================================================== */
+const KEY = 'doodlePals.v1';
+const prefs = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } })();
+prefs.done = Array.isArray(prefs.done) ? prefs.done : [];
+prefs.sound = prefs.sound !== false; prefs.fast = !!prefs.fast; prefs.trace = !!prefs.trace;
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(prefs)); } catch (e) { /* private mode: progress lasts for this visit */ } };
+const isDone = id => prefs.done.includes(id);
+const doneCount = () => prefs.done.filter(id => byId[id]).length;
+
+const Sfx = {
+  ctx: null,
+  tone(f, t0, dur, type = 'triangle', vol = .12) {
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain(), t = c.currentTime + t0;
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + .05);
+  },
+  play(kind) {
+    if (!prefs.sound) return;
+    try {
+      this.ctx ||= new (window.AudioContext || window.webkitAudioContext)();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      ({
+        tap: () => this.tone(560, 0, .07),
+        next: () => { this.tone(660, 0, .09); this.tone(880, .07, .12); },
+        back: () => { this.tone(620, 0, .09); this.tone(440, .07, .1); },
+        pop: () => this.tone(900, 0, .06, 'sine', .1),
+        clear: () => [700, 520, 380].forEach((f, i) => this.tone(f, i * .05, .09, 'sine', .08)),
+        win: () => [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone(f, i * .1, .3, 'triangle', .13)),
+      })[kind]?.();
+    } catch (e) { /* audio not available */ }
+  },
+};
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/[\p{Extended_Pictographic}️‍]/gu, '').replace(/—/g, ', '));
+  u.rate = .92; u.pitch = 1.15; speechSynthesis.speak(u);
+}
+function paintSound() {
+  for (const b of [$('#soundBtn'), $('#soundBtn2')]) { b.innerHTML = ico(prefs.sound ? 'volume-2' : 'volume-x'); b.setAttribute('aria-label', prefs.sound ? 'Sound on' : 'Sound off'); }
+}
+function toggleSound() { prefs.sound = !prefs.sound; save(); paintSound(); Sfx.play('pop'); }
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); }
+const CHEERS = ['Nice line! ✨', 'You got this! 💪', 'Looking great! 🌟', 'Wow, so good! 🎨', 'Keep going! 🚀', 'Super doodle! 💖', 'Awesome! 🙌', 'Beautiful! 🌈'];
+
+/* =====================================================================
+   5. LIBRARY SCREEN
+   ===================================================================== */
+let filter = 'all';
+const rank = n => n >= CHARS.length ? 'Doodle Legend 👑' : n >= 30 ? 'Drawing Champion 🏆' : n >= 15 ? 'Art Wizard 🪄' : n >= 5 ? 'Doodle Star ⭐' : n >= 1 ? 'Sketch Sprout 🌱' : 'New Doodler ✏️';
+function cardHTML(ch) {
+  const c = CAT[ch.cat], done = isDone(ch.id);
+  return `<button class="pal-card${done ? ' done' : ''}" data-id="${ch.id}" style="${catVars(c)}" aria-label="Draw ${ch.name} the ${ch.what}, ${ch.steps.length} steps${done ? ', already drawn' : ''}">
+    ${ch.star ? `<span class="ribbon">${ico('sparkles')} Star Lesson</span>` : ''}
+    <span class="pal-art">${artSVG(ch)}</span>
+    <span class="pal-name">${ch.name}</span>
+    <span class="pal-what">${ch.what} · ${ch.steps.length} steps</span>
+    ${done ? `<span class="pal-star" aria-hidden="true">${ico('star')}</span>` : ''}
+  </button>`;
+}
+const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('inview', e.isIntersecting)), { rootMargin: '120px' }) : null;
+function renderLibrary() {
+  const n = doneCount();
+  $('#progCount').textContent = `${n} of ${CHARS.length}`;
+  $('#progBar').style.width = `${n / CHARS.length * 100}%`;
+  $('#progBarWrap').setAttribute('aria-valuemax', CHARS.length); $('#progBarWrap').setAttribute('aria-valuenow', n);
+  $('#rank').textContent = rank(n);
+  $('#chips').innerHTML = [{ id: 'all', name: 'All Pals', emoji: '🌈', c: '#2b2340', sh: '#000' }, ...CATS].map(c =>
+    `<button class="chip btn3d" data-f="${c.id}" aria-pressed="${filter === c.id}" style="--c:${c.c};--csh:${c.sh}">${c.emoji} ${c.name}</button>`).join('');
+  $('#featured').innerHTML = filter === 'all' ? `<h2 class="text-2xl sm:text-3xl font-bold mb-1 flex items-center gap-2">⭐ Star Lessons <span class="text-base sm:text-lg font-medium text-[#6b5f86]">— start here!</span></h2>
+    <div class="pal-grid big mt-3">${CHARS.filter(c => c.star).map(cardHTML).join('')}</div>` : '';
+  $('#sections').innerHTML = CATS.filter(c => filter === 'all' || filter === c.id).map(c => {
+    const list = CHARS.filter(ch => ch.cat === c.id), got = list.filter(ch => isDone(ch.id)).length;
+    return `<section class="mt-10" style="${catVars(c)}">
+      <div class="flex flex-wrap items-end justify-between gap-2 mb-4">
+        <div><h2 class="text-2xl sm:text-3xl font-bold" style="color:${c.c}">${c.emoji} ${c.name}</h2><p class="text-[#6b5f86] font-medium">${c.blurb}</p></div>
+        <span class="rounded-full bg-white px-4 py-1 font-bold shadow-[0_3px_0_#eadccb]">${got}/${list.length} ⭐</span>
+      </div>
+      <div class="pal-grid">${list.map(cardHTML).join('')}</div>
+    </section>`;
+  }).join('');
+  io?.disconnect();
+  document.querySelectorAll('.pal-card').forEach(el => io ? io.observe(el) : el.classList.add('inview'));
+}
+
+/* =====================================================================
+   6. THE PENCIL DEMO ENGINE — draws the current step over and over
+   ===================================================================== */
+const PENCIL = `<g id="pencil" filter="url(#psh)"><g transform="rotate(32) scale(.9)" stroke="#2b2340" stroke-width="1.6" stroke-linejoin="round">
+  <path d="M0 0L-5.5-14H5.5Z" fill="#f6d2a8"/><path d="M0 0L-2.2-5.6H2.2Z" fill="#2b2340" stroke="none"/>
+  <rect x="-5.5" y="-52" width="11" height="38" fill="#ffcf3f"/><path d="M-1.8-50V-16" stroke="#f0a91e" stroke-width="2"/>
+  <rect x="-5.5" y="-59" width="11" height="7" fill="#c9d1e4"/><path d="M-5.5-59V-63Q-5.5-68 0-68Q5.5-68 5.5-63V-59Z" fill="#ff8fb3"/></g></g>`;
+const REST = { x: 176, y: 186 };
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const Demo = {
+  raf: 0, t: 0, last: 0, playing: true, els: [], lens: [], segs: [], draws: [], total: 1,
+  setup() {
+    const g = $('#gCur');
+    this.g = g; this.pencil = $('#pencil'); this.aim = $('#aim');
+    this.els = [...g.querySelectorAll('path')];
+    this.lens = this.els.map(e => Math.max(1, e.getTotalLength()));
+    this.els.forEach((e, i) => { e.style.strokeDasharray = `${this.lens[i]} ${this.lens[i] + 20}`; });
+    const segs = []; let pos = REST;
+    this.draws = this.els.map((e, i) => {
+      const a = e.getPointAtLength(0), b = e.getPointAtLength(this.lens[i]);
+      segs.push({ k: 'move', from: pos, to: { x: a.x, y: a.y }, d: 260 + Math.hypot(a.x - pos.x, a.y - pos.y) * 2.6 });
+      const ds = { k: 'draw', i, d: Math.max(280, this.lens[i] * 9) };
+      segs.push(ds); pos = { x: b.x, y: b.y };
+      return ds;
+    });
+    segs.push({ k: 'move', from: pos, to: REST, d: 560 }, { k: 'hold', d: 1600 }, { k: 'fade', d: 420 });
+    let acc = 0; for (const s of segs) { s.t0 = acc; acc += s.d; }
+    this.segs = segs; this.total = acc; this.t = 0; this.apply();
+  },
+  start() { this.stop(); this.last = 0; const loop = now => { this.frame(now); this.raf = requestAnimationFrame(loop); }; this.raf = requestAnimationFrame(loop); },
+  stop() { cancelAnimationFrame(this.raf); this.raf = 0; },
+  frame(now) {
+    const dt = this.last ? Math.min(64, now - this.last) : 0; this.last = now;
+    if (this.playing && this.els.length) { this.t = (this.t + dt * (prefs.fast ? 2.3 : 1)) % this.total; this.apply(); }
+  },
+  apply() {
+    if (!this.els.length) return;
+    const t = this.t, seg = this.segs.find(s => t < s.t0 + s.d) || this.segs[this.segs.length - 1];
+    const p = Math.min(1, Math.max(0, (t - seg.t0) / seg.d));
+    this.draws.forEach((ds, i) => {
+      const q = t >= ds.t0 + ds.d ? 1 : t <= ds.t0 ? 0 : (t - ds.t0) / ds.d, e = this.els[i];
+      e.style.strokeDashoffset = this.lens[i] * (1 - q);
+      e.style.visibility = q > 0 ? 'visible' : 'hidden';
+      if (e.classList.contains('ink')) e.style.fillOpacity = q >= 1 ? 1 : 0;
+    });
+    this.g.style.opacity = seg.k === 'fade' ? 1 - p : 1;
+    this.g.classList.toggle('flash', seg.k === 'hold');
+    let x = REST.x, y = REST.y, lift = 0;
+    if (seg.k === 'draw') { const pt = this.els[seg.i].getPointAtLength(this.lens[seg.i] * p); x = pt.x; y = pt.y; }
+    else if (seg.k === 'move') { const e = ease(p); x = seg.from.x + (seg.to.x - seg.from.x) * e; y = seg.from.y + (seg.to.y - seg.from.y) * e; lift = Math.sin(Math.PI * p); }
+    this.pencil.setAttribute('transform', `translate(${r1(x)} ${r1(y - lift * 9)}) scale(${r1(1 + lift * .14)})`);
+    const aimAt = seg.k === 'move' && this.segs[this.segs.indexOf(seg) + 1]?.k === 'draw' ? seg.to : null;
+    this.aim.style.display = aimAt ? '' : 'none';
+    if (aimAt) this.aim.setAttribute('transform', `translate(${r1(aimAt.x)} ${r1(aimAt.y)})`);
+  },
+  setPlaying(on) { this.playing = on; this.last = 0; $('#playBtn').innerHTML = ico(on ? 'pause' : 'play'); $('#playBtn').setAttribute('aria-label', on ? 'Pause the pencil' : 'Play the pencil'); },
+};
+
+/* =====================================================================
+   7. SKETCHPAD — finger / mouse practice canvas with undo, eraser, trace
+   ===================================================================== */
+const COLORS = [['Ink', '#2b2340'], ['Pink', '#ff4fa0'], ['Purple', '#8b5cf6'], ['Blue', '#2f8cff'], ['Green', '#1fbf63'], ['Orange', '#ff8a1f']];
+const SIZES = [3, 6, 11];
+const padMemory = {};
+const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+const Pad = {
+  strokes: [], active: null, color: COLORS[0][1], size: 1, eraser: false, W: 0, H: 0, dpr: 1,
+  init() {
+    this.cv = $('#pad'); this.ctx = this.cv.getContext('2d');
+    if ('ResizeObserver' in window) new ResizeObserver(() => this.resize()).observe(this.cv); else addEventListener('resize', () => this.resize());
+    this.cv.addEventListener('pointerdown', e => this.down(e));
+    this.cv.addEventListener('pointermove', e => this.move(e));
+    for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) this.cv.addEventListener(ev, () => this.up());
+  },
+  use(id) { this.strokes = padMemory[id] ||= []; this.active = null; this.resize(); },
+  resize() {
+    const r = this.cv.getBoundingClientRect(); if (!r.width) return;
+    this.dpr = Math.min(2.5, window.devicePixelRatio || 1); this.W = r.width; this.H = r.height;
+    this.cv.width = Math.round(r.width * this.dpr); this.cv.height = Math.round(r.height * this.dpr);
+    this.redraw();
+  },
+  pt(e) { const r = this.cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; },
+  down(e) {
+    if (e.button > 0) return;
+    e.preventDefault();
+    try { this.cv.setPointerCapture(e.pointerId); } catch (err) { /* keep drawing without capture */ }
+    this.active = { c: this.color, w: SIZES[this.size], er: this.eraser, p: [this.pt(e)] };
+    this.strokes.push(this.active); $('#padHint').hidden = true;
+  },
+  move(e) {
+    const s = this.active; if (!s) return;
+    for (const ev of (e.getCoalescedEvents ? e.getCoalescedEvents() : [e])) {
+      const p = this.pt(ev), q = s.p[s.p.length - 1];
+      if (Math.hypot(p[0] - q[0], p[1] - q[1]) < .002) continue;
+      s.p.push(p); this.seg(this.ctx, s, s.p.length - 1, this.cv.width, this.cv.height);
+    }
+  },
+  up() { if (!this.active) return; this.cap(this.ctx, this.active, this.cv.width, this.cv.height); this.active = null; },
+  pen(ctx, s, w) { ctx.globalCompositeOperation = s.er ? 'destination-out' : 'source-over'; ctx.strokeStyle = ctx.fillStyle = s.c; ctx.lineWidth = s.w / 200 * w; ctx.lineCap = ctx.lineJoin = 'round'; },
+  seg(ctx, s, k, w, h) {
+    const P = s.p, X = p => [p[0] * w, p[1] * h]; this.pen(ctx, s, w); ctx.beginPath();
+    if (k === 1) { ctx.moveTo(...X(P[0])); ctx.lineTo(...X(mid(P[0], P[1]))); }
+    else { ctx.moveTo(...X(mid(P[k - 2], P[k - 1]))); ctx.quadraticCurveTo(...X(P[k - 1]), ...X(mid(P[k - 1], P[k]))); }
+    ctx.stroke();
+  },
+  cap(ctx, s, w, h) {
+    const P = s.p, X = p => [p[0] * w, p[1] * h]; this.pen(ctx, s, w); ctx.beginPath();
+    if (P.length === 1) { const [x, y] = X(P[0]); ctx.arc(x, y, ctx.lineWidth / 2, 0, Math.PI * 2); ctx.fill(); }
+    else { ctx.moveTo(...X(mid(P[P.length - 2], P[P.length - 1]))); ctx.lineTo(...X(P[P.length - 1])); ctx.stroke(); }
+  },
+  paint(ctx, w, h) {
+    ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, w, h);
+    for (const s of this.strokes) { for (let k = 1; k < s.p.length; k++) this.seg(ctx, s, k, w, h); this.cap(ctx, s, w, h); }
+  },
+  redraw() { this.paint(this.ctx, this.cv.width, this.cv.height); $('#padHint').hidden = this.strokes.length > 0; },
+  undo() { this.strokes.pop(); this.redraw(); Sfx.play('back'); },
+  clear() { if (!this.strokes.length) return; this.strokes.length = 0; this.redraw(); Sfx.play('clear'); },
+  snapshot(size = 600) {
+    if (!this.strokes.some(s => !s.er)) return null;
+    const ink = document.createElement('canvas'); ink.width = ink.height = size; this.paint(ink.getContext('2d'), size, size);
+    const out = document.createElement('canvas'); out.width = out.height = size;
+    const o = out.getContext('2d'); o.fillStyle = '#fffdf9'; o.fillRect(0, 0, size, size); o.drawImage(ink, 0, 0);
+    return out.toDataURL('image/png');
+  },
+};
+function paintTools() {
+  $('#swatches').innerHTML = COLORS.map(([n, c]) => `<button class="swatch" data-color="${c}" style="--c:${c}" aria-label="${n} pencil" aria-pressed="${!Pad.eraser && Pad.color === c}"></button>`).join('')
+    + `<button id="sizeBtn" class="tool btn3d ml-auto" aria-label="Pencil size: ${['thin', 'medium', 'thick'][Pad.size]}" title="Pencil size"><span class="size-dot" style="width:${[6, 11, 18][Pad.size]}px;height:${[6, 11, 18][Pad.size]}px;color:${Pad.color}"></span></button>`;
+  $('#eraserBtn').setAttribute('aria-pressed', Pad.eraser);
+  $('#traceBtn').setAttribute('aria-pressed', prefs.trace);
+}
+
+/* =====================================================================
+   8. GUIDE SCREEN
+   ===================================================================== */
+const G = { ch: null, step: 0 };
+function openGuide(ch) {
+  G.ch = ch; G.step = 0;
+  const c = CAT[ch.cat];
+  document.title = `Draw ${ch.name} · Doodle Pals`;
+  $('#guide').style.cssText = catVars(c); $('#celebrate').style.cssText = catVars(c); $('#toast').style.cssText = catVars(c);
+  $('#library').hidden = true; $('#guide').hidden = false; window.scrollTo(0, 0);
+  $('#gIcon').innerHTML = artSVG(ch); $('#gName').textContent = `${ch.name} the ${ch.what}`; $('#gCat').textContent = `${c.emoji} ${c.name}`;
+  $('#peek').hidden = true;
+  Demo.setPlaying(true); paintSpeed();
+  Pad.use(ch.id); paintTools();
+  renderStep(false); Demo.start();
+}
+function renderStep(pop = true) {
+  const ch = G.ch, st = ch.steps[G.step], n = ch.steps.length, last = G.step === n - 1;
+  $('#stepBadge').textContent = G.step + 1;
+  $('#stepOf').textContent = `Step ${G.step + 1} of ${n}`;
+  $('#tipText').textContent = st.t;
+  if (pop) { const tc = $('#tipCard'); tc.classList.remove('tip-pop'); void tc.offsetWidth; tc.classList.add('tip-pop'); }
+  $('#backBtn').disabled = G.step === 0;
+  $('#backBtn').innerHTML = `${ico('arrow-left')} Back`;
+  const nb = $('#nextBtn'); nb.classList.toggle('finish', last);
+  nb.innerHTML = last ? `I drew it! ${ico('star')}` : `Next ${ico('arrow-right')}`;
+  $('#dots').innerHTML = ch.steps.map((_, i) => `<button class="dot ${i < G.step ? 'past' : i === G.step ? 'now' : ''}" data-step="${i}" aria-label="Go to step ${i + 1}"${i === G.step ? ' aria-current="step"' : ''}></button>`).join('');
+  $('#gDone').hidden = !isDone(ch.id);
+  // stage: finished steps in blue, the current step in black (animated), a faint dotted preview of where it goes
+  let past = '', cur = '', ghost = '';
+  for (let i = 0; i < G.step; i++) for (const s of ch.steps[i].g) past += `<path d="${s.d}"${s.ink ? ' class="ink"' : ''}/>`;
+  for (const s of st.g) { cur += `<path d="${s.d}"${s.ink ? ' class="ink"' : ''}/>`; ghost += `<path d="${s.d}"/>`; }
+  $('#stage').innerHTML = `<defs><filter id="psh" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="2" dy="3" stdDeviation="1.6" flood-color="#2b2340" flood-opacity=".28"/></filter></defs>
+    <g class="g-past">${past}</g><g class="g-ghost">${ghost}</g><g class="g-cur" id="gCur">${cur}</g>
+    <g id="aim"><circle class="aim-ring" r="7"/></g>${PENCIL}`;
+  Demo.setup();
+  // tracing paper on the sketchpad shows everything up to this step
+  $('#trace').toggleAttribute('hidden', !prefs.trace);
+  $('#trace').innerHTML = ch.steps.slice(0, G.step + 1).flatMap(s => s.g).map(s => `<path d="${s.d}"/>`).join('');
+}
+function goStep(i, cheer) {
+  if (i < 0 || i >= G.ch.steps.length || i === G.step) return;
+  G.step = i; renderStep();
+  if (cheer) toast(CHEERS[Math.floor(Math.random() * CHEERS.length)]);
+}
+function next() {
+  if (G.step === G.ch.steps.length - 1) return celebrate();
+  Sfx.play('next'); goStep(G.step + 1, true);
+}
+function back() { if (G.step > 0) { Sfx.play('back'); goStep(G.step - 1); } }
+function paintSpeed() {
+  const b = $('#speedBtn'); b.setAttribute('aria-checked', prefs.fast);
+  b.setAttribute('aria-label', prefs.fast ? 'Speed: fast. Tap to slow down' : 'Speed: slow. Tap to speed up');
+  $('#speedLabel').textContent = prefs.fast ? 'Fast' : 'Slow';
+}
+function peek() {
+  const el = $('#peek');
+  if (!el.hidden) { el.hidden = true; return; }
+  el.innerHTML = `<span class="peek-tag">Sneak peek! 👀</span>${artSVG(G.ch)}`; el.hidden = false; Sfx.play('pop');
+  clearTimeout(peek.t); peek.t = setTimeout(() => { el.hidden = true; }, 3200);
+}
+
+/* =====================================================================
+   9. CELEBRATION
+   ===================================================================== */
+function confetti() {
+  const host = $('#confetti'), colors = ['#ff6fb5', '#ffd23f', '#7c6cff', '#22b866', '#1ea5e0', '#ff9334'];
+  host.replaceChildren();
+  for (let i = 0; i < 90; i++) {
+    const p = document.createElement('i'); p.className = 'confetto';
+    p.style.cssText = `left:${Math.random() * 100}%;background:${colors[i % 6]};width:${8 + Math.random() * 7}px;height:${10 + Math.random() * 9}px;border-radius:${Math.random() > .5 ? '50%' : '3px'};animation-duration:${1.8 + Math.random() * 1.7}s;animation-delay:${Math.random() * .5}s;--dx:${Math.round((Math.random() * 2 - 1) * 140)}px;--r:${Math.round(Math.random() * 900 - 450)}deg`;
+    host.appendChild(p);
+  }
+  clearTimeout(confetti.t); confetti.t = setTimeout(() => host.replaceChildren(), 4500);
+}
+function nextPal() {
+  const i = CHARS.indexOf(G.ch), rest = [...CHARS.slice(i + 1), ...CHARS.slice(0, i)];
+  return rest.find(c => !isDone(c.id)) || rest[0];
+}
+function celebrate() {
+  const ch = G.ch, first = !isDone(ch.id);
+  if (first) { prefs.done.push(ch.id); save(); }
+  Sfx.play('win'); confetti(); Demo.stop(); $('#toast').classList.remove('show');
+  $('#cTitle').textContent = `You drew ${ch.name}! 🎉`;
+  $('#cSub').textContent = first ? `+1 star! That's ${doneCount()} of ${CHARS.length} pals.` : 'Even better the second time! 🌈';
+  $('#cArt').innerHTML = artSVG(ch);
+  const snap = Pad.snapshot();
+  $('#cMine').hidden = !snap; $('#cSave').hidden = !snap;
+  if (snap) { $('#cImg').src = snap; $('#cSave').href = snap; $('#cSave').download = `doodle-pals-${ch.id}.png`; }
+  const np = nextPal(); $('#cNext').innerHTML = `Next: ${np.name} ${ico('arrow-right')}`; $('#cNext').dataset.id = np.id;
+  $('#gDone').hidden = false;
+  $('#celebrate').hidden = false; $('#cNext').focus();
+}
+function closeCelebrate() { $('#celebrate').hidden = true; $('#confetti').replaceChildren(); }
+
+/* =====================================================================
+   10. ROUTER + WIRING
+   ===================================================================== */
+function showLibrary() {
+  Demo.stop(); if ('speechSynthesis' in window) speechSynthesis.cancel();
+  closeCelebrate(); document.title = 'Doodle Pals';
+  $('#guide').hidden = true; $('#library').hidden = false; renderLibrary();
+}
+function route() {
+  const m = location.hash.match(/^#\/draw\/([\w-]+)/);
+  if (m && byId[m[1]]) { closeCelebrate(); openGuide(byId[m[1]]); } else showLibrary();
+}
+const go = id => { location.hash = `#/draw/${id}`; };
+const home = () => { if (location.hash.startsWith('#/draw/')) location.hash = '#/'; else showLibrary(); };
+
+function wire() {
+  document.querySelectorAll('[data-ico]').forEach(el => { el.innerHTML = ico(el.dataset.ico); });
+  paintSound();
+  $('#soundBtn').onclick = toggleSound; $('#soundBtn2').onclick = toggleSound;
+  $('#library').addEventListener('click', e => {
+    const card = e.target.closest('.pal-card'); if (card) { Sfx.play('tap'); return go(card.dataset.id); }
+    const chip = e.target.closest('.chip'); if (chip) { filter = chip.dataset.f; Sfx.play('pop'); renderLibrary(); }
+  });
+  $('#surpriseBtn').onclick = () => { const left = CHARS.filter(c => !isDone(c.id)), pool = left.length ? left : CHARS; Sfx.play('tap'); go(pool[Math.floor(Math.random() * pool.length)].id); };
+  $('#resetBtn').onclick = () => { if (confirm('Erase all your stars and start over?')) { prefs.done = []; save(); renderLibrary(); } };
+  $('#homeBtn').onclick = () => { Sfx.play('back'); home(); };
+  $('#nextBtn').onclick = next; $('#backBtn').onclick = back;
+  $('#dots').addEventListener('click', e => { const d = e.target.closest('.dot'); if (d) { Sfx.play('pop'); goStep(+d.dataset.step); } });
+  $('#speakBtn').onclick = () => speak(`Step ${G.step + 1}. ${G.ch.steps[G.step].t}`);
+  $('#speedBtn').onclick = () => { prefs.fast = !prefs.fast; save(); paintSpeed(); Sfx.play(prefs.fast ? 'next' : 'back'); };
+  $('#playBtn').onclick = () => { Demo.setPlaying(!Demo.playing); Sfx.play('pop'); };
+  $('#peekBtn').onclick = peek; $('#peek').onclick = peek;
+  $('#swatches').addEventListener('click', e => {
+    const sw = e.target.closest('.swatch');
+    if (sw) { Pad.color = sw.dataset.color; Pad.eraser = false; }
+    else if (e.target.closest('#sizeBtn')) Pad.size = (Pad.size + 1) % SIZES.length;
+    else return;
+    Sfx.play('pop'); paintTools();
+  });
+  $('#eraserBtn').onclick = () => { Pad.eraser = !Pad.eraser; Sfx.play('pop'); paintTools(); };
+  $('#undoBtn').onclick = () => Pad.undo();
+  $('#clearBtn').onclick = () => Pad.clear();
+  $('#traceBtn').onclick = () => { prefs.trace = !prefs.trace; save(); $('#trace').toggleAttribute('hidden', !prefs.trace); Sfx.play('pop'); paintTools(); };
+  $('#cNext').onclick = () => { closeCelebrate(); go($('#cNext').dataset.id); };
+  $('#cAgain').onclick = () => { closeCelebrate(); Pad.strokes.length = 0; Pad.redraw(); G.step = 0; renderStep(); Demo.start(); };
+  $('#cHome').onclick = () => { closeCelebrate(); home(); };
+  document.addEventListener('keydown', e => {
+    if (!$('#celebrate').hidden) { if (e.key === 'Escape') { closeCelebrate(); Demo.start(); } return; }
+    if ($('#guide').hidden || e.target.closest('input, textarea')) return;
+    if (e.key === 'ArrowRight') next(); else if (e.key === 'ArrowLeft') back(); else if (e.key === 'Escape') home();
+  });
+  window.addEventListener('hashchange', route);
+}
+
+Pad.init(); wire(); route();
+})();
+</script>
+</body>
+</html>
