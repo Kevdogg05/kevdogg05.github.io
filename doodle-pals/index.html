@@ -245,13 +245,18 @@
   .dot.now { background: var(--cat); transform: scale(1.35); }
   @media (max-width: 480px) {
     .nav-btn { min-width: 0; height: 56px; padding: 0 16px; font-size: 19px; border-radius: 20px; }
-    .dot { width: 12px; height: 12px; }
-    #dots { gap: 6px; }
+    .dot { width: 10px; height: 10px; }
+    #dots { gap: 5px; }
     .panel-title { font-size: 18px; }
     #speedLabel { display: none; }
     .tip-card { gap: 10px; }
     .c-art, .c-mine img { width: 132px; height: 132px; }
+    #refPanel .panel-bar { gap: 6px; }
+    #refPanel .panel-bar .tool { width: 38px; height: 38px; }
+    .tool-chip b, .press b { font-size: 13px; }
   }
+  .tool-chip .sh, .press .sh { display: none; }
+  @media (max-width: 480px) { .tool-chip .lg, .press .lg { display: none; } .tool-chip .sh, .press .sh { display: inline; } }
 
   /* celebration + toast */
   .celebrate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(43,35,64,.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); animation: fadeIn .3s ease; }
@@ -260,7 +265,7 @@
   .c-art { width: 180px; height: 180px; margin: 0 auto; border-radius: 28px; background: var(--tint); display: grid; place-items: center; --hole: var(--tint); animation: happyJump 1.2s ease-in-out infinite; }
   .c-art svg { width: 86%; height: 86%; overflow: visible; }
   @keyframes happyJump { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
-  .c-mine img { width: 180px; height: 180px; border-radius: 28px; box-shadow: inset 0 0 0 3px #efe2d0; background: var(--paper); border: 3px solid #efe2d0; }
+  .c-mine img { width: 180px; height: 180px; object-fit: cover; border-radius: 28px; box-shadow: inset 0 0 0 3px #efe2d0; background: var(--paper); border: 3px solid #efe2d0; }
   .big-star { width: 76px; height: 76px; margin: 0 auto 8px; border-radius: 50%; background: #ffd23f; color: #fff; display: grid; place-items: center; box-shadow: 0 5px 0 #dda600; animation: starPop .8s cubic-bezier(.3,1.8,.5,1) .2s both; }
   .big-star .lucide { width: 44px; height: 44px; fill: #fff; }
   .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 60; }
@@ -268,6 +273,65 @@
   @keyframes fall { to { transform: translate(var(--dx), 110vh) rotate(var(--r)); } }
   .toast { position: fixed; left: 50%; top: 16px; z-index: 70; transform: translate(-50%, -160%); background: #fff; border: 3px solid var(--cat, #7c6cff); color: var(--ink); font-weight: 700; font-size: 22px; padding: 10px 22px; border-radius: 999px; box-shadow: 0 5px 0 var(--cat-sh, #5b4bd6); pointer-events: none; white-space: nowrap; }
   .toast.show { animation: toast 1.7s cubic-bezier(.3,1.6,.5,1) forwards; }
+  @media (max-width: 520px) { .toast { white-space: normal; text-align: center; width: max-content; max-width: calc(100vw - 32px); font-size: 18px; border-radius: 22px; } }
+
+  /* ---------- Art School ---------- */
+  :root {
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .39 0 0 0 0 .33 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    --speck: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 2.2 -1.1'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23s)'/%3E%3C/svg%3E");
+  }
+  .mode-tab { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 22px; background: #fff; text-align: left; line-height: 1.15; --sh: #eadccb; }
+  .mode-tab b { display: block; font-size: 21px; }
+  .mode-tab small { display: block; font-size: 14px; font-weight: 500; color: #7a6e93; }
+  .mode-tab[aria-selected="true"] { background: var(--c); color: #fff; --sh: var(--csh); }
+  .mode-tab[aria-selected="true"] small { color: rgba(255,255,255,.88); }
+  .mode-emoji { font-size: 34px; line-height: 1; }
+  @media (max-width: 420px) { .mode-tab { padding: 10px; gap: 8px; } .mode-tab b { font-size: 17px; } .mode-tab small { font-size: 12px; } .mode-emoji { font-size: 26px; } }
+  .artpaper, #guide.art .paper { background-color: #fbfaf6; background-image: var(--grain); background-size: 180px 180px; background-position: 0 0; }
+  .grain { position: absolute; inset: 0; pointer-events: none; background-image: var(--speck); background-size: 150px 150px; mix-blend-mode: screen; opacity: .45; }
+  #guide:not(.art) .grain, #guide.art #padPanel, #guide:not(.art) #refPanel { display: none; }
+  #guide.art #gIcon { background: #fbfaf6; }
+  @media (min-width: 760px) { #guide.art { --sq: max(250px, min(calc((100vw - 84px) / 2), calc(100dvh - 380px), 620px)); } }
+  #guide.art #speedLabel { display: none; }
+  .nav-next .short { display: none; }
+  @media (max-width: 480px) { .nav-next.finish .long { display: none; } .nav-next.finish .short { display: inline; } }
+  .drawing { width: 100%; height: 100%; }
+  .lbl { font: 600 8.5px "Fredoka", "Trebuchet MS", system-ui, sans-serif; fill: #3b7be8; }
+  .note { fill: none; stroke: #3b7be8; stroke-width: 1.1; stroke-dasharray: 3 2.4; stroke-linecap: round; }
+  .note.sun { stroke: #e0a800; stroke-dasharray: none; stroke-width: 1.4; }
+  .a-notes { animation: fadeIn .8s ease; }
+  #stage .a-cur.flash > [data-k="line"], #stage .a-cur.flash > [data-k="dark"], #stage .a-cur.flash > [data-k="guide"], #stage .a-cur.flash > [data-k="ink"], #stage .a-cur.flash > [data-k="inkThin"],
+  #stage .a-cur.flash > [data-k="hatch"], #stage .a-cur.flash > [data-k="dots"], #stage .a-cur.flash > [data-k="strands"] { animation: flashA .6s ease-in-out 2; }
+  @keyframes flashA { 50% { stroke: #ff3d9a; stroke-opacity: 1; } }
+  #refGrid { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #refGrid path { fill: none; stroke: #6cb6ff; stroke-width: .9; stroke-dasharray: 2.5 2; }
+  .squint #ref { filter: blur(2.6px) grayscale(1); }
+  .ref-tag { position: absolute; left: 10px; bottom: 10px; background: rgba(255,255,255,.92); border-radius: 999px; padding: 3px 12px; font-size: 13px; font-weight: 600; color: #6b5f86; pointer-events: none; }
+  .tool-chip, .press { display: inline-flex; align-items: center; gap: 6px; background: #fff; border-radius: 14px; padding: 3px 10px 3px 4px; box-shadow: 0 3px 0 #eadccb; line-height: 1.1; min-height: 42px; white-space: nowrap; }
+  .press { padding: 3px 10px; }
+  .tool-chip b, .press b { font-size: 15px; }
+  .bars { display: inline-flex; align-items: flex-end; gap: 3px; height: 20px; }
+  .bars i { width: 7px; border-radius: 3px; background: #e7dccd; }
+  .bars i.on { background: var(--cat); }
+  .tool-ico { flex: none; overflow: visible; }
+  .art-hero { background: #fff; border-radius: 28px; padding: 20px; box-shadow: 0 6px 0 #eadccb; }
+  .how { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
+  .how li { display: inline-flex; align-items: center; gap: 8px; background: #f0ecff; border-radius: 999px; padding: 5px 14px 5px 5px; font-weight: 600; }
+  .how b { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #7a5af8; color: #fff; font-size: 14px; }
+  .kit-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .kit-item { position: relative; display: flex; align-items: center; gap: 10px; text-align: left; padding: 8px 42px 8px 10px; border-radius: 18px; background: #fffaf3; border: 3px solid transparent; line-height: 1.15; --sh: #eadccb; }
+  .kit-item b { font-size: 16px; }
+  .kit-item small { display: block; font-size: 13px; font-weight: 500; color: #7a6e93; }
+  .kit-check { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; border: 3px solid #e3d7c6; display: grid; place-items: center; color: transparent; font-size: 13px; }
+  .kit-item[aria-pressed="true"] { border-color: #22b866; background: #effbf3; }
+  .kit-item[aria-pressed="true"] .kit-check { background: #22b866; border-color: #22b866; color: #fff; }
+  .habits { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .habit { display: flex; align-items: center; gap: 10px; background: #fffaf3; border-radius: 16px; padding: 10px 12px; font-weight: 500; line-height: 1.25; }
+  .art-thumb { position: relative; background-color: #fbfaf6; background-image: var(--grain); background-size: 180px 180px; }
+  .pal-art.art-thumb svg { width: 96%; height: 96%; }
+  .kit-row { display: flex; justify-content: center; gap: 2px; margin-top: 6px; }
+  .c-art.artpaper { background-color: #fbfaf6; background-image: var(--grain); animation: none; }
+  .peek.artpaper svg { width: 92%; height: 92%; }
   @keyframes toast { 0% { transform: translate(-50%, -160%) scale(.8); } 18%, 78% { transform: translate(-50%, 0) scale(1); } 100% { transform: translate(-50%, -160%) scale(.9); } }
 </style>
 </head>
@@ -297,11 +361,16 @@
     <button id="soundBtn" class="icon-btn btn3d shrink-0" aria-label="Sound on" title="Sound on/off"></button>
   </header>
 
+  <div class="grid grid-cols-2 gap-3 mb-4" role="tablist" aria-label="Choose what to learn">
+    <button id="tabPals" class="mode-tab btn3d" role="tab" aria-selected="true" style="--c:#f35fae;--csh:#c93d88"><span class="mode-emoji" aria-hidden="true">🐱</span><span><b>Cartoon Pals</b><small>54 cute characters</small></span></button>
+    <button id="tabArt" class="mode-tab btn3d" role="tab" aria-selected="false" style="--c:#7a5af8;--csh:#5838d6"><span class="mode-emoji" aria-hidden="true">🎨</span><span><b>Art School</b><small>Real paper &amp; pencil</small></span></button>
+  </div>
+
   <div class="rounded-[28px] bg-white p-4 sm:p-5 shadow-[0_6px_0_#eadccb] flex flex-wrap items-center gap-4">
     <div class="grid place-items-center w-16 h-16 rounded-2xl bg-[#ffd23f] text-white shadow-[0_4px_0_#dda600] text-3xl shrink-0" aria-hidden="true" data-ico="trophy"></div>
     <div class="flex-1 min-w-[200px]">
       <div class="flex flex-wrap items-baseline gap-x-3">
-        <span class="text-2xl font-bold"><span id="progCount">0 of 54</span> pals drawn</span>
+        <span class="text-2xl font-bold"><span id="progCount">0 of 54</span> <span id="progNoun">pals drawn</span></span>
         <span id="rank" class="text-lg font-semibold text-[#f35fae]"></span>
       </div>
       <div class="prog-track mt-2" role="progressbar" aria-label="Pals drawn" aria-valuemin="0" id="progBarWrap"><div id="progBar" class="prog-fill" style="width:0"></div></div>
@@ -313,11 +382,14 @@
     <div id="chips" class="chip-row flex gap-3 overflow-x-auto pb-2 pt-1"></div>
   </nav>
 
-  <div id="featured" class="mt-2"></div>
-  <div id="sections"></div>
+  <div id="palsHome">
+    <div id="featured" class="mt-2"></div>
+    <div id="sections"></div>
+  </div>
+  <div id="artHome" hidden></div>
 
   <footer class="mt-14 text-center text-[#8d82a6] font-medium">
-    <p>Tip: tap any pal, watch the pencil, then try it yourself on the sketchpad! ✏️</p>
+    <p>Tip: watch the pencil, then try it yourself — on the sketchpad or on real paper! ✏️</p>
     <button id="resetBtn" class="mt-3 underline underline-offset-4 decoration-2 text-sm">Reset my stars</button>
   </footer>
 </section>
@@ -343,6 +415,7 @@
       <div class="min-w-0 flex-1">
         <div id="stepOf" class="text-sm font-bold uppercase tracking-wide text-[var(--cat)]">Step 1 of 5</div>
         <p id="tipText" class="text-xl sm:text-2xl font-semibold leading-snug"></p>
+        <p id="artTip" class="mt-1 text-base sm:text-lg font-medium leading-snug text-[#6b5f86]" hidden></p>
       </div>
       <button id="speakBtn" class="tool btn3d shrink-0" aria-label="Read it to me" title="Read it to me" data-ico="volume-2"></button>
     </div>
@@ -363,12 +436,13 @@
       </div>
       <div class="paper" id="stageWrap">
         <svg id="stage" viewBox="0 0 200 200" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Animated pencil showing how to draw this step"></svg>
-        <div class="legend"><span><i style="background:#8ec5ff"></i>done</span><span><i style="background:#1c1830"></i>draw now</span></div>
+        <i class="grain"></i>
+        <div class="legend" id="legend"></div>
         <div id="peek" class="peek" hidden></div>
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="padPanel">
       <div class="panel-bar">
         <span class="panel-title"><span data-ico="pencil"></span> Your turn!</span>
         <button id="traceBtn" class="tool btn3d" aria-pressed="false" aria-label="Tracing paper" title="Tracing paper" data-ico="ghost"></button>
@@ -382,6 +456,20 @@
         <div id="padHint" class="pad-hint">Draw here with your finger or mouse!</div>
       </div>
       <div id="swatches" class="flex flex-wrap items-center gap-3 px-1 pt-1"></div>
+    </div>
+
+    <div class="panel" id="refPanel">
+      <div class="panel-bar">
+        <span id="toolRow" class="flex items-center gap-2 mr-auto min-w-0"></span>
+        <button id="gridBtn" class="tool btn3d" aria-pressed="false" aria-label="Grid helper" title="Grid helper" data-ico="grid-3x3"></button>
+        <button id="squintBtn" class="tool btn3d" aria-pressed="false" aria-label="Squint view" title="Squint view" data-ico="eye-closed"></button>
+      </div>
+      <div class="paper artpaper" id="refWrap">
+        <svg id="ref" viewBox="0 0 200 200" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="What your paper should look like after this step"></svg>
+        <i class="grain"></i>
+        <svg id="refGrid" viewBox="0 0 200 200" aria-hidden="true" hidden><path d="M50 0V200M100 0V200M150 0V200M0 50H200M0 100H200M0 150H200"/></svg>
+        <span class="ref-tag">Copy this on your paper ✏️</span>
+      </div>
     </div>
   </main>
 
@@ -400,11 +488,12 @@
     <p id="cSub" class="mt-1 text-lg font-medium text-[#6b5f86]"></p>
     <div class="mt-4 flex flex-wrap justify-center gap-5">
       <figure><div id="cArt" class="c-art"></div><figcaption class="mt-2 font-semibold text-[#6b5f86]">The guide</figcaption></figure>
-      <figure id="cMine" class="c-mine" hidden><img id="cImg" alt="Your drawing"><figcaption class="mt-2 font-semibold text-[#6b5f86]">Your drawing!</figcaption></figure>
+      <figure id="cMine" class="c-mine" hidden><img id="cImg" alt="Your drawing"><figcaption id="cMineCap" class="mt-2 font-semibold text-[#6b5f86]">Your drawing!</figcaption></figure>
     </div>
     <div class="mt-5 flex flex-wrap justify-center gap-3">
       <button id="cNext" class="nav-btn nav-next btn3d"></button>
       <a id="cSave" class="nav-btn btn3d bg-white text-lg" download hidden><span data-ico="download"></span> Save it</a>
+      <label id="cPhoto" class="nav-btn btn3d bg-white text-lg cursor-pointer" hidden><input id="cPhotoIn" type="file" accept="image/*" capture="environment" class="sr-only"><span data-ico="camera"></span> Add my photo</label>
       <button id="cAgain" class="nav-btn btn3d bg-white text-lg"><span data-ico="rotate-ccw"></span> Again</button>
       <button id="cHome" class="nav-btn btn3d bg-white text-lg"><span data-ico="house"></span> All pals</button>
     </div>
@@ -1016,6 +1105,7 @@ const KEY = 'doodlePals.v1';
 const prefs = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } })();
 prefs.done = Array.isArray(prefs.done) ? prefs.done : [];
 prefs.sound = prefs.sound !== false; prefs.fast = !!prefs.fast; prefs.trace = !!prefs.trace;
+prefs.art = Array.isArray(prefs.art) ? prefs.art : []; prefs.kit = Array.isArray(prefs.kit) ? prefs.kit : [];
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(prefs)); } catch (e) { /* private mode: progress lasts for this visit */ } };
 const isDone = id => prefs.done.includes(id);
 const doneCount = () => prefs.done.filter(id => byId[id]).length;
@@ -1058,10 +1148,528 @@ function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.re
 const CHEERS = ['Nice line! ✨', 'You got this! 💪', 'Looking great! 🌟', 'Wow, so good! 🎨', 'Keep going! 🚀', 'Super doodle! 💖', 'Awesome! 🙌', 'Beautiful! 🌈'];
 
 /* =====================================================================
-   5. LIBRARY SCREEN
+   5. ART SCHOOL — real paper-and-pencil lessons with real artist tools
    ===================================================================== */
-let filter = 'all';
+const NS = 'http://www.w3.org/2000/svg';
+const MEAS = (() => {
+  const s = document.createElementNS(NS, 'svg'); s.setAttribute('aria-hidden', 'true');
+  s.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:hidden';
+  const p = document.createElementNS(NS, 'path'); s.appendChild(p); document.body.appendChild(s); return p;
+})();
+function samplePath(d, n) { MEAS.setAttribute('d', d); const L = MEAS.getTotalLength(); return Array.from({ length: n + 1 }, (_, i) => { const p = MEAS.getPointAtLength(L * i / n); return [p.x, p.y]; }); }
+function pathBox(d) { MEAS.setAttribute('d', d); const b = MEAS.getBBox(); return [b.x, b.y, b.x + b.width, b.y + b.height]; }
+function inPoly(poly, x, y) {
+  let c = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c;
+  }
+  return c;
+}
+const seeded = s => () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+/* a shading region = an outline (used to clip) + an "is this point inside?" test (used to hatch) */
+const rC = (x, y, r) => ({ d: C(x, y, r), box: [x - r, y - r, x + r, y + r], in: (a, b) => (a - x) ** 2 + (b - y) ** 2 <= r * r });
+const rE = (x, y, rx, ry) => ({ d: E(x, y, rx, ry), box: [x - rx, y - ry, x + rx, y + ry], in: (a, b) => ((a - x) / rx) ** 2 + ((b - y) / ry) ** 2 <= 1 });
+const rP = pts => ({ d: 'M' + pts.map(p => `${r1(p[0])} ${r1(p[1])}`).join('L') + 'Z', box: [Math.min(...pts.map(p => p[0])), Math.min(...pts.map(p => p[1])), Math.max(...pts.map(p => p[0])), Math.max(...pts.map(p => p[1]))], in: (x, y) => inPoly(pts, x, y) });
+const rB = (x0, y0, x1, y1) => rP([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]);
+/* outlines traced from a path are rasterized once into a lookup mask, so shading them stays fast */
+const rD = d => {
+  const poly = samplePath(d, 96), box = pathBox(d), res = .5, [x0, y0, x1, y1] = box;
+  const W = Math.ceil((x1 - x0) / res) + 1, H = Math.ceil((y1 - y0) / res) + 1, mask = new Uint8Array(W * H);
+  for (let r = 0; r < H; r++) {
+    const y = y0 + r * res, xs = [];
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, yi] = poly[i], [xj, yj] = poly[j]; if ((yi > y) !== (yj > y)) xs.push(xi + (y - yi) * (xj - xi) / (yj - yi)); }
+    xs.sort((a, b) => a - b);
+    for (let k = 0; k + 1 < xs.length; k += 2) for (let c = Math.max(0, Math.ceil((xs[k] - x0) / res)), c1 = Math.min(W - 1, Math.floor((xs[k + 1] - x0) / res)); c <= c1; c++) mask[r * W + c] = 1;
+  }
+  return { d, box, in: (x, y) => x >= x0 && x <= x1 && y >= y0 && y <= y1 && mask[Math.round((y - y0) / res) * W + Math.round((x - x0) / res)] === 1 };
+};
+const rAnd = (a, ...bs) => ({ d: a.d, box: a.box, in: (x, y) => a.in(x, y) && bs.every(b => b.in(x, y)) });
+const rNot = r => ({ in: (x, y) => !r.in(x, y) });
+const rIf = f => ({ in: f });
+
+/* back-and-forth shading (zig) or separate flicked lines, clipped to a region */
+function hatch(reg, o = {}) {
+  const ang = (o.a ?? 45) * Math.PI / 180, gap = o.gap ?? 2.4, zig = o.zig !== false, rnd = seeded(o.seed ?? 11);
+  const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx, [x0, y0, x1, y1] = reg.box;
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, R = Math.hypot(x1 - x0, y1 - y0) / 2 + 1;
+  let d = '', n = 0;
+  for (let off = -R + gap * rnd(); off <= R; off += gap) {
+    let best = null, run = null;
+    for (let s = -R; s <= R + .7; s += .7) {
+      const x = cx + nx * off + dx * s, y = cy + ny * off + dy * s;
+      if (s <= R && x >= x0 && x <= x1 && y >= y0 && y <= y1 && reg.in(x, y)) { if (run) run[1] = s; else run = [s, s]; }
+      else if (run) { if (!best || run[1] - run[0] > best[1] - best[0]) best = run; run = null; }
+    }
+    if (!best || best[1] - best[0] < 1.5) continue;
+    const s0 = best[0] + rnd() * 1.2, s1 = best[1] - rnd() * 1.2, w = off + (rnd() - .5) * gap * .25;
+    let a = [cx + nx * w + dx * s0, cy + ny * w + dy * s0], b = [cx + nx * w + dx * s1, cy + ny * w + dy * s1];
+    if (zig && n % 2) [a, b] = [b, a];
+    d += P`${zig && n ? 'L' : 'M'}${a[0]} ${a[1]}L${b[0]} ${b[1]}`; n++;
+  }
+  return d;
+}
+/* stippling: dots placed more densely where dens(x, y) is high */
+function stipple(reg, dens, o = {}) {
+  const rnd = seeded(o.seed ?? 5), [x0, y0, x1, y1] = reg.box, pts = [], min = o.min ?? 4;
+  for (let i = 0; i < 6000 && pts.length < (o.n ?? 200); i++) {
+    const x = x0 + rnd() * (x1 - x0), y = y0 + rnd() * (y1 - y0);
+    if (reg.in(x, y) && rnd() < dens(x, y) && pts.every(([a, b]) => (a - x) ** 2 + (b - y) ** 2 > min)) pts.push([x, y]);
+  }
+  pts.sort((a, b) => Math.floor(a[1] / 8) - Math.floor(b[1] / 8) || (Math.floor(a[1] / 8) % 2 ? b[0] - a[0] : a[0] - b[0]));
+  return pts.map(([x, y]) => P`M${x} ${y}l.1 .1`).join('');
+}
+/* hair strands flowing between two guide curves (0 = outer edge, 1 = inner edge) */
+function strands(outer, inner, o = {}) {
+  const N = 44, PA = samplePath(outer, N), PB = samplePath(inner, N), rnd = seeded(o.seed ?? 9), trim = o.trim ?? .25;
+  let d = '';
+  for (let k = 0; k < (o.n ?? 20); k++) {
+    const f = o.dist ? o.dist(rnd()) : rnd(), jit = (rnd() - .5) * 1.4;
+    const a = Math.floor(rnd() * trim * N), b = Math.min(N, Math.ceil((o.to ?? 1) * N - rnd() * trim * N * .6));
+    const pts = [];
+    for (let i = a; i <= b; i++) { const t = Math.min(1, Math.max(0, f + Math.sin(i * .35 + k * 1.7) * .02)); pts.push([PA[i][0] + (PB[i][0] - PA[i][0]) * t + jit, PA[i][1] + (PB[i][1] - PA[i][1]) * t]); }
+    if (pts.length > 3) d += smooth(pts, false);
+  }
+  return d;
+}
+/* mirror a path left-to-right (for symmetric features) */
+function mx(d, W = 200) {
+  let cmd = '', i = 0;
+  return d.replace(/[a-zA-Z]|-?(?:\d+\.?\d*|\.\d+)(?:e-?\d+)?/g, tok => {
+    if (/[a-zA-Z]/.test(tok)) { cmd = tok; i = 0; return tok; }
+    const v = +tok, U = cmd.toUpperCase(), rel = cmd !== U; let r = v;
+    if (U === 'H') r = rel ? -v : W - v;
+    else if (U === 'A') { const j = i % 7; r = j === 2 ? -v : j === 4 ? 1 - v : j === 5 ? (rel ? -v : W - v) : v; }
+    else if (U !== 'V' && i % 2 === 0) r = rel ? -v : W - v;
+    i++; return ` ${r1(r)} `;
+  });
+}
+const scrub = (x0, y0, x1, y1, n) => { let d = P`M${x0} ${y0}`; for (let i = 1; i <= n; i++) d += P`L${i % 2 ? x1 : x0} ${y0 + (y1 - y0) * i / n}`; return d; };
+const loops = (x0, y0, x1, y1, r = 6, turns = 6) => smooth(Array.from({ length: turns * 12 + 1 }, (_, i) => { const t = i / (turns * 12), a = t * turns * Math.PI * 2; return [x0 + (x1 - x0) * t + r * Math.cos(a), y0 + (y1 - y0) * t + r * Math.sin(a)]; }), false);
+const rect = (x0, y0, x1, y1) => P`M${x0} ${y0}H${x1}V${y1}H${x0}Z`;
+const capsule = (x1, y1, x2, y2, r) => { const a = Math.atan2(y2 - y1, x2 - x1), nx = -Math.sin(a) * r, ny = Math.cos(a) * r; return P`M${x1 + nx} ${y1 + ny}L${x2 + nx} ${y2 + ny}A${r} ${r} 0 0 0 ${x2 - nx} ${y2 - ny}L${x1 - nx} ${y1 - ny}A${r} ${r} 0 0 0 ${x1 + nx} ${y1 + ny}Z`; };
+/* a smooth tapered tube along a bent limb, e.g. shoulder → elbow → hand */
+function limb(chain, r0, r1) {
+  const pts = samplePath(smooth(chain, false), 24), left = [], right = [];
+  pts.forEach((p, i) => {
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)], L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    const nx = -(b[1] - a[1]) / L, ny = (b[0] - a[0]) / L, r = r0 + (r1 - r0) * i / (pts.length - 1);
+    left.push([p[0] + nx * r, p[1] + ny * r]); right.push([p[0] - nx * r, p[1] - ny * r]);
+  });
+  return smooth(left, false) + smooth(right.reverse(), false).replace('M', 'L') + 'Z';
+}
+const cub = Q => P`M${Q[0][0]} ${Q[0][1]}C${Q[1][0]} ${Q[1][1]} ${Q[2][0]} ${Q[2][1]} ${Q[3][0]} ${Q[3][1]}`;
+const bz = (Q, t) => { const u = 1 - t; return [0, 1].map(k => u * u * u * Q[0][k] + 3 * u * u * t * Q[1][k] + 3 * u * t * t * Q[2][k] + t * t * t * Q[3][k]); };
+const bzD = (Q, t) => { const u = 1 - t; return [0, 1].map(k => 3 * u * u * (Q[1][k] - Q[0][k]) + 6 * u * t * (Q[2][k] - Q[1][k]) + 3 * t * t * (Q[3][k] - Q[2][k])); };
+
+/* lesson building blocks. Stroke kinds: guide (light, erasable), line, dark, ink, inkThin,
+   hatch, dots, strands, tone (blended graphite), erase (lifted highlight), clear (erase all guides);
+   label + note are blue teaching notes that are never drawn on paper. */
+const A = (k, d, o) => ({ k, d, ...o });
+const gl = (d, o) => A('guide', d, o), ln = (d, o) => A('line', d, o), dk = (d, o) => A('dark', d, o);
+const ik = (d, o) => A('ink', d, o), it = (d, o) => A('inkThin', d, o);
+const ht = (reg, o = {}) => A('hatch', hatch(reg, o), { clip: o.noclip ? null : reg.d, o: o.o, w: o.w, tilt: o.tilt, tool: o.tool });
+const dt = (reg, dens, o = {}) => A('dots', stipple(reg, dens, o), { o: o.o });
+const sd = (outer, inner, o = {}) => A('strands', strands(outer, inner, o), { o: o.o, w: o.w, tool: o.tool });
+const tn = (d, o = {}) => A('tone', d, { m: o.m, op: o.op ?? .4, blur: o.blur ?? 3, grad: o.grad, clip: o.clip, tool: o.tool });
+const er = (d, o = {}) => A('erase', d, { w: o.w, tool: o.tool ?? 'kneaded' });
+const clr = m => A('clear', m, { tool: 'eraser' });
+const lb = (x, y, text, o = {}) => ({ k: 'label', x, y, text, anchor: o.anchor ?? 'middle', size: o.size });
+const nt = (d, o = {}) => ({ k: 'note', d, fill: o.fill });
+const sun = (x, y) => [nt(C(x, y, 5.5), { fill: '#ffd23f' }), nt([0, 45, 90, 135, 180, 225, 270, 315].map(a => { const [x1, y1] = pol(x, y, 8.5, a), [x2, y2] = pol(x, y, 12.5, a); return P`M${x1} ${y1}L${x2} ${y2}`; }).join(''), { fill: '#ffd23f' })];
+const arrow = (x1, y1, x2, y2) => { const a = Math.atan2(y2 - y1, x2 - x1); return nt(P`M${x1} ${y1}L${x2} ${y2}M${x2 - 6 * Math.cos(a - .5)} ${y2 - 6 * Math.sin(a - .5)}L${x2} ${y2}L${x2 - 6 * Math.cos(a + .5)} ${y2 - 6 * Math.sin(a + .5)}`); };
+const st = (t, tool, press, tip, s) => ({ t, tool, press, tip, s: s.flat(2) });
+
+const ART_TRACKS = [
+  { id: 'tech', name: 'Pencil Power', emoji: '✏️', blurb: 'Shading tricks every real artist uses', c: '#ef7d3c', t: '#fff0e6', sh: '#c45d22' },
+  { id: 'people', name: 'Real People', emoji: '🧑‍🎨', blurb: 'Faces, eyes, hair and bodies — the realistic way', c: '#7a5af8', t: '#f0ecff', sh: '#5838d6' },
+  { id: 'toon', name: 'Cartoon Pro', emoji: '🌟', blurb: 'Level up your cartoons like a real animator', c: '#14a3a8', t: '#e2f7f7', sh: '#0d7b80' },
+];
+const TRACK = Object.fromEntries(ART_TRACKS.map(t => [t.id, t]));
+const LEVELS = ['🌱 Level 1', '🌿 Level 2', '🌳 Level 3'];
+const LESSONS = [];
+const lesson = (id, title, track, level, blurb, kit, build) => LESSONS.push({ id, title, track, level, blurb, kit, build });
+
+/* ---------------- PENCIL POWER ---------------- */
+lesson('pressure', 'Light, Medium, Dark', 'tech', 1, 'Control how hard you press', ['HB', '2B'], () => {
+  const wave = y => P`M14 ${y}C34 ${y - 14} 52 ${y + 14} 80 ${y}S124 ${y - 14} 148 ${y}`;
+  return [
+    st('Hold your pencil near the tip, like holding a fork. Barely touch the paper and draw a long wavy line — light as a feather! 🪶', 'HB', 1, 'Let your whole arm move, not just your fingers.', [ln(wave(32), { o: .3, w: 1.2 }), lb(156, 35, 'light', { anchor: 'start' })]),
+    st('Draw the same wave below it, pressing a little harder. That is medium pressure.', 'HB', 2, 'Same speed, a bit more pressure — that is the whole trick.', [ln(wave(74), { o: .62, w: 1.6 }), lb(156, 77, 'medium', { anchor: 'start' })]),
+    st('Switch to your soft 2B pencil and press firmly for a dark, bold wave.', '2B', 3, 'B pencils are soft and dark. H pencils are hard and light. HB is right in the middle.', [dk(wave(116), { w: 2.5 }), lb(156, 119, 'dark', { anchor: 'start' })]),
+    st('Hold the pencil farther back and tip it onto its side. Sweep back and forth to make soft, wide shading.', '2B', 1, 'This is the "overhand grip": the pencil lies under your palm. Perfect for shading big areas!', [ht(rB(14, 146, 148, 184), { a: 82, gap: 1.3, o: .3 }), lb(156, 168, 'side', { anchor: 'start' })]),
+  ];
+});
+
+lesson('values', 'The Value Scale', 'tech', 1, 'Five steps from white to black', ['HB', '2B', '4B', 'tissue'], () => {
+  const x = i => 10 + i * 38, box = i => rB(x(i), 64, x(i) + 32, 112);
+  return [
+    st('Draw five boxes in a row. Use a ruler if you have one!', 'HB', 2, '"Value" means how light or dark something is. Artists think in about five values.', [[0, 1, 2, 3, 4].map(i => ln(rect(x(i), 64, x(i) + 32, 112), { o: .7, w: 1.4 })), [0, 1, 2, 3, 4].map(i => lb(x(i) + 16, 128, String(i + 1)))]),
+    st('Box 1 stays white — the paper is your lightest value! In box 2, shade ONE light, even layer.', 'HB', 1, 'Keep your strokes close together so no white gaps peek through.', [ht(box(1), { a: 55, gap: 2, o: .26 })]),
+    st('Box 3: shade one layer, then shade over it again in a different direction.', 'HB', 2, 'Layering is how artists get darker without pressing super hard.', [ht(box(2), { a: 55, gap: 2, o: .3, seed: 2 }), ht(box(2), { a: -35, gap: 2, o: .3, seed: 3 })]),
+    st('Box 4: switch to your 2B and build three layers.', '2B', 2, 'Soft pencils fill the tiny bumps in the paper — that makes rich darks.', [[55, -35, 10].map((a, k) => ht(box(3), { a, gap: 1.8, o: .36, seed: 4 + k }))]),
+    st('Box 5: grab your darkest pencil (4B or 6B) and press firmly. Make it as dark as you can!', '4B', 3, 'Shade in small sections and go over them again until no paper shows.', [[55, -35, 10, 80].map((a, k) => ht(box(4), { a, gap: 1.5, o: .5, seed: 8 + k }))]),
+    st('Smooth boxes 2–5 by rubbing gently with a tissue. Then squint: each box should be one step darker!', 'tissue', 1, 'Squinting blurs the details so you only see light and dark. Artists squint all the time!', [[1, 2, 3, 4].map(i => tn(rect(x(i), 64, x(i) + 32, 112), { op: [0, .1, .18, .3, .45][i], blur: 1.2, clip: rect(x(i), 64, x(i) + 32, 112), m: loops(x(i) + 5, 74, x(i) + 27, 102, 5, 3) })), arrow(14, 146, 186, 146), lb(14, 160, 'light', { anchor: 'start' }), lb(186, 160, 'dark', { anchor: 'end' })]),
+  ];
+});
+
+lesson('hatching', 'Hatching & Scribbles', 'tech', 1, 'Four ways to shade with lines', ['HB', '2B'], () => {
+  const sq = [[16, 24, 92, 98], [108, 24, 184, 98], [16, 118, 92, 192], [108, 118, 184, 192]];
+  const ball = rC(54, 155, 28);
+  const lat = [148, 153, 158, 163, 168, 173, 178].map(y => { const w = Math.sqrt(28 * 28 - (y - 155) ** 2); return P`M${54 - w} ${y}Q54 ${y + w * .32} ${54 + w} ${y}`; }).join('');
+  const scrib = (x0, x1, y0, y1, r, seed) => { const rnd = seeded(seed), pts = [], loopsPerRow = Math.round((x1 - x0) / (r * 1.1)); let row = 0; for (let y = y0; y <= y1; y += r * 1.15, row++) for (let i = 0; i <= loopsPerRow * 5; i++) { const t = i / (loopsPerRow * 5), a = t * loopsPerRow * 2 * Math.PI, xx = row % 2 ? x1 - (x1 - x0) * t : x0 + (x1 - x0) * t, rr = r * (.75 + rnd() * .5); pts.push([xx + rr * Math.cos(a) + (rnd() - .5) * 1.4, y + rr * Math.sin(a) + (rnd() - .5) * 1.4]); } return smooth(pts, false); };
+  return [
+    st('Draw four squares — two on top, two on the bottom.', 'HB', 2, 'Squares are practice frames. Artists fill whole pages of these!', [sq.map(q => ln(rect(...q), { o: .6, w: 1.3 }))]),
+    st('HATCHING: fill the first square with straight lines that all go the same way. Flick each one — press, then lift.', 'HB', 2, 'Lines close together look dark. Lines far apart look light.', [ht(rB(...sq[0]), { a: 60, gap: 3.4, o: .7, zig: false, w: 1.1 }), lb(54, 16, 'hatching')]),
+    st('CROSS-HATCHING: hatch the second square, then add another layer of lines going the other way.', '2B', 2, 'Add a third direction for even darker shadows.', [ht(rB(...sq[1]), { a: 60, gap: 3.4, o: .6, zig: false, seed: 4 }), ht(rB(...sq[1]), { a: -30, gap: 3.4, o: .6, zig: false, seed: 5 }), lb(146, 16, 'cross-hatching')]),
+    st('CONTOUR LINES: draw a ball in the third square, then curve your lines around it like stripes on a beach ball.', 'HB', 2, 'Curved lines that hug a shape make it look round!', [ln(ball.d, { o: .75 }), A('line', lat, { o: .6, w: 1.1 }), lb(54, 112, 'contour lines')]),
+    st('SCRIBBLE SHADING: fill the last square with tiny loopy circles. Pack them tighter where you want it darker.', '2B', 1, 'Tiny circles make a soft texture — great for skin, fur and clouds.', [A('line', scrib(112, 180, 124, 188, 3.2, 3), { o: .4, w: 1, clip: rect(...sq[3]) }), A('line', scrib(144, 180, 152, 188, 2.6, 4), { o: .45, w: 1, clip: rect(140, 148, 184, 192) }), lb(146, 112, 'scribble')]),
+  ];
+});
+
+lesson('blending', 'Smooth Blending', 'tech', 1, 'Dark to light with no stripes', ['HB', '2B', 'stump', 'kneaded'], () => [
+  st('Draw a long rectangle.', 'HB', 2, 'This is a "gradient bar". Artists draw these to warm up.', [ln(rect(14, 56, 186, 104), { o: .7, w: 1.3 })]),
+  st('Start at the right end. Shade with small back-and-forth strokes, pressing medium-hard.', '2B', 2, 'Keep your strokes going the same direction for an even tone.', [ht(rB(128, 56, 186, 104), { a: 75, gap: 1.5, o: .5 }), ht(rB(146, 56, 186, 104), { a: -15, gap: 1.8, o: .4, seed: 3 })]),
+  st('Keep going to the left, pressing lighter and lighter. Fade out to white paper at the end.', '2B', 1, 'No sudden jumps! Overlap each new section with the last one.', [ht(rB(76, 56, 136, 104), { a: 75, gap: 1.8, o: .32, seed: 5 }), ht(rB(30, 56, 84, 104), { a: 75, gap: 2.6, o: .16, seed: 6 })]),
+  st('Blend: rub gently in small circles with a blending stump or a folded tissue — from LIGHT toward DARK.', 'stump', 1, 'Never blend with your finger! Skin oil makes shiny, blotchy smudges.', [tn(rect(14, 56, 186, 104), { grad: { l: [14, 0, 186, 0], stops: [[0, 0], [.25, .06], [.6, .3], [1, .62]] }, op: .9, blur: 1, clip: rect(14, 56, 186, 104), m: loops(24, 80, 178, 80, 12, 8) })]),
+  st('Lift a highlight: squeeze your kneaded eraser into a point and dab out a light streak.', 'kneaded', 1, 'Erasers are drawing tools too — they draw with white!', [er('M96 100L118 60', { w: 5 }), er('M108 100L126 66', { w: 2.5 })]),
+  st('Bonus: draw a second bar and shade it with only your pencil — fade it smoothly with no blending.', 'HB', 2, 'One minute of gradient practice a day makes your shading super smooth.', [ln(rect(14, 130, 186, 170), { o: .7, w: 1.3 }), ht(rB(124, 130, 186, 170), { a: 70, gap: 1.4, o: .45, seed: 9 }), ht(rB(70, 130, 140, 170), { a: 70, gap: 1.7, o: .3, seed: 10 }), ht(rB(24, 130, 86, 170), { a: 70, gap: 2.5, o: .15, seed: 11 })]),
+]);
+
+lesson('stipple', 'Dot Shading (Stippling)', 'tech', 2, 'Make a ball out of dots', ['HB', '2B', 'kneaded'], () => {
+  const cx = 96, cy = 88, R = 50, ball = rC(cx, cy, R), shine = rC(76, 68, 13);
+  const dark = (x, y) => Math.max(0, Math.min(1, ((x - cx) + (y - cy)) * .62 / R * .75 + .45));
+  const band = (lo, hi) => (x, y) => { const v = dark(x, y); return v >= lo && v < hi ? .9 : 0; };
+  const cast = rAnd(rE(122, 146, 48, 9), rNot(ball));
+  return [
+    st('Lightly draw a circle. This guideline will disappear at the end!', 'HB', 1, 'Light guidelines are easy to erase later.', [gl(ball.d)]),
+    st('Shadow side: tap LOTS of dots close together. Hold the pencil straight up and down!', '2B', 2, 'Tap, don\'t drag — every mark should be a round dot, not a comma.', [dt(ball, band(.66, 2), { n: 260, min: 3.4, seed: 2 })]),
+    st('Middle: tap fewer dots, spaced farther apart.', '2B', 2, 'Spacing controls the value: crowded dots look dark, spread-out dots look light.', [dt(ball, band(.4, .66), { n: 120, min: 10, seed: 3 })]),
+    st('Light side: just a few dots. Leave the shiny highlight with NO dots at all!', '2B', 1, 'The empty paper becomes the shine.', [dt(rAnd(ball, rNot(shine)), band(.16, .4), { n: 40, min: 30, seed: 4 }), lb(76, 71, 'shine', { size: 7.5 })]),
+    st('Cast shadow: dots on the ground under the ball — darkest right where the ball touches.', '2B', 2, 'A shadow is darkest where the object touches the ground.', [dt(cast, (x, y) => Math.max(.12, 1 - Math.hypot((x - 100) / 64, (y - 140) / 9)), { n: 130, min: 4, seed: 5 })]),
+    st('Erase the guide circle. The dots alone make the edge — that is the magic of stippling!', 'kneaded', 1, 'Some stipple artists use thousands of dots. Patience is an art superpower!', [clr(C(cx, cy, R + 3))]),
+  ];
+});
+
+lesson('sphere', 'Shade a Ball', 'tech', 2, 'The 5 parts of light and shadow', ['HB', '2B', 'stump', 'kneaded'], () => {
+  const S0 = rC(95, 95, 55), lit = rC(78, 78, 51.9), shadow = rAnd(S0, rNot(lit));
+  const ring = (lo, hi) => rIf((x, y) => { const d = Math.hypot(x - 78, y - 78); return d > lo && d < hi; });
+  const core = rAnd(rC(95, 95, 49), ring(56, 80)), core2 = rAnd(rC(95, 95, 50), ring(58, 70));
+  const castE = rE(128, 151, 44, 8.5), cast = rAnd(castE, rNot(S0)), contact = rAnd(rE(108, 150, 20, 4.5), rNot(S0));
+  return [
+    st('Draw a circle. Tracing around a cup or a roll of tape is totally allowed — real artists do it too!', 'HB', 2, 'Draw it lightly. A heavy outline makes a ball look flat, like a sticker.', [ln(S0.d, { o: .6, w: 1.4 })]),
+    st('Choose where the light comes from (draw a tiny sun!). Then lightly draw a curve where the shadow starts.', 'HB', 1, 'This curve is called the "terminator" — where light ends and shadow begins.', [sun(22, 22), arrow(34, 34, 58, 58), gl('M45.2 118.2A51.9 51.9 0 0 0 118.2 45.2'), lb(22, 46, 'light')]),
+    st('Shade the whole shadow side with soft back-and-forth strokes that follow the curve of the ball.', 'HB', 2, 'Turn your paper so your hand can follow the curve comfortably.', [ht(shadow, { a: 40, gap: 2.1, o: .3 })]),
+    st('Core shadow: go darker in a band just inside the shadow edge. Switch to your 2B.', '2B', 2, 'The core shadow is the darkest part ON the ball itself.', [ht(core, { a: -40, gap: 1.8, o: .36, seed: 3 }), ht(core2, { a: 50, gap: 1.8, o: .34, seed: 4 }), lb(196, 34, 'core shadow', { anchor: 'end' }), nt('M168 40L136 92')]),
+    st('Leave a lighter rim along the bottom edge — light bouncing up from the table. Now shade the cast shadow on the ground.', '2B', 3, 'The shadow is darkest right under the ball, where no light can sneak in.', [ht(cast, { a: 5, gap: 1.8, o: .38, seed: 5 }), ht(contact, { a: 0, gap: 1.2, o: .6, seed: 6 }), lb(184, 116, 'reflected light', { anchor: 'end' }), nt('M164 120L141 128'), lb(150, 178, 'cast shadow'), nt('M150 170L146 156')]),
+    st('Blend with a stump, moving around the ball in curved strokes. Blend the light side very gently.', 'stump', 1, 'Blend from light into dark so you don\'t drag dark graphite into the light.', [tn(S0.d, { grad: { r: [76, 74, 84], stops: [[0, 0], [.35, .08], [.66, .42], [.86, .58], [1, .4]] }, op: 1, blur: 0, clip: S0.d, m: spiral(95, 95, 50, 8, 3) }), tn(castE.d, { op: .3, blur: 2.5, clip: rect(60, 148, 200, 172), m: loops(96, 151, 168, 151, 5, 4) })]),
+    st('Lift a highlight with your kneaded eraser. Now you know the 5 parts: highlight, light, core shadow, reflected light and cast shadow!', 'kneaded', 1, 'Prop your drawing up and look from far away — does the ball pop off the page?', [er(loops(73, 72, 79, 76, 3, 3), { w: 5 }), lb(24, 100, 'highlight'), nt('M38 96L68 78')]),
+  ];
+});
+
+lesson('cube', 'Shade a Cube', 'tech', 2, 'Three sides, three values', ['HB', '2B', 'stump'], () => {
+  const T = [[100, 40], [150, 62], [100, 84], [50, 62]], Lf = [[50, 62], [100, 84], [100, 150], [50, 128]], Rf = [[100, 84], [150, 62], [150, 128], [100, 150]];
+  const sh = [[100, 150], [150, 128], [194, 148], [146, 174]];
+  return [
+    st('Draw a diamond shape for the top of the box.', 'HB', 2, 'Keep the opposite sides parallel — like railroad tracks.', [ln(rP(T).d, { o: .75 })]),
+    st('Drop three straight lines down from the three front corners. Make them the same length.', 'HB', 2, 'Vertical edges of a box always stay straight up and down.', [ln('M50 62V128', { o: .75 }), ln('M100 84V150', { o: .75 }), ln('M150 62V128', { o: .75 })]),
+    st('Connect the bottoms. You just drew a 3D cube!', 'HB', 2, 'The bottom edges are parallel to the top edges.', [ln('M50 128L100 150L150 128', { o: .75 })]),
+    st('The light comes from the upper left. The top gets the most light — give it one very light layer.', 'HB', 1, 'Decide where the light is BEFORE you shade anything.', [sun(20, 20), arrow(30, 30, 52, 46), ht(rP(T), { a: 25, gap: 2.6, o: .15 })]),
+    st('Left side: medium. Right side: darkest — build it up in two layers with your 2B.', '2B', 2, 'Three faces, three different values. That is what makes it look solid!', [ht(rP(Lf), { a: 90, gap: 2.2, o: .28, seed: 3 }), ht(rP(Rf), { a: 90, gap: 1.8, o: .38, seed: 4 }), ht(rP(Rf), { a: 30, gap: 2, o: .3, seed: 5 })]),
+    st('Cast shadow: a dark shape stretching away from the light along the ground. No outline — just shading!', '2B', 3, 'Shadows fall on the side opposite the light, and they are darkest near the box.', [ht(rP(sh), { a: 15, gap: 1.6, o: .4, seed: 6 }), ht(rP([[100, 150], [150, 128], [166, 137], [116, 160]]), { a: -20, gap: 1.4, o: .4, seed: 7 })]),
+    st('Blend each side smoothly, then darken the front corner edge so it pops toward you.', 'stump', 1, 'Edges closest to you have the most contrast.', [tn(rP(Lf).d, { op: .16, blur: 1, clip: rP(Lf).d, m: loops(60, 80, 90, 130, 6, 4) }), tn(rP(Rf).d, { op: .3, blur: 1, clip: rP(Rf).d, m: loops(110, 90, 140, 130, 6, 4) }), tn(rP(sh).d, { op: .25, blur: 2, clip: rP(sh).d, m: loops(112, 150, 176, 158, 6, 4) }), dk('M100 84V150', { tool: '2B' })]),
+  ];
+});
+
+/* ---------------- REAL PEOPLE ---------------- */
+const EGG = 'M100 30C136 30 154 62 152 98C150 136 128 168 100 170C72 168 50 136 48 98C46 62 64 30 100 30Z';
+const EYE_L = 'M69 100Q79.5 93 90 100Q79.5 105 69 100Z';
+lesson('facemap', 'Face Proportions', 'people', 2, 'Where everything goes on a real face', ['HB', 'eraser'], () => [
+  st('Lightly draw an upside-down egg for the head.', 'HB', 1, 'Draw light "ghost lines" first. They are your map, not the final drawing.', [gl(EGG)]),
+  st('Draw a line down the middle and one across the middle. The eyes sit on this middle line — lower than most people think!', 'HB', 1, 'Measure: hold your pencil against the egg to find the halfway point.', [gl('M100 30V170'), gl('M48 100H152'), lb(156, 103, 'eyes', { anchor: 'start' })]),
+  st('Nose line: halfway between the eye line and the chin. Mouth line: one third of the way from the nose to the chin.', 'HB', 1, 'Most beginners put the nose too low. Measure!', [gl('M78 135H122'), gl('M82 147H118'), lb(147, 138, 'nose', { anchor: 'start' }), lb(141, 151, 'mouth', { anchor: 'start' })]),
+  st('A face is about five eyes wide. Mark five equal spaces on the eye line — the eyes go in spaces 2 and 4.', 'HB', 2, 'There is exactly one eye-width of space between the two eyes.', [[68.8, 89.6, 110.4, 131.2].map(x => gl(P`M${x} 95V105`)), ln(EYE_L, { o: .8 }), ln(mx(EYE_L), { o: .8 }), ln(C(79.5, 99.5, 3.4), { o: .8, fill: '#3c3b43' }), ln(C(120.5, 99.5, 3.4), { o: .8, fill: '#3c3b43' }), lb(100, 91, '1 eye', { size: 7 })]),
+  st('Nose: about as wide as the space between the eyes. The corners of the mouth line up under the middle of each eye.', 'HB', 2, 'Use your pencil like a ruler — hold it straight down from each eye.', [ln('M93 127Q89 135 95 136Q100 139 105 136Q111 135 107 127', { o: .8 }), ln('M80 147Q90 144 100 147Q110 144 120 147', { o: .85 }), ln('M86 151Q100 157 114 151', { o: .5 }), nt('M79.5 104V146'), nt('M120.5 104V146')]),
+  st('Ears fit between the eye line and the nose line. Add eyebrows just above the eyes, and the neck.', 'HB', 2, 'Necks are wide — almost as wide as the jaw. Not a thin stick!', [['M49 101C41 96 38 112 41 122C43 131 47 135 52 134', 'M67 90Q78 85 91 89', 'M77 158C77 172 75 184 71 196'].flatMap(d => [d, mx(d)]).map((d, i) => ln(d, { o: i === 2 || i === 3 ? .9 : .8, w: i === 2 || i === 3 ? 2 : undefined }))]),
+  st('Hair grows ABOVE the skull, so it sits higher than the egg. Add the hairline and jaw, then erase your guidelines!', 'HB', 2, 'Erase gently with a kneaded eraser so you don\'t smudge your work.', [ln('M50 100C50 136 72 168 100 170C128 168 150 136 150 100', { o: .85 }), ln('M46 104C38 54 64 16 100 16C136 16 162 54 154 104', { o: .85 }), ln('M51 86C58 62 82 58 100 60C118 58 142 62 149 86', { o: .7 }), clr(scrub(48, 30, 152, 170, 12))]),
+]);
+
+lesson('eye', 'A Realistic Eye', 'people', 3, 'Iris, shine, lashes and brows', ['HB', '2B', '4B', 'kneaded'], () => {
+  const UP = [[30, 105], [55, 70], [125, 62], [170, 98]], LO = [[30, 105], [62, 124], [132, 124], [170, 98]];
+  const upD = cub(UP), loD = cub(LO), almond = rD(upD + P`C${LO[2][0]} ${LO[2][1]} ${LO[1][0]} ${LO[1][1]} ${LO[0][0]} ${LO[0][1]}Z`);
+  const ix = 98, iy = 96, iris = rC(ix, iy, 23), pupil = rC(ix, iy, 9), shine = rC(89, 87, 5), irisVis = rAnd(iris, almond, rNot(shine));
+  const rnd = seeded(21);
+  let spokes = '', lash = '', low = '', brow = '';
+  for (let a = 0; a < 360; a += 10) {
+    const t = (a + rnd() * 5) * Math.PI / 180, r2 = 17 + rnd() * 5, x0 = ix + 10.5 * Math.cos(t), y0 = iy + 10.5 * Math.sin(t), x1 = ix + r2 * Math.cos(t), y1 = iy + r2 * Math.sin(t);
+    if (!shine.in((x0 + x1) / 2, (y0 + y1) / 2) && almond.in(x1, y1 + 1)) spokes += P`M${x0} ${y0}L${x1} ${y1}`;
+  }
+  for (let t = .14; t < .99; t += .04) {
+    const [bx, by] = bz(UP, t), [ddx, ddy] = bzD(UP, t), L = Math.hypot(ddx, ddy), nx = ddy / L, ny = -ddx / L, len = 7 + 13 * t * t + rnd() * 3, lean = .2 + t * .9;
+    lash += P`M${bx} ${by}Q${bx + nx * len * .5} ${by + ny * len * .55} ${bx + (nx + lean) * len * .7} ${by + ny * len}`;
+  }
+  for (let t = .45; t < .97; t += .07) { const [bx, by] = bz(LO, t), len = 4 + 6 * t; low += P`M${bx} ${by + 1}Q${bx + 1} ${by + len * .6} ${bx + 3 + 3 * t} ${by + len}`; }
+  const BR = [[40, 50], [72, 32], [126, 28], [168, 44]];
+  for (let i = 0; i < 70; i++) {
+    const t = i / 69, [bx, by] = bz(BR, t), thick = 10 * (1 - t * .7), ang = (-75 + t * 62 + (rnd() - .5) * 12) * Math.PI / 180, len = 7 + rnd() * 4, x0 = bx + (rnd() - .5) * 2, y0 = by + (rnd() - .5) * thick + 3;
+    brow += P`M${x0} ${y0}L${x0 + Math.cos(ang) * len} ${y0 + Math.sin(ang) * len}`;
+  }
+  const lidShadow = rD(upD + 'L170 106C125 72 55 80 34 110Z');
+  return [
+    st('Lightly draw an almond shape — pointy at the inner corner (near the nose), rounder at the outer corner.', 'HB', 1, 'Real eyes are not footballs! The top curve is higher; the bottom curve is flatter.', [gl(upD), gl(loD)]),
+    st('Draw the iris: a big circle tucked under the top lid. The top of it hides under the lid!', 'HB', 2, 'If you can see white above the iris, the eye looks surprised or scared.', [ln('M86.6 76A23 23 0 1 0 109.4 76', { o: .8 })]),
+    st('Lightly circle a little shine, then shade the pupil very dark — but never color over the shine!', '4B', 3, 'The shine (called a catchlight) is what makes an eye look alive.', [gl(shine.d), ln(pupil.d, { o: .9 }), ht(rAnd(pupil, rNot(shine)), { a: 45, gap: 1, o: .85 })]),
+    st('Iris: draw lines from the pupil out to the edge, like spokes on a bike wheel. Then darken the outer rim and the top.', '2B', 2, 'The dark ring around the iris is called the limbal ring. It makes eyes look real!', [A('line', spokes, { o: .5, w: .9 }), ht(rAnd(irisVis, rNot(rC(ix, iy, 19.5))), { a: 30, gap: 1.2, o: .55 }), ht(rAnd(irisVis, rNot(pupil), rIf((x, y) => y < 88)), { a: 0, gap: 1.6, o: .4, seed: 4 })]),
+    st('Darken the top lid line — it is the thickest, darkest line of the eye. Add the crease above it, following the same curve.', '2B', 3, 'Keep the bottom lid line lighter and thinner than the top.', [dk(upD, { w: 2.8 }), ln('M40 84C70 50 130 44 168 80', { o: .55 }), ln(loD, { o: .45, w: 1.3 })]),
+    st('The white of the eye is NOT pure white! Softly shade the corners and just under the top lid. Add the little tear duct.', 'HB', 1, 'This shading makes the eyeball look round and wet.', [ht(rAnd(almond, rNot(iris), rIf(x => x < 74 || x > 122)), { a: 70, gap: 2, o: .2, seed: 5 }), ht(rAnd(almond, lidShadow, rNot(shine)), { a: 10, gap: 1.6, o: .3, seed: 6 }), ln('M30 105Q37 99 42 106Q37 111 30 105', { o: .6, w: 1.2 })]),
+    st('Eyelashes: flick each lash out from the lid in a curve — press, then lift. They get longer toward the outer corner.', '2B', 2, 'Lashes grow in little clumps, not like a perfect comb.', [A('dark', lash, { w: 1.2, o: .9 }), A('line', low, { w: 1, o: .7 })]),
+    st('Eyebrow: lots of short hair strokes in the direction hair grows — upward at the inner end, sweeping sideways at the outer end.', 'HB', 2, 'Never draw a brow as one solid shape. Build it hair by hair!', [A('line', brow, { w: 1, o: .7 })]),
+  ];
+});
+
+lesson('nose', 'A Realistic Nose', 'people', 3, 'Draw it with shadows, not lines', ['HB', '2B', 'stump', 'kneaded'], () => {
+  const nosL = 'M80 137C83 130 93 131 95 138C91 142 84 142 80 137Z', nosR = mx(nosL);
+  const sideL = rP([[86, 56], [90, 56], [87, 78], [83, 104], [80, 116], [66, 118], [74, 92], [81, 68]]);
+  const sideR = rP([[114, 56], [110, 56], [113, 78], [117, 104], [120, 116], [134, 118], [126, 92], [119, 68]]);
+  const topL = rP([[86, 24], [90, 24], [90, 58], [84, 70], [82, 50]]), topR = rP([[114, 24], [110, 24], [110, 58], [116, 70], [118, 50]]);
+  const shelf = rD('M70 142C84 149 116 149 130 142C124 156 76 156 70 142Z');
+  const creaseL = rAnd(rC(72, 128, 16), rNot(rC(75, 126, 12.5))), creaseR = rAnd(rC(128, 128, 16), rNot(rC(125, 126, 12.5)));
+  const ballSh = rAnd(rC(100, 121, 21), rNot(rC(96, 114, 18)));
+  const wing = 'M61 121C55 131 61 142 76 141';
+  return [
+    st('Lightly draw a circle for the ball of the nose, and two smaller circles on the sides for the nostril "wings".', 'HB', 1, 'Every nose is built from these three balls.', [gl(C(100, 120, 20)), gl(C(72, 128, 12)), gl(C(128, 128, 12))]),
+    st('Draw two faint lines going up from the wings toward the eyebrows. That is the bridge of the nose.', 'HB', 1, 'The bridge is narrow between the eyes and wider near the tip.', [gl('M80 112C84 80 88 52 90 24'), gl(mx('M80 112C84 80 88 52 90 24'))]),
+    st('Draw the nostrils: tilted bean shapes. Shade them dark — darkest at the top.', '2B', 3, 'Nostrils are never perfect black circles. Look at a real nose — they curve!', [ln(nosL, { o: .9 }), ht(rD(nosL), { a: 30, gap: 1.1, o: .75 }), ln(nosR, { o: .9 }), ht(rD(nosR), { a: -30, gap: 1.1, o: .75, seed: 3 })]),
+    st('Draw the curve of each wing and a soft line under the tip. Real noses have almost no outlines!', 'HB', 2, 'If you outline the whole nose it looks like a cartoon. Let shadows do the work.', [ln(wing, { o: .7 }), ln(mx(wing), { o: .7 }), ln('M94 141Q100 144 106 141', { o: .45 })]),
+    st('Shade the sides of the bridge and the shadow side of the ball. Keep the top of the ball and the middle of the bridge light!', 'HB', 2, 'Light hits the front of the nose, so the front stays bright.', [ht(sideL, { a: 70, gap: 1.8, o: .2 }), ht(sideR, { a: 110, gap: 1.8, o: .26, seed: 4 }), ht(topL, { a: 80, gap: 2.8, o: .1, seed: 12 }), ht(topR, { a: 100, gap: 2.8, o: .13, seed: 13 }), ht(ballSh, { a: 40, gap: 1.8, o: .3, seed: 5 })]),
+    st('Add darker shadows under the nose and in the creases where the wings meet the cheeks.', '2B', 3, 'The darkest shadows hide in tight corners where light cannot reach.', [ht(shelf, { a: 0, gap: 1.4, o: .42, seed: 6 }), ht(creaseL, { a: 60, gap: 1.3, o: .42, seed: 7 }), ht(creaseR, { a: -60, gap: 1.3, o: .48, seed: 8 })]),
+    st('Blend softly with a stump. Lift highlights on the tip and down the bridge, then erase the guide circles.', 'stump', 1, 'A highlight on the tip makes the nose look shiny and 3D.', [tn(sideL.d, { op: .16, blur: 4, m: loops(82, 60, 76, 110, 4, 5) }), tn(sideR.d, { op: .22, blur: 4, m: loops(118, 60, 124, 110, 4, 5) }), tn(shelf.d, { op: .3, blur: 2.5, m: loops(78, 148, 122, 148, 4, 4) }), er(loops(98, 112, 101, 116, 2.5, 2), { w: 5 }), er('M99 44L99.6 98', { w: 3.5 }), clr(scrub(58, 24, 142, 150, 9))]),
+  ];
+});
+
+lesson('lips', 'Realistic Lips', 'people', 3, "Cupid's bow, shading and shine", ['HB', '2B', 'tissue', 'kneaded'], () => {
+  const seam = 'M38 100C60 103 80 97 92 100Q100 106 108 100C120 97 140 103 162 100';
+  const top = 'M38 100C56 92 76 75 90 77Q100 82 110 77C124 75 144 92 162 100', bot = 'M44 103C60 132 140 132 156 103';
+  const upper = rD('M38 100C56 92 76 75 90 77Q100 82 110 77C124 75 144 92 162 100C140 103 120 97 108 100Q100 106 92 100C80 97 60 103 38 100Z');
+  const lower = rD(seam + 'L156 103C140 132 60 132 44 103Z');
+  const shine = rE(100, 117, 19, 5.5), chin = rD('M60 124C80 136 120 136 140 124C126 146 74 146 60 124Z');
+  return [
+    st('Start with the line where the lips meet. It is not straight — it dips down a little in the middle.', 'HB', 2, 'This middle line is the darkest line of the mouth.', [ln(seam, { o: .75 })]),
+    st('Draw the top edge of the upper lip. In the middle it makes a little "M" shape called the Cupid\'s bow.', 'HB', 1, 'The Cupid\'s bow lines up right under the center of the nose.', [ln(top, { o: .6 })]),
+    st('Draw the bottom lip as a wide, gentle "U". It is usually fuller than the top lip.', 'HB', 1, 'Keep this line light — the shadow under it will show the edge.', [ln(bot, { o: .4 })]),
+    st('Shade the top lip darker — it faces down, away from the light. Curve your strokes up and down, following the lip.', '2B', 2, 'Lips have tiny up-and-down wrinkles. Shading that way shows them!', [ht(upper, { a: 82, gap: 1.6, o: .36 }), ht(upper, { a: 100, gap: 2.2, o: .24, seed: 3 })]),
+    st('Shade the bottom lip lighter. Keep a shiny spot in the middle, and go darker near the corners.', 'HB', 2, 'The bottom lip faces up toward the light, so it is lighter than the top lip.', [ht(rAnd(lower, rNot(shine)), { a: 86, gap: 2, o: .2, seed: 4 }), ht(rAnd(lower, rIf((x, y) => y < 108)), { a: 0, gap: 1.6, o: .3, seed: 5 }), ht(rAnd(lower, rIf(x => x < 66 || x > 134)), { a: 80, gap: 1.6, o: .3, seed: 6 })]),
+    st('Shade the shadow under the bottom lip, and darken the middle line and the corners of the mouth.', '2B', 3, 'The corners of the mouth are little dark dents.', [ht(chin, { a: 0, gap: 1.6, o: .34, seed: 7 }), dk(seam, { w: 2.2 }), dk('M38 100L33 102.5', { w: 2 }), dk('M162 100L167 102.5', { w: 2 })]),
+    st('Blend gently with a tissue, then lift little shiny streaks on the bottom lip with your kneaded eraser.', 'tissue', 1, 'Tiny highlights make lips look soft and shiny.', [tn(upper.d, { op: .22, blur: 2, clip: upper.d, m: loops(46, 92, 154, 92, 4, 8) }), tn(lower.d, { op: .12, blur: 2, clip: lower.d, m: loops(54, 112, 146, 112, 5, 7) }), er('M86 116Q100 112 114 116', { w: 4 }), er('M70 111Q74 109 78 111', { w: 2.5 }), er('M93 73Q100 77 107 73', { w: 2.5 })]),
+  ];
+});
+
+lesson('hair', 'Flowing Hair', 'people', 2, 'Big shapes, clumps and shine', ['HB', '2B', 'kneaded'], () => {
+  const faceG = 'M100 46C126 46 140 70 139 96C138 124 122 146 100 148C78 146 62 124 61 96C60 70 74 46 100 46Z';
+  const outerL = 'M100 28C76 28 54 44 48 72C40 102 44 140 58 172', innerL = 'M95 50C74 56 62 78 62 104C62 128 66 150 64 172';
+  const outerR = 'M100 28C126 28 150 46 156 74C162 104 158 144 146 172', innerR = 'M95 50C122 58 139 78 139 102C140 126 136 150 138 172';
+  const hairClip = outerL + 'L64 172C66 150 62 128 62 104C62 78 74 56 95 50Z' + outerR + 'L138 172C136 150 140 126 139 102C139 78 122 58 95 50Z';
+  return [
+    st('Lightly draw the face shape. Hair always sits ON TOP of the head, so leave room above it.', 'HB', 1, 'Hair has thickness! It puffs up above the skull.', [gl(faceG)]),
+    st('Draw the outline of all the hair as ONE big shape — like a hood around the face. Add the part line.', 'HB', 2, 'Think of hair as a big shape first, not single hairs.', [ln(outerL, { o: .75 }), ln(outerR, { o: .75 }), ln(innerL, { o: .6 }), ln(innerR, { o: .6 }), ln('M88 30C90 38 92 45 95 50', { o: .6 })]),
+    st('Split the hair into big clumps with long, flowing lines that follow the way the hair falls.', 'HB', 2, 'Start each line at the part and let it flow down like a waterfall.', [sd(outerL, innerL, { n: 4, seed: 2, trim: .05, o: .55, w: 1.2 }), sd(outerR, innerR, { n: 4, seed: 3, trim: .05, o: .55, w: 1.2 })]),
+    st('Shade the darkest parts: near the part, under the clumps and close to the face. Use long strokes in the direction the hair grows!', '2B', 2, 'Flick each stroke off at the end so it tapers like real hair.', [sd(outerL, innerL, { n: 34, seed: 4, dist: r => r ** .6 }), sd(outerR, innerR, { n: 34, seed: 5, dist: r => r ** .6 }), sd(outerL, innerL, { n: 16, seed: 6, trim: .1, to: .35, o: .6 }), sd(outerR, innerR, { n: 16, seed: 7, trim: .1, to: .35, o: .6 })]),
+    st('Leave a band of white paper where light hits the top of the head — the shine. Lift it out with your kneaded eraser.', 'kneaded', 1, 'Shiny hair has a light band that curves around the head like a halo.', [A('erase', 'M46 70C66 48 134 46 156 70', { w: 7, tool: 'kneaded', clip: hairClip }), A('erase', 'M48 82C68 62 132 60 154 82', { w: 3, tool: 'kneaded', clip: hairClip })]),
+    st('Add a few loose flyaway hairs, draw the jaw and chin, then erase the face guideline.', '2B', 1, 'Only draw a FEW single hairs — too many looks messy.', [A('strands', 'M58 58C50 48 46 42 38 44M150 66C160 56 166 54 172 56M146 168C150 176 156 180 162 182', { o: .5 }), ln('M63 118C69 136 84 147 100 148C116 147 131 136 137 118', { o: .7 }), clr(scrub(62, 48, 138, 148, 7))]),
+  ];
+});
+
+lesson('body', 'Body Proportions', 'people', 2, 'Measure a person in "heads"', ['HB', 'eraser'], () => {
+  const both = d => [d, mx(d)];
+  const skel = ['M100 34V41', 'M78 42H122', 'M100 41V96', 'M88 97H112', ...both('M78 42L73 78L70 101'), ...both('M92 97L91 144L92 184')];
+  const shapes = [E(100, 57, 18, 17), 'M85 88Q100 84 115 88L117 102Q100 110 83 102Z', ...both(ER(75.5, 60, 4.6, 18, 8)), ...both(ER(71.5, 89.5, 3.8, 12.5, 7)), ...both(ER(91.5, 120.5, 7, 24, 1)), ...both(ER(91.5, 164, 5.2, 21, -1))];
+  const side = 'M96 33.5V41M96 41Q86 41.5 80 43.5Q74.5 46 74 55L70.5 78Q68.5 90 67.5 100M67.5 100Q66 107 69.5 109.5Q73 108 73 100.5M73 100.5L75 82Q77 68 80 60M84 58Q86 70 88 80M88 80Q84 102 75 128H100M87 128L87 166Q87 178 88.5 183M96 128L95 166Q95 178 94 183M88.5 183Q83 186 86 189H96Q97 186 94 183';
+  return [
+    st('Draw 9 short lines evenly spaced from top to bottom. That makes 8 boxes — each box is one "head" tall.', 'HB', 1, 'Grown-ups are about 7½ to 8 heads tall. Kids your age are about 6 heads tall!', [Array.from({ length: 9 }, (_, k) => gl(P`M74 ${12 + 22 * k}H126`)), Array.from({ length: 8 }, (_, k) => lb(68, 26 + 22 * k, String(k + 1), { anchor: 'end', size: 8 }))]),
+    st('Draw the head in the top box — an oval.', 'HB', 2, 'Everything else is measured with this head.', [ln(E(100, 23, 8.5, 11), { o: .8 })]),
+    st('Draw a stick skeleton: shoulders about 2 heads wide, hips about 1½. Elbows reach the waist, wrists reach the hips, knees go in box 6.', 'HB', 1, 'Arms are longer than you think — fingertips reach the middle of the thigh!', [skel.map(d => gl(d, { o: .7 }))]),
+    st('Add simple shapes on the skeleton: an oval chest, a hip shape, and long ovals for the arms and legs.', 'HB', 1, 'Artists call this a "mannequin". It helps you see the body in 3D.', [gl(shapes.join(''), { o: .6 })]),
+    st('Draw the real outline over your shapes with smooth curves. Let\'s give her a simple dress!', 'HB', 2, 'Use the shapes like a map, but smooth out the bumps.', [ln(side, { o: .85 }), ln(mx(side), { o: .85 })]),
+    st('Finish with hair, a face and shoes. Then erase all the guidelines and box lines!', '2B', 2, 'Practice by drawing people at the park or on TV — quick and loose!', [ln('M90.5 25C88 10 112 10 109.5 25', { o: .85 }), both('M91 21C89 32 87 40 84 46').map(d => ln(d, { o: .7 })), dk('M96.5 22.5l.1 .1', { w: 2.2 }), dk('M103.5 22.5l.1 .1', { w: 2.2 }), ln('M98 28Q100 29.5 102 28', { o: .7, w: 1 }), clr(scrub(60, 8, 140, 190, 10))]),
+  ];
+});
+
+lesson('portrait', 'Shade a Portrait', 'people', 3, 'Put it all together like a real artist', ['HB', '2B', '4B', 'tissue', 'kneaded'], () => {
+  const face = rD(EGG);
+  const outerL = 'M100 16C72 16 46 36 42 74C38 106 42 134 52 152', innerL = 'M96 34C78 42 60 56 54 80C49 102 50 130 58 152';
+  const outerR = 'M100 16C128 16 154 36 158 74C162 106 158 134 148 152', innerR = 'M96 34C118 40 140 54 146 80C151 102 150 130 142 152';
+  const nose = 'M93 127Q89 135 95 136Q100 139 105 136Q111 135 107 127';
+  const neckSh = rP([[78, 156], [122, 156], [124, 182], [100, 174], [77, 170]]);
+  const hairClip = outerL + 'L58 152C50 130 49 102 54 80C60 56 78 42 96 34Z' + outerR + 'L142 152C150 130 151 102 146 80C140 54 118 40 96 34Z';
+  const shadeR = rAnd(face, rIf((x, y) => x > 124 - Math.max(0, y - 120) * .2 && y > 70));
+  return [
+    st('Start with your face map: an egg, a center line, the eye line, and the nose and mouth lines.', 'HB', 1, 'Every portrait starts with the same light map — even for professional artists.', [gl(EGG), gl('M100 30V170'), gl('M48 100H152'), gl('M78 135H122'), gl('M82 147H118')]),
+    st('Place the features: almond eyes with irises, eyebrows, the nose and the lips.', 'HB', 2, 'Draw features lightly first. You will darken the best lines later.', [ln(EYE_L, { o: .85 }), ln(mx(EYE_L), { o: .85 }), ln(C(79.5, 99.5, 3.6), { o: .9, fill: '#3c3b43' }), ln(C(120.5, 99.5, 3.6), { o: .9, fill: '#3c3b43' }), ln('M67 90Q78 85 91 89', { w: 2 }), ln(mx('M67 90Q78 85 91 89'), { w: 2 }), ln(nose, { o: .8 }), ln('M80 147Q90 144 100 147Q110 144 120 147', { o: .9 }), ln('M86 151Q100 157 114 151', { o: .5 })]),
+    st('Draw the hair as big shapes over the head (a bob!), then the neck and shoulders.', 'HB', 2, 'The hair covers the ears in this style — draw what you can actually see.', [ln(outerL, { o: .8 }), ln(outerR, { o: .8 }), ln(innerL, { o: .7 }), ln(innerR, { o: .7 }), ln('M77 157C77 172 75 184 71 194', { o: .8 }), ln(mx('M77 157C77 172 75 184 71 194'), { o: .8 }), ln('M71 194Q50 195 28 200', { o: .7 }), ln(mx('M71 194Q50 195 28 200'), { o: .7 })]),
+    st('The light comes from the left. Softly shade the right side of the face and under the cheekbone.', 'HB', 1, 'Shading only one side makes the face look round and real.', [sun(16, 16), ht(shadeR, { a: 75, gap: 1.8, o: .17 }), ht(rAnd(face, rE(128, 126, 18, 11)), { a: 30, gap: 2, o: .16, seed: 3 })]),
+    st('Add the darker shadows: eye sockets, the side of the nose, under the nose, under the lip, and a big shadow on the neck.', '2B', 2, 'These are "form shadows" — places that turn away from the light.', [ht(rAnd(rE(79.5, 95, 15, 9), rNot(rD(EYE_L))), { a: 10, gap: 1.8, o: .18, seed: 4 }), ht(rAnd(rE(120.5, 95, 15, 9), rNot(rD(mx(EYE_L)))), { a: 10, gap: 1.8, o: .26, seed: 5 }), ht(rP([[103, 104], [107, 104], [109, 126], [111, 134], [104, 132]]), { a: 80, gap: 1.6, o: .3, seed: 6 }), ht(rE(100, 140, 9, 2.6), { a: 0, gap: 1.2, o: .45, seed: 7 }), ht(rE(100, 156, 11, 3), { a: 0, gap: 1.3, o: .32, seed: 8 }), ht(neckSh, { a: 10, gap: 1.6, o: .42, seed: 9 })]),
+    st('Shade the hair dark with long strokes, then lift a shine band across the top with your kneaded eraser.', '4B', 3, 'Hair is usually the darkest value in a portrait.', [sd(outerL, innerL, { n: 36, seed: 10, dist: r => r ** .7, o: .55 }), sd(outerR, innerR, { n: 36, seed: 11, dist: r => r ** .7, o: .55 }), A('erase', 'M44 50C62 30 138 28 156 50', { w: 6, tool: 'kneaded', clip: hairClip })]),
+    st('Blend the skin with a tissue, lift highlights on the forehead, nose and cheek, draw the jaw, and erase your guidelines!', 'tissue', 1, 'Step back and look. Squint — do the darks and lights look right?', [tn(rect(124, 76, 160, 172), { op: .16, blur: 4, clip: EGG, m: loops(132, 90, 138, 160, 6, 5) }), tn(neckSh.d, { op: .25, blur: 3, m: loops(80, 164, 120, 166, 5, 4) }), ln('M50 100C50 136 72 168 100 170C128 168 150 136 150 100', { o: .8, tool: 'HB' }), er('M93 62Q100 59 107 62', { w: 2.5 }), er('M99 108L99.4 124', { w: 2 }), er('M66 114Q70 112 74 114', { w: 2 }), clr(scrub(48, 30, 152, 170, 12))]),
+  ];
+});
+
+/* ---------------- CARTOON PRO ---------------- */
+lesson('head34', 'Cartoon Head: ¾ View', 'toon', 2, 'Turn a character\'s head', ['HB', '2B', 'eraser'], () => [
+  st('Draw a circle for the head.', 'HB', 1, 'This circle is the skull. The face hangs off the bottom of it.', [gl(C(96, 90, 50))]),
+  st('Draw curved guidelines: one down the face (bending toward where she looks) and one across for the eyes. Curved lines make it 3D!', 'HB', 1, 'Imagine lines on a beach ball turning to the side.', [gl('M104 40.5C124 56 132 86 126 112C122 128 114 138 108 146'), gl('M46 92C70 106 118 108 146 96')]),
+  st('Draw the jaw: from the side of the circle, swoop down to a chin that sits under the center line.', 'HB', 2, 'In ¾ view the chin moves toward the side she is facing.', [ln('M50 104C52 134 80 160 112 160C124 158 134 150 140 130', { o: .85 }), ln('M148 96C148 110 144 122 140 130', { o: .85 })]),
+  st('Eyes sit ON the eye line. The far eye is smaller and squished — it is turning away from you!', '2B', 2, 'Keep about one eye-width of space between the eyes.', [ln(E(100, 101, 10, 13)), ln(E(138, 99, 6.5, 12)), ht(rAnd(rE(102, 104, 5.5, 7.5), rNot(rC(99.5, 100, 2.4))), { a: 45, gap: 1, o: .85 }), ht(rAnd(rE(139.5, 102, 3.5, 6), rNot(rC(138.5, 99, 1.6))), { a: 45, gap: 1, o: .85, seed: 3 }), dk('M88 85Q100 79 110 84'), dk('M132 83Q138 80 144 83')]),
+  st('The nose sits on the center line, halfway to the chin. Add the mouth, and an ear on the near side.', 'HB', 2, 'The ear lines up between the eye line and the bottom of the nose.', [ln('M126 114Q136 122 126 128'), ln('M104 140Q117 148 130 137'), ln('M62 98C46 92 44 124 62 124'), ln('M58 104C52 108 53 116 59 118', { o: .6 })]),
+  st('Hair is BIGGER than the circle! Draw the bangs and a ponytail. Trace your favorite lines darker and erase the guides.', '2B', 2, 'Hair grows from the hairline and flows in big locks.', [ln('M40 96C34 50 70 30 104 32C138 34 156 60 150 96'), ln('M56 70C70 82 90 82 102 68C110 82 128 84 146 74'), ln('M44 76C20 80 14 118 30 140C34 120 40 100 50 92'), dk('M50 104C52 134 80 160 112 160C124 158 134 150 140 130'), clr(scrub(40, 36, 150, 150, 8))]),
+]);
+
+lesson('faces', 'Cartoon Expressions', 'toon', 1, 'Happy, sad, surprised, angry', ['HB', '2B'], () => {
+  const F = [[55, 58], [145, 58], [55, 148], [145, 148]];
+  const happy = ([x, y]) => [ln(P`M${x - 17} ${y - 14}Q${x - 11} ${y - 19} ${x - 5} ${y - 15}`), ln(P`M${x + 5} ${y - 15}Q${x + 11} ${y - 19} ${x + 17} ${y - 14}`), dk(P`M${x - 15} ${y - 3}Q${x - 10} ${y - 10} ${x - 5} ${y - 3}`), dk(P`M${x + 5} ${y - 3}Q${x + 10} ${y - 10} ${x + 15} ${y - 3}`), ln(P`M${x - 14} ${y + 7}Q${x} ${y + 26} ${x + 14} ${y + 7}Z`), ht(rD(P`M${x - 14} ${y + 7}Q${x} ${y + 26} ${x + 14} ${y + 7}Z`), { a: 0, gap: 1.4, o: .45 })];
+  const sad = ([x, y]) => [ln(P`M${x - 17} ${y - 11}L${x - 5} ${y - 17}`), ln(P`M${x + 5} ${y - 17}L${x + 17} ${y - 11}`), dk(C(x - 10, y - 3, 3), { fill: '#232228' }), dk(C(x + 10, y - 3, 3), { fill: '#232228' }), ln(P`M${x - 10} ${y + 17}Q${x} ${y + 8} ${x + 10} ${y + 17}`), ln(drop(x - 13, y + 9, 2.6), { o: .7 })];
+  const wow = ([x, y]) => [ln(P`M${x - 17} ${y - 18}Q${x - 11} ${y - 25} ${x - 5} ${y - 20}`), ln(P`M${x + 5} ${y - 20}Q${x + 11} ${y - 25} ${x + 17} ${y - 18}`), ln(C(x - 10, y - 4, 5.5)), ln(C(x + 10, y - 4, 5.5)), dk(C(x - 10, y - 4, 2.2), { fill: '#232228' }), dk(C(x + 10, y - 4, 2.2), { fill: '#232228' }), ln(E(x, y + 15, 5, 7)), ht(rE(x, y + 15, 5, 7), { a: 0, gap: 1.2, o: .5 })];
+  const mad = ([x, y]) => [dk(P`M${x - 17} ${y - 16}L${x - 5} ${y - 10}`), dk(P`M${x + 5} ${y - 10}L${x + 17} ${y - 16}`), dk(P`M${x - 15} ${y - 5}L${x - 5} ${y - 3}Q${x - 10} ${y + 3} ${x - 15} ${y - 5}Z`, { fill: '#232228' }), dk(P`M${x + 15} ${y - 5}L${x + 5} ${y - 3}Q${x + 10} ${y + 3} ${x + 15} ${y - 5}Z`, { fill: '#232228' }), ln(P`M${x - 9} ${y + 16}Q${x} ${y + 10} ${x + 9} ${y + 16}`), ln(P`M${x + 22} ${y - 30}l3 4M${x + 28} ${y - 30}l-3 4M${x + 22} ${y - 22}l3 -4M${x + 28} ${y - 22}l-3 -4`, { o: .7 })];
+  return [
+    st('Draw four circle faces. Trace a coin or a cup if you like!', 'HB', 2, 'Same face shape, four different feelings — watch what changes.', [F.map(([x, y]) => ln(C(x, y, 34), { o: .8 }))]),
+    st('HAPPY: eyebrows up, eyes curved like little rainbows, and a big open smile.', '2B', 2, 'Eyebrows do most of the work in an expression!', [happy(F[0]), lb(55, 102, 'happy')]),
+    st('SAD: eyebrows tilt UP in the middle, the mouth curves down — add a tear.', '2B', 2, 'Make a sad face in a mirror and watch your own eyebrows!', [sad(F[1]), lb(145, 102, 'sad')]),
+    st('SURPRISED: eyebrows way up high, big round eyes and an "O" mouth.', '2B', 2, 'The higher the eyebrows, the bigger the surprise.', [wow(F[2]), lb(55, 194, 'surprised')]),
+    st('ANGRY: eyebrows slant DOWN toward the nose, eyes squint, mouth tight. Grr!', '2B', 3, 'Real animators act out faces in a mirror, then draw what they see.', [mad(F[3]), lb(145, 194, 'angry')]),
+  ];
+});
+
+lesson('sparkle', 'Big Sparkly Eyes', 'toon', 2, 'Shiny cartoon eyes, step by step', ['HB', '2B', '4B', 'pen'], () => {
+  const iris = rD('M80 76C74 104 84 136 103 138C122 136 132 104 126 72Q103 66 80 76Z'), pupil = rE(103, 108, 11, 17);
+  const s1 = rC(92, 90, 9), s2 = rC(114, 124, 4.5), clean = r => rAnd(r, rNot(s1), rNot(s2));
+  const lashes = ['M150 74Q160 60 166 50', 'M138 69Q146 55 150 45', 'M164 82Q176 76 186 70'];
+  return [
+    st('Draw a thick curved line for the top lashes — it is the boldest line in the eye. Add a little flick at the end.', '2B', 3, 'This one bold line gives the whole eye its shape.', [dk('M36 92C64 66 128 60 164 80', { w: 3.4 }), dk('M164 80L176 70', { w: 3 })]),
+    st('Hang a tall oval iris from the lash line.', 'HB', 2, 'Cartoon irises are tall ovals, not circles.', [ln('M80 76C74 104 84 136 103 138C122 136 132 104 126 72', { o: .85 })]),
+    st('Lightly outline TWO shines — a big one up top, a little one below. Then shade the pupil dark around them.', '4B', 3, 'Shines go on the same side in both eyes, where the light is.', [gl(s1.d, { o: .7 }), gl(s2.d, { o: .7 }), ln(pupil.d, { o: .9 }), ht(clean(pupil), { a: 40, gap: 1, o: .85 })]),
+    st('Shade the top half of the iris dark, fading lighter toward the bottom.', '2B', 2, 'Dark at the top and light at the bottom makes the eye look like glass.', [ht(clean(rAnd(iris, rNot(pupil), rIf((x, y) => y < 100))), { a: 0, gap: 1.3, o: .45, seed: 3 }), ht(clean(rAnd(iris, rNot(pupil), rIf((x, y) => y >= 100 && y < 118))), { a: 0, gap: 2.4, o: .22, seed: 4 })]),
+    st('Add a thin bottom lash line, a crease, a few lashes and an eyebrow.', 'HB', 2, 'Only 3 or 4 lashes — cartoons keep it simple!', [ln('M62 126C82 140 120 142 146 124', { o: .7 }), ln('M48 72C76 46 132 42 162 62', { o: .5 }), lashes.map(d => dk(d, { w: 2 })), ln('M46 42C76 26 122 22 160 34', { w: 2.2 })]),
+    st('Ink it with a black pen: thick on the top lash, thin everywhere else. When the ink is dry, erase the pencil.', 'pen', 2, 'Thick and thin lines together are called "line weight". It makes art look pro!', [ik('M36 92C64 66 128 60 164 80L176 70', { w: 3.6 }), it('M80 76C74 104 84 136 103 138C122 136 132 104 126 72'), it('M62 126C82 140 120 142 146 124'), it('M48 72C76 46 132 42 162 62'), lashes.map(d => it(d)), ik('M46 42C76 26 122 22 160 34', { w: 2.2 }), clr(C(103, 107, 30))]),
+  ];
+});
+
+lesson('action', 'Action Poses', 'toon', 2, 'Line of action = poses with energy', ['HB', '2B', 'eraser'], () => {
+  const limbs = [[100, 62, 80, 48, 5], [80, 48, 66, 28, 4.5], [110, 66, 134, 58, 5], [134, 58, 154, 38, 4.5], [82, 124, 66, 152, 6.5], [66, 152, 52, 180, 5.5], [95, 124, 120, 140, 6.5], [120, 140, 116, 172, 5.5]];
+  const torso = 'M98 56C84 64 80 92 82 110C88 118 98 116 102 110C106 92 112 70 112 60C108 54 102 54 98 56Z';
+  return [
+    st('Draw ONE swoopy line for the whole pose — the "line of action". A C or S curve makes poses feel alive!', 'HB', 1, 'Straight, stiff lines make stiff poses. Curves = energy!', [gl('M118 20C92 62 86 118 64 186', { o: .8 })]),
+    st('Put the head at the top of the line and an oval for the hips in the middle.', 'HB', 1, 'The head and hips both sit right on the line of action.', [gl(C(112, 38, 17)), gl(E(88, 118, 14, 10))]),
+    st('Add stick arms and legs. Bend them at the elbows and knees — no straight robot limbs!', 'HB', 1, 'Jumping? Reach the arms up high and kick one leg back.', [gl('M100 62L80 48L66 28'), gl('M110 66L134 58L154 38'), gl('M82 124L66 152L52 180'), gl('M95 124L120 140L116 172'), gl('M106 55C100 75 94 96 90 110')]),
+    st('Build the body with simple shapes: a bean for the chest and tubes for the arms and legs.', 'HB', 1, 'Tubes help you see which way each part is pointing.', [gl(torso + limbs.map(l => capsule(...l)).join(''), { o: .6 })]),
+    st('Draw the final outline: clothes, hands, shoes, a happy face and hair.', '2B', 2, 'Draw over your guides with confident, smooth lines.', [ln(C(112, 38, 17), { o: .9 }), ln(torso, { o: .9 }), ln(limb([[100, 62], [80, 48], [66, 29]], 5.5, 3.6), { o: .9 }), ln(limb([[110, 66], [134, 58], [154, 39]], 5.5, 3.6), { o: .9 }), ln(limb([[83, 124], [66, 152], [52, 179]], 7, 4.2), { o: .9 }), ln(limb([[95, 124], [120, 140], [116, 171]], 7, 4.2), { o: .9 }), ln(C(65, 26, 5)), ln(C(155, 36, 5)), ln(ER(50, 182, 9, 5, -20)), ln(ER(119, 175, 9, 5, 12)), ln('M82 106C80 116 78 126 80 130L92 132L96 124L100 132L110 128C108 118 104 110 102 106', { o: .9 }), dk(C(108, 37, 1.8), { fill: '#232228' }), dk(C(118, 35, 1.8), { fill: '#232228' }), ln('M108 45Q114 50 121 44', { w: 1.6 }), ln('M96 32C98 18 110 16 116 21C122 17 130 24 129 32'), ln('M97 36C86 34 80 42 82 50')]),
+    st('Erase the guides and add speed lines to show she is moving! Then try 5 more poses using only a line of action.', 'HB', 2, 'Quick "gesture drawings" of 30 seconds each are how animators warm up.', [ln('M30 70L50 78M24 90L46 96M34 110L52 114', { o: .6 }), ln('M150 150L170 160M146 168L166 176', { o: .6 }), clr(scrub(40, 16, 160, 190, 10))]),
+  ];
+});
+
+lesson('inkcel', 'Ink & Cel-Shade Mochi', 'toon', 2, 'Line weight and cartoon shadows', ['HB', 'pen', 'eraser', '2B'], () => {
+  const m = byId.mochi.steps.map(s => s.s.filter(x => !x.deco));
+  const outer = [m[0][0], ...m[1], m[2][0], m[2][1], m[2][2], m[5][0]];
+  const head = rE(100, 82, 54, 46), body = rD(m[2][0].d + 'Z');
+  return [
+    st('Sketch Mochi very lightly in pencil — you learned her in Cartoon Pals!', 'HB', 1, 'Pros always sketch lightly first, then ink on top.', [gl(m.flat().map(s => s.d).join(''), { o: .5 })]),
+    st('Ink the OUTSIDE edges with a thick line: head, ears, body, paws and tail.', 'pen', 3, 'Turn your paper so you can always pull the pen toward you.', [outer.map(s => ik(s.d, { w: 3.2 }))]),
+    st('Ink the INSIDE details with a thinner line: face, whiskers and stripes. Thick outside + thin inside = "line weight"!', 'pen', 1, 'Go slow and steady — ink cannot be erased!', [m[3].slice(0, 2).map(s => it(s.d, { fill: '#141318' })), it(m[3][2].d, { fill: '#141318' }), it(m[3][3].d), m[4].map(s => it(s.d))]),
+    st('Wait for the ink to dry (count to 30!), then erase ALL the pencil lines.', 'eraser', 2, 'Erasing too soon smears the ink. Patience!', [clr(scrub(40, 20, 170, 182, 12))]),
+    st('Pick a light direction. Shade the side away from the light with flat, even strokes — cartoon shadows have crisp edges. This is "cel shading"!', '2B', 2, 'Cel shading is how animated movies and comics show light.', [sun(20, 20), ht(rAnd(head, rNot(rE(90, 74, 54, 46))), { a: 45, gap: 1.6, o: .38 }), ht(rAnd(body, rIf((x, y) => x > 114 || y < 130)), { a: 45, gap: 1.6, o: .38, seed: 3 })]),
+    st('Add a cast shadow on the ground, and shade the inside of the ears.', '2B', 2, 'A shadow under a character "glues" it to the ground.', [ht(rAnd(rE(112, 183, 52, 6), rIf((x, y) => y > 179)), { a: 0, gap: 1.3, o: .45, seed: 4 }), ht(rP([[65, 46], [66, 26], [84, 39]]), { a: 45, gap: 1.3, o: .4, seed: 5 }), ht(rP([[135, 46], [134, 26], [116, 39]]), { a: -45, gap: 1.3, o: .4, seed: 6 })]),
+  ];
+});
+const lessonById = Object.fromEntries(LESSONS.map(L => [L.id, L]));
+const buildLesson = L => { L.steps ||= L.build(); return L; };
+
+/* ---------- art tools (drawn tip-down at 0,0) ---------- */
+const pencilTool = (body, label, txt = INK) => `<path d="M0 0L-5.5-14H5.5Z" fill="#f6d2a8"/><path d="M0 0L-2.2-5.6H2.2Z" fill="#2b2340" stroke="none"/><rect x="-5.5" y="-52" width="11" height="38" fill="${body}"/>`
+  + (label ? `<text x="0" y="-33" transform="rotate(-90 0 -33)" text-anchor="middle" dominant-baseline="central" font-size="7.5" font-weight="700" font-family="Fredoka, sans-serif" fill="${txt}" stroke="none">${label}</text>` : '<path d="M-1.8-50V-16" stroke="#f0a91e" stroke-width="2"/>')
+  + '<rect x="-5.5" y="-59" width="11" height="7" fill="#c9d1e4"/><path d="M-5.5-59V-63Q-5.5-68 0-68Q5.5-68 5.5-63V-59Z" fill="#ff8fb3"/>';
+const TOOLS = {
+  pencil: pencilTool('#ffcf3f'), HB: pencilTool('#ffcf3f', 'HB'), '2B': pencilTool('#5cc28a', '2B'), '4B': pencilTool('#5b9cf0', '4B', '#fff'), '6B': pencilTool('#3a3842', '6B', '#fff'),
+  eraser: '<rect x="-8" y="-24" width="16" height="24" rx="4" fill="#ff9fbf"/><rect x="-8.5" y="-44" width="17" height="22" rx="3" fill="#7cc4ff"/>',
+  kneaded: '<path d="M-11-3C-15-14-6-24 4-21C14-19 15-7 9-2C4 2-6 2-11-3Z" fill="#b8b5c3"/><path d="M-4-16Q0-19 5-16" fill="none" stroke="#fff" stroke-width="1.6"/>',
+  stump: '<path d="M0 0L-4.5-12V-62Q-4.5-66 0-66Q4.5-66 4.5-62V-12Z" fill="#f2ece0"/><path d="M0 0L-2.4-6.5H2.4Z" fill="#8d8a96" stroke="none"/><path d="M-4.5-24L4.5-30M-4.5-38L4.5-44M-4.5-52L4.5-58" fill="none" stroke="#cfc6b6" stroke-width="1"/>',
+  tissue: '<path d="M-15-5C-19-19-7-30 5-26C18-24 20-10 12-2C6 4-9 4-15-5Z" fill="#ffffff"/><path d="M-8-18Q-2-12-6-6M4-22Q8-14 2-8" fill="none" stroke="#d9dce6" stroke-width="1.2"/>',
+  pen: '<path d="M0 0L-1.6-7H1.6Z" fill="#141318"/><path d="M-3.5-7L-5-15H5L3.5-7Z" fill="#9aa0ad"/><rect x="-5.5" y="-64" width="11" height="49" rx="2.5" fill="#2a2932"/><rect x="-5.5" y="-42" width="11" height="5" fill="#ff6fb5"/>',
+  paper: '<rect x="-16" y="-62" width="32" height="44" rx="2" fill="#fff"/><path d="M-10-50H10M-10-42H10M-10-34H4" fill="none" stroke="#cfd5e3" stroke-width="2"/>',
+};
+const TOOL_NAME = { HB: 'HB pencil', '2B': '2B pencil', '4B': '4B pencil', '6B': '6B pencil', eraser: 'Eraser', kneaded: 'Kneaded eraser', stump: 'Blending stump', tissue: 'Tissue', pen: 'Black pen', paper: 'Paper' };
+const toolIcon = (t, size = 28) => `<svg class="tool-ico" viewBox="-24 -74 48 78" width="${size}" height="${size}" aria-hidden="true"><g transform="rotate(30 0 -34)" stroke="${INK}" stroke-width="2" stroke-linejoin="round">${TOOLS[t] || ''}</g></svg>`;
+
+/* ---------- graphite renderer: turns lesson strokes into pencil-on-paper SVG ---------- */
+const PAPER = '#fbfaf6';
+const AST = { guide: ['#7d8291', 1.1, .55], line: ['#3c3b43', 1.7, .88], dark: ['#232228', 2.4, .95], ink: ['#141318', 2.8, 1], inkThin: ['#141318', 1.5, 1], hatch: ['#45444c', 1, .45], dots: ['#38373e', 1.9, .9], strands: ['#3e3d45', .9, .5], erase: [PAPER, 5, .96] };
+function strokeSVG(s, id, defs, anim) {
+  const clip = s.clip ? ` clip-path="url(#${id}c)"` : '';
+  if (s.clip) defs.push(`<clipPath id="${id}c"><path d="${s.clip}"/></clipPath>`);
+  if (s.k === 'clear') return anim ? `<path d="${s.d}" data-k="clear" data-tool="${s.tool}" fill="none" stroke="none"/>` : '';
+  if (s.k === 'tone') {
+    let fill = '#4a4950';
+    if (s.grad) {
+      const g = s.grad, stops = g.stops.map(([o, a]) => `<stop offset="${o}" stop-color="#4a4950" stop-opacity="${a}"/>`).join('');
+      defs.push(g.r ? `<radialGradient id="${id}g" gradientUnits="userSpaceOnUse" cx="${g.r[0]}" cy="${g.r[1]}" r="${g.r[2]}">${stops}</radialGradient>` : `<linearGradient id="${id}g" gradientUnits="userSpaceOnUse" x1="${g.l[0]}" y1="${g.l[1]}" x2="${g.l[2]}" y2="${g.l[3]}">${stops}</linearGradient>`);
+      fill = `url(#${id}g)`;
+    }
+    if (s.blur) defs.push(`<filter id="${id}f" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${s.blur}"/></filter>`);
+    const vis = `<path d="${s.d}" fill="${fill}"${s.blur ? ` filter="url(#${id}f)"` : ''}/>`;
+    if (!anim) return `<g opacity="${s.op}"${clip}>${vis}</g>`;
+    return `<g id="${id}v" style="opacity:0"${clip}>${vis}</g><path d="${s.m || s.d}" data-k="tone" data-tv="${id}v" data-op="${s.op}"${s.tool ? ` data-tool="${s.tool}"` : ''} fill="none" stroke="none"/>`;
+  }
+  const [col, w0, o0] = AST[s.k];
+  const fill = s.fill ? `fill="${s.fill}"${anim ? ' fill-opacity="0"' : ''}` : 'fill="none"';
+  const attrs = `${fill} stroke="${col}" stroke-width="${s.w ?? w0}" stroke-opacity="${s.o ?? o0}"${clip}`;
+  const cls = s.k === 'guide' ? ' class="gd"' : '';
+  if (!anim) return `<path${cls} d="${s.d}" ${attrs}/>`;
+  const data = ` data-k="${s.k}"${s.tool ? ` data-tool="${s.tool}"` : ''}${s.tilt != null ? ` data-tilt="${s.tilt}"` : ''}${s.fill ? ' data-fill="1"' : ''}`;
+  const parts = s.d.split(/(?=M)/);
+  if (parts.length < 2) return `<path${cls} d="${s.d}" ${attrs}${data}/>`;
+  return `<g${cls} ${attrs}${data}>${parts.map(p => `<path d="${p}"/>`).join('')}</g>`;
+}
+const noteSVG = s => s.k === 'label'
+  ? `<text x="${s.x}" y="${s.y}" text-anchor="${s.anchor}" class="lbl"${s.size ? ` style="font-size:${s.size}px"` : ''}>${s.text}</text>`
+  : `<path d="${s.d}" class="note${s.fill ? ' sun' : ''}"${s.fill ? ` style="fill:${s.fill}"` : ''}/>`;
+/* everything up to step `upto`; the step `animStep` is rendered ready for the pencil animation */
+function artLayers(L, upto, ctx, animStep = -1, withNotes = true) {
+  const defs = [], clears = L.steps.map(s => s.s.some(x => x.k === 'clear'));
+  let past = '', cur = '', notes = '';
+  for (let i = 0; i <= upto; i++) {
+    const erased = clears.some((c, j) => c && j > i && j <= upto && j !== animStep);
+    L.steps[i].s.forEach((s, j) => {
+      if (s.k === 'label' || s.k === 'note') { if (withNotes && i === upto) notes += noteSVG(s); return; }
+      if (s.k === 'guide' && erased) return;
+      const out = strokeSVG(s, `${ctx}-${L.id}-${i}-${j}`, defs, i === animStep);
+      if (i === animStep) cur += out; else past += out;
+    });
+  }
+  return { defs: defs.join(''), past, cur, notes };
+}
+function drawingSVG(L, ctx) {
+  buildLesson(L);
+  const a = artLayers(L, L.steps.length - 1, ctx, -1, false);
+  return `<svg viewBox="0 0 200 200" class="drawing" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><defs>${a.defs}</defs>${a.past}</svg>`;
+}
+const PRESS = ['Light', 'Medium', 'Firm'];
+const both2 = (long, short) => long === short ? long : `<span class="lg">${long}</span><span class="sh">${short}</span>`;
+function toolRowHTML(st) {
+  const pencil = /^\dB$|^HB$/.test(st.tool);
+  const label = pencil ? PRESS[st.press - 1] : { eraser: 'Rub gently', kneaded: 'Dab & lift', stump: 'Gentle circles', tissue: 'Gentle circles', pen: 'Steady hand' }[st.tool];
+  const shortName = pencil ? st.tool : { kneaded: 'Kneaded', stump: 'Stump', pen: 'Pen' }[st.tool] || TOOL_NAME[st.tool], shortLabel = label.split(' ')[0];
+  return `<span class="tool-chip" title="Use your ${TOOL_NAME[st.tool]}" aria-label="Use your ${TOOL_NAME[st.tool]}">${toolIcon(st.tool, 30)}<b>${both2(TOOL_NAME[st.tool], shortName)}</b></span>
+    <span class="press" title="How hard to press" aria-label="Pressure: ${label}"><span class="bars">${[1, 2, 3].map(i => `<i class="${i <= st.press ? 'on' : ''}" style="height:${4 + i * 5}px"></i>`).join('')}</span><b>${both2(label, shortLabel)}</b></span>`;
+}
+
+/* =====================================================================
+   6. LIBRARY SCREEN — Cartoon Pals and Art School
+   ===================================================================== */
+let filter = 'all', artFilter = 'all', libMode = 'pals';
 const rank = n => n >= CHARS.length ? 'Doodle Legend 👑' : n >= 30 ? 'Drawing Champion 🏆' : n >= 15 ? 'Art Wizard 🪄' : n >= 5 ? 'Doodle Star ⭐' : n >= 1 ? 'Sketch Sprout 🌱' : 'New Doodler ✏️';
+const artRank = n => n >= LESSONS.length ? 'Master Artist 🖼️' : n >= 12 ? 'Portrait Pro 🧑‍🎨' : n >= 6 ? 'Shading Star 🌗' : n >= 1 ? 'Art Student 🎒' : 'Ready to learn ✏️';
+const artDone = () => prefs.art.filter(id => lessonById[id]).length;
+const KIT = [['HB', 'HB pencil', 'A regular school pencil!'], ['2B', '2B pencil', 'Softer, for shading'], ['4B', '4B or 6B pencil', 'For the darkest darks'], ['kneaded', 'Kneaded eraser', 'Squishy — lifts highlights'],
+  ['eraser', 'Regular eraser', 'For cleaning up'], ['stump', 'Blending stump', 'Or a folded tissue'], ['pen', 'Black fine-liner', 'For inking cartoons'], ['paper', 'Drawing paper', 'A sketchbook is perfect']];
+const HABITS = [['🪶', 'Start light, finish dark. You can always add more — erasing is harder.'], ['🔄', 'Turn your paper so your hand moves comfortably.'], ['😑', 'Squint to see just the light and dark shapes.'],
+  ['🚶', 'Step back every few minutes and look from far away.'], ['🪞', 'Hold your drawing up to a mirror to spot wonky parts.'], ['⏰', '10 minutes every day beats 2 hours once a week!']];
 function cardHTML(ch) {
   const c = CAT[ch.cat], done = isDone(ch.id);
   return `<button class="pal-card${done ? ' done' : ''}" data-id="${ch.id}" style="${catVars(c)}" aria-label="Draw ${ch.name} the ${ch.what}, ${ch.steps.length} steps${done ? ', already drawn' : ''}">
@@ -1072,15 +1680,31 @@ function cardHTML(ch) {
     ${done ? `<span class="pal-star" aria-hidden="true">${ico('star')}</span>` : ''}
   </button>`;
 }
+function lessonCard(L) {
+  const T = TRACK[L.track], done = prefs.art.includes(L.id);
+  buildLesson(L);
+  return `<button class="pal-card art-card${done ? ' done' : ''}" data-lesson="${L.id}" style="${catVars(T)}" aria-label="${L.title}, ${LEVELS[L.level - 1]}, ${L.steps.length} steps${done ? ', finished' : ''}">
+    <span class="ribbon">${LEVELS[L.level - 1]}</span>
+    <span class="pal-art art-thumb">${drawingSVG(L, 'th')}<i class="grain"></i></span>
+    <span class="pal-name">${L.title}</span>
+    <span class="pal-what">${L.blurb} · ${L.steps.length} steps</span>
+    <span class="kit-row" aria-hidden="true">${L.kit.map(t => toolIcon(t, 24)).join('')}</span>
+    ${done ? `<span class="pal-star" aria-hidden="true">${ico('star')}</span>` : ''}
+  </button>`;
+}
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('inview', e.isIntersecting)), { rootMargin: '120px' }) : null;
 function renderLibrary() {
-  const n = doneCount();
-  $('#progCount').textContent = `${n} of ${CHARS.length}`;
-  $('#progBar').style.width = `${n / CHARS.length * 100}%`;
-  $('#progBarWrap').setAttribute('aria-valuemax', CHARS.length); $('#progBarWrap').setAttribute('aria-valuenow', n);
-  $('#rank').textContent = rank(n);
-  $('#chips').innerHTML = [{ id: 'all', name: 'All Pals', emoji: '🌈', c: '#2b2340', sh: '#000' }, ...CATS].map(c =>
-    `<button class="chip btn3d" data-f="${c.id}" aria-pressed="${filter === c.id}" style="--c:${c.c};--csh:${c.sh}">${c.emoji} ${c.name}</button>`).join('');
+  const art = libMode === 'art', total = art ? LESSONS.length : CHARS.length, n = art ? artDone() : doneCount();
+  $('#tabPals').setAttribute('aria-selected', !art); $('#tabArt').setAttribute('aria-selected', art);
+  $('#palsHome').hidden = art; $('#artHome').hidden = !art;
+  $('#progCount').textContent = `${n} of ${total}`; $('#progNoun').textContent = art ? 'lessons finished' : 'pals drawn';
+  $('#progBar').style.width = `${n / total * 100}%`;
+  $('#progBarWrap').setAttribute('aria-valuemax', total); $('#progBarWrap').setAttribute('aria-valuenow', n);
+  $('#rank').textContent = art ? artRank(n) : rank(n);
+  const f = art ? artFilter : filter, groups = art ? [{ id: 'all', name: 'All Lessons', emoji: '🎨', c: '#2b2340', sh: '#000' }, ...ART_TRACKS] : [{ id: 'all', name: 'All Pals', emoji: '🌈', c: '#2b2340', sh: '#000' }, ...CATS];
+  $('#chips').innerHTML = groups.map(c => `<button class="chip btn3d" data-f="${c.id}" aria-pressed="${f === c.id}" style="--c:${c.c};--csh:${c.sh}">${c.emoji} ${c.name}</button>`).join('');
+  io?.disconnect();
+  if (art) return renderArtHome();
   $('#featured').innerHTML = filter === 'all' ? `<h2 class="text-2xl sm:text-3xl font-bold mb-1 flex items-center gap-2">⭐ Star Lessons <span class="text-base sm:text-lg font-medium text-[#6b5f86]">— start here!</span></h2>
     <div class="pal-grid big mt-3">${CHARS.filter(c => c.star).map(cardHTML).join('')}</div>` : '';
   $('#sections').innerHTML = CATS.filter(c => filter === 'all' || filter === c.id).map(c => {
@@ -1093,61 +1717,110 @@ function renderLibrary() {
       <div class="pal-grid">${list.map(cardHTML).join('')}</div>
     </section>`;
   }).join('');
-  io?.disconnect();
-  document.querySelectorAll('.pal-card').forEach(el => io ? io.observe(el) : el.classList.add('inview'));
+  document.querySelectorAll('#palsHome .pal-card').forEach(el => io ? io.observe(el) : el.classList.add('inview'));
+}
+function renderArtHome() {
+  const have = KIT.filter(k => prefs.kit.includes(k[0])).length;
+  const intro = artFilter !== 'all' ? '' : `<section class="art-hero mt-2">
+    <h2 class="text-2xl sm:text-3xl font-bold">🎨 Real drawing on real paper</h2>
+    <p class="mt-1 text-lg text-[#6b5f86] font-medium">These lessons are for your sketchbook! Watch the pencil, then copy each step with a real pencil on real paper. Real artists' tools, real artists' tricks.</p>
+    <ol class="how mt-3"><li><b>1</b>Watch the pencil</li><li><b>2</b>Draw it on your paper</li><li><b>3</b>Compare and fix</li><li><b>4</b>Snap a photo when you finish</li></ol>
+    <h3 class="mt-6 text-xl font-bold">🧰 Your art kit <span class="text-base font-semibold text-[#6b5f86]">— tap what you have (${have}/${KIT.length})</span></h3>
+    <div class="kit-grid mt-3">${KIT.map(([id, name, note]) => `<button class="kit-item btn3d" data-kit="${id}" aria-pressed="${prefs.kit.includes(id)}">${toolIcon(id, 38)}<span><b>${name}</b><small>${note}</small></span><span class="kit-check" aria-hidden="true">${ico('check')}</span></button>`).join('')}</div>
+    <p class="mt-3 text-[#6b5f86] font-medium">No fancy pencils? A regular school pencil is an HB — that's all you need to start!</p>
+    <h3 class="mt-6 text-xl font-bold">🧠 Habits of real artists</h3>
+    <div class="habits mt-3">${HABITS.map(([e, t]) => `<div class="habit"><span class="text-2xl" aria-hidden="true">${e}</span><span>${t}</span></div>`).join('')}</div>
+  </section>`;
+  $('#artHome').innerHTML = intro + ART_TRACKS.filter(t => artFilter === 'all' || artFilter === t.id).map(t => {
+    const list = LESSONS.filter(L => L.track === t.id), got = list.filter(L => prefs.art.includes(L.id)).length;
+    return `<section class="mt-10" style="${catVars(t)}">
+      <div class="flex flex-wrap items-end justify-between gap-2 mb-4">
+        <div><h2 class="text-2xl sm:text-3xl font-bold" style="color:${t.c}">${t.emoji} ${t.name}</h2><p class="text-[#6b5f86] font-medium">${t.blurb}</p></div>
+        <span class="rounded-full bg-white px-4 py-1 font-bold shadow-[0_3px_0_#eadccb]">${got}/${list.length} ⭐</span>
+      </div>
+      <div class="pal-grid big">${list.map(lessonCard).join('')}</div>
+    </section>`;
+  }).join('');
 }
 
 /* =====================================================================
-   6. THE PENCIL DEMO ENGINE — draws the current step over and over
+   7. THE DEMO ENGINE — a pencil (or eraser, stump, tissue, pen) acts out the step on a loop
    ===================================================================== */
-const PENCIL = `<g id="pencil" filter="url(#psh)"><g transform="rotate(32) scale(.9)" stroke="#2b2340" stroke-width="1.6" stroke-linejoin="round">
-  <path d="M0 0L-5.5-14H5.5Z" fill="#f6d2a8"/><path d="M0 0L-2.2-5.6H2.2Z" fill="#2b2340" stroke="none"/>
-  <rect x="-5.5" y="-52" width="11" height="38" fill="#ffcf3f"/><path d="M-1.8-50V-16" stroke="#f0a91e" stroke-width="2"/>
-  <rect x="-5.5" y="-59" width="11" height="7" fill="#c9d1e4"/><path d="M-5.5-59V-63Q-5.5-68 0-68Q5.5-68 5.5-63V-59Z" fill="#ff8fb3"/></g></g>`;
+const PSH = '<filter id="psh" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="2" dy="3" stdDeviation="1.6" flood-color="#2b2340" flood-opacity=".28"/></filter>';
+const PENCIL = '<g id="pencil" filter="url(#psh)"><g id="tool" stroke="#2b2340" stroke-width="1.6" stroke-linejoin="round"></g></g>';
 const REST = { x: 176, y: 186 };
+const TILT = { kneaded: 0, tissue: 0, stump: 36, eraser: 18, pen: 24 };
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+/* how long (ms) a stroke takes, by kind: shading is quick back-and-forth, details are slow and careful */
+const artDur = (k, len, parts) => ({
+  guide: len * 5, line: len * 7, dark: len * 8, ink: len * 8.5, inkThin: len * 7.5, erase: len * 6,
+  hatch: len * 1.25, strands: len * 1.4, dots: parts * 22, tone: len * 2.6, clear: len * 2.4,
+}[k] || 400);
 const Demo = {
-  raf: 0, t: 0, last: 0, playing: true, els: [], lens: [], segs: [], draws: [], total: 1,
+  raf: 0, t: 0, last: 0, playing: true, items: [], segs: [], draws: [], total: 1,
   setup() {
-    const g = $('#gCur');
-    this.g = g; this.pencil = $('#pencil'); this.aim = $('#aim');
-    this.els = [...g.querySelectorAll('path')];
-    this.lens = this.els.map(e => Math.max(1, e.getTotalLength()));
-    this.els.forEach((e, i) => { e.style.strokeDasharray = `${this.lens[i]} ${this.lens[i] + 20}`; });
+    const g = $('#gCur'), art = G.mode === 'art', stepTool = art ? G.les.steps[G.step].tool : 'pencil';
+    this.g = g; this.pencil = $('#pencil'); this.toolEl = $('#tool'); this.aim = $('#aim'); this.curTool = null;
+    this.guides = [...document.querySelectorAll('#stage .a-past .gd')];
+    this.items = [...g.children].filter(e => art ? e.dataset.k : e.tagName === 'path').map(el => {
+      const k = el.dataset.k || 'cartoon', parts = el.tagName === 'g' ? [...el.children] : [el];
+      const lens = parts.map(p => Math.max(.2, p.getTotalLength()));
+      if (k !== 'tone' && k !== 'clear') parts.forEach((p, j) => { p.style.strokeDasharray = `${lens[j]} ${lens[j] + 20}`; });
+      const tool = el.dataset.tool || (k === 'tone' ? (/stump|tissue/.test(stepTool) ? stepTool : 'stump') : k === 'erase' ? 'kneaded' : stepTool);
+      const tilt = el.dataset.tilt ? +el.dataset.tilt : TILT[tool] ?? (k === 'hatch' || k === 'strands' ? 58 : k === 'dots' ? 6 : 30);
+      return { el, k, parts, lens, total: lens.reduce((a, b) => a + b, 0), tool, tilt, tv: el.dataset.tv ? document.getElementById(el.dataset.tv) : null, op: +(el.dataset.op || 1), fill: el.classList.contains('ink') || !!el.dataset.fill };
+    });
     const segs = []; let pos = REST;
-    this.draws = this.els.map((e, i) => {
-      const a = e.getPointAtLength(0), b = e.getPointAtLength(this.lens[i]);
-      segs.push({ k: 'move', from: pos, to: { x: a.x, y: a.y }, d: 260 + Math.hypot(a.x - pos.x, a.y - pos.y) * 2.6 });
-      const ds = { k: 'draw', i, d: Math.max(280, this.lens[i] * 9) };
+    this.draws = this.items.map((it, i) => {
+      const a = it.parts[0].getPointAtLength(0), lastPart = it.parts[it.parts.length - 1], b = lastPart.getPointAtLength(it.lens[it.lens.length - 1]);
+      const dist = Math.hypot(a.x - pos.x, a.y - pos.y);
+      segs.push({ k: 'move', i, from: pos, to: { x: a.x, y: a.y }, d: art ? 160 + dist * 1.8 : 260 + dist * 2.6 });
+      const ds = { k: 'draw', i, d: art ? Math.max(300, Math.min(it.parts.length > 1 ? 4200 : 3600, artDur(it.k, it.total, it.parts.length))) : Math.max(280, it.total * 9) };
       segs.push(ds); pos = { x: b.x, y: b.y };
       return ds;
     });
-    segs.push({ k: 'move', from: pos, to: REST, d: 560 }, { k: 'hold', d: 1600 }, { k: 'fade', d: 420 });
+    segs.push({ k: 'move', i: -1, from: pos, to: REST, d: 560 }, { k: 'hold', d: art ? 1900 : 1600 }, { k: 'fade', d: 420 });
     let acc = 0; for (const s of segs) { s.t0 = acc; acc += s.d; }
+    const lastItem = this.items[this.items.length - 1];
+    this.restTool = lastItem ? lastItem.tool : stepTool; this.restTilt = lastItem ? lastItem.tilt : 30;
     this.segs = segs; this.total = acc; this.t = 0; this.apply();
   },
   start() { this.stop(); this.last = 0; const loop = now => { this.frame(now); this.raf = requestAnimationFrame(loop); }; this.raf = requestAnimationFrame(loop); },
   stop() { cancelAnimationFrame(this.raf); this.raf = 0; },
   frame(now) {
     const dt = this.last ? Math.min(64, now - this.last) : 0; this.last = now;
-    if (this.playing && this.els.length) { this.t = (this.t + dt * (prefs.fast ? 2.3 : 1)) % this.total; this.apply(); }
+    if (this.playing && this.items.length) { this.t = (this.t + dt * (prefs.fast ? 2.3 : 1)) % this.total; this.apply(); }
   },
   apply() {
-    if (!this.els.length) return;
+    if (!this.items.length) return;
     const t = this.t, seg = this.segs.find(s => t < s.t0 + s.d) || this.segs[this.segs.length - 1];
     const p = Math.min(1, Math.max(0, (t - seg.t0) / seg.d));
     this.draws.forEach((ds, i) => {
-      const q = t >= ds.t0 + ds.d ? 1 : t <= ds.t0 ? 0 : (t - ds.t0) / ds.d, e = this.els[i];
-      e.style.strokeDashoffset = this.lens[i] * (1 - q);
-      e.style.visibility = q > 0 ? 'visible' : 'hidden';
-      if (e.classList.contains('ink')) e.style.fillOpacity = q >= 1 ? 1 : 0;
+      const q = t >= ds.t0 + ds.d ? 1 : t <= ds.t0 ? 0 : (t - ds.t0) / ds.d, it = this.items[i];
+      if (it.k === 'tone') { if (it.tv) it.tv.style.opacity = r1(q * it.op * 100) / 100; return; }
+      if (it.k === 'clear') { for (const gd of this.guides) gd.style.opacity = 1 - q; return; }
+      let D = q * it.total;
+      it.parts.forEach((part, j) => {
+        const L = it.lens[j], f = Math.max(0, Math.min(1, D / L)); D -= L;
+        part.style.strokeDashoffset = L * (1 - f); part.style.visibility = f > 0 ? 'visible' : 'hidden';
+      });
+      if (it.fill) it.el.style.fillOpacity = q >= 1 ? 1 : 0;
     });
     this.g.style.opacity = seg.k === 'fade' ? 1 - p : 1;
     this.g.classList.toggle('flash', seg.k === 'hold');
-    let x = REST.x, y = REST.y, lift = 0;
-    if (seg.k === 'draw') { const pt = this.els[seg.i].getPointAtLength(this.lens[seg.i] * p); x = pt.x; y = pt.y; }
-    else if (seg.k === 'move') { const e = ease(p); x = seg.from.x + (seg.to.x - seg.from.x) * e; y = seg.from.y + (seg.to.y - seg.from.y) * e; lift = Math.sin(Math.PI * p); }
-    this.pencil.setAttribute('transform', `translate(${r1(x)} ${r1(y - lift * 9)}) scale(${r1(1 + lift * .14)})`);
+    let x = REST.x, y = REST.y, lift = 0, it = null;
+    if (seg.k === 'draw') {
+      it = this.items[seg.i];
+      let D = p * it.total, j = 0;
+      while (j < it.parts.length - 1 && D > it.lens[j]) { D -= it.lens[j]; j++; }
+      const pt = it.parts[j].getPointAtLength(Math.min(D, it.lens[j])); x = pt.x; y = pt.y;
+    } else if (seg.k === 'move') {
+      it = seg.i >= 0 ? this.items[seg.i] : null;
+      const e = ease(p); x = seg.from.x + (seg.to.x - seg.from.x) * e; y = seg.from.y + (seg.to.y - seg.from.y) * e; lift = Math.sin(Math.PI * p);
+    }
+    const tool = it ? it.tool : this.restTool, tilt = it ? it.tilt : this.restTilt;
+    if (tool !== this.curTool) { this.toolEl.innerHTML = TOOLS[tool] || TOOLS.pencil; this.curTool = tool; }
+    this.pencil.setAttribute('transform', `translate(${r1(x)} ${r1(y - lift * 9)}) rotate(${tilt}) scale(${r1(9 + lift * 1.3) / 10})`);
     const aimAt = seg.k === 'move' && this.segs[this.segs.indexOf(seg) + 1]?.k === 'draw' ? seg.to : null;
     this.aim.style.display = aimAt ? '' : 'none';
     if (aimAt) this.aim.setAttribute('transform', `translate(${r1(aimAt.x)} ${r1(aimAt.y)})`);
@@ -1156,7 +1829,7 @@ const Demo = {
 };
 
 /* =====================================================================
-   7. SKETCHPAD — finger / mouse practice canvas with undo, eraser, trace
+   8. SKETCHPAD — finger / mouse practice canvas with undo, eraser, trace
    ===================================================================== */
 const COLORS = [['Ink', '#2b2340'], ['Pink', '#ff4fa0'], ['Purple', '#8b5cf6'], ['Blue', '#2f8cff'], ['Green', '#1fbf63'], ['Orange', '#ff8a1f']];
 const SIZES = [3, 6, 11];
@@ -1230,52 +1903,76 @@ function paintTools() {
 }
 
 /* =====================================================================
-   8. GUIDE SCREEN
+   9. GUIDE SCREEN — shared by cartoon pals and art lessons
    ===================================================================== */
-const G = { ch: null, step: 0 };
-function openGuide(ch) {
-  G.ch = ch; G.step = 0;
-  const c = CAT[ch.cat];
-  document.title = `Draw ${ch.name} · Doodle Pals`;
-  $('#guide').style.cssText = catVars(c); $('#celebrate').style.cssText = catVars(c); $('#toast').style.cssText = catVars(c);
+const G = { mode: 'pal', ch: null, les: null, step: 0 };
+const curItem = () => G.mode === 'art' ? G.les : G.ch;
+const ART_CHEERS = ['Nice shading! ✨', 'Real artist moves! 🎨', 'Looking pro! 🌟', 'So smooth! 🧈', 'Keep going! ✏️', 'Great control! 💪'];
+function enterGuide(theme, title) {
+  document.title = title;
+  for (const id of ['#guide', '#celebrate', '#toast']) $(id).style.cssText = catVars(theme);
+  $('#guide').classList.toggle('art', G.mode === 'art');
   $('#library').hidden = true; $('#guide').hidden = false; window.scrollTo(0, 0);
-  $('#gIcon').innerHTML = artSVG(ch); $('#gName').textContent = `${ch.name} the ${ch.what}`; $('#gCat').textContent = `${c.emoji} ${c.name}`;
   $('#peek').hidden = true;
   Demo.setPlaying(true); paintSpeed();
+}
+function openGuide(ch) {
+  G.mode = 'pal'; G.ch = ch; G.les = null; G.step = 0;
+  const c = CAT[ch.cat];
+  enterGuide(c, `Draw ${ch.name} · Doodle Pals`);
+  $('#gIcon').innerHTML = artSVG(ch); $('#gName').textContent = `${ch.name} the ${ch.what}`; $('#gCat').textContent = `${c.emoji} ${c.name}`;
+  $('#legend').innerHTML = '<span><i style="background:#8ec5ff"></i>done</span><span><i style="background:#1c1830"></i>draw now</span>';
   Pad.use(ch.id); paintTools();
   renderStep(false); Demo.start();
 }
+function openLesson(L) {
+  buildLesson(L); G.mode = 'art'; G.les = L; G.ch = null; G.step = 0;
+  const T = TRACK[L.track];
+  enterGuide(T, `${L.title} · Art School`);
+  $('#gIcon').innerHTML = drawingSVG(L, 'gi'); $('#gName').textContent = L.title; $('#gCat').textContent = `${T.emoji} ${T.name} · ${LEVELS[L.level - 1]}`;
+  $('#legend').innerHTML = '<span><i style="background:#ff3d9a"></i>new</span><span><i style="background:#3b7be8"></i>notes — don\'t draw</span>';
+  renderStep(false); Demo.start();
+}
 function renderStep(pop = true) {
-  const ch = G.ch, st = ch.steps[G.step], n = ch.steps.length, last = G.step === n - 1;
+  const item = curItem(), art = G.mode === 'art', st = item.steps[G.step], n = item.steps.length, last = G.step === n - 1;
   $('#stepBadge').textContent = G.step + 1;
   $('#stepOf').textContent = `Step ${G.step + 1} of ${n}`;
   $('#tipText').textContent = st.t;
+  $('#artTip').hidden = !(art && st.tip); $('#artTip').textContent = art && st.tip ? `💡 ${st.tip}` : '';
   if (pop) { const tc = $('#tipCard'); tc.classList.remove('tip-pop'); void tc.offsetWidth; tc.classList.add('tip-pop'); }
   $('#backBtn').disabled = G.step === 0;
   $('#backBtn').innerHTML = `${ico('arrow-left')} Back`;
   const nb = $('#nextBtn'); nb.classList.toggle('finish', last);
-  nb.innerHTML = last ? `I drew it! ${ico('star')}` : `Next ${ico('arrow-right')}`;
-  $('#dots').innerHTML = ch.steps.map((_, i) => `<button class="dot ${i < G.step ? 'past' : i === G.step ? 'now' : ''}" data-step="${i}" aria-label="Go to step ${i + 1}"${i === G.step ? ' aria-current="step"' : ''}></button>`).join('');
-  $('#gDone').hidden = !isDone(ch.id);
-  // stage: finished steps in blue, the current step in black (animated), a faint dotted preview of where it goes
-  let past = '', cur = '', ghost = '';
-  for (let i = 0; i < G.step; i++) for (const s of ch.steps[i].g) past += `<path d="${s.d}"${s.ink ? ' class="ink"' : ''}/>`;
-  for (const s of st.g) { cur += `<path d="${s.d}"${s.ink ? ' class="ink"' : ''}/>`; ghost += `<path d="${s.d}"/>`; }
-  $('#stage').innerHTML = `<defs><filter id="psh" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="2" dy="3" stdDeviation="1.6" flood-color="#2b2340" flood-opacity=".28"/></filter></defs>
-    <g class="g-past">${past}</g><g class="g-ghost">${ghost}</g><g class="g-cur" id="gCur">${cur}</g>
-    <g id="aim"><circle class="aim-ring" r="7"/></g>${PENCIL}`;
+  nb.innerHTML = last ? `<span class="long">${art ? 'I finished!' : 'I drew it!'}</span><span class="short">Done!</span> ${ico('star')}` : `Next ${ico('arrow-right')}`;
+  $('#dots').innerHTML = item.steps.map((_, i) => `<button class="dot ${i < G.step ? 'past' : i === G.step ? 'now' : ''}" data-step="${i}" aria-label="Go to step ${i + 1}"${i === G.step ? ' aria-current="step"' : ''}></button>`).join('');
+  $('#gDone').hidden = !(art ? prefs.art.includes(item.id) : isDone(item.id));
+  if (art) {
+    // stage: earlier steps look like finished pencil work; this step is drawn live by the tool. The reference shows the result to copy.
+    const a = artLayers(item, G.step, 'st', G.step), ref = artLayers(item, G.step, 'rf');
+    $('#stage').innerHTML = `<defs>${PSH}${a.defs}</defs><g class="a-past">${a.past}</g><g class="a-cur" id="gCur">${a.cur}</g><g class="a-notes">${a.notes}</g><g id="aim"><circle class="aim-ring" r="7"/></g>${PENCIL}`;
+    $('#ref').innerHTML = `<defs>${ref.defs}</defs>${ref.past}<g class="a-notes">${ref.notes}</g>`;
+    $('#toolRow').innerHTML = toolRowHTML(st);
+  } else {
+    // stage: finished steps in blue, the current step in black (animated), a faint dotted preview of where it goes
+    let past = '', cur = '', ghost = '';
+    for (let i = 0; i < G.step; i++) for (const s of item.steps[i].g) past += `<path d="${s.d}"${s.ink ? ' class="ink"' : ''}/>`;
+    for (const s of st.g) { cur += `<path d="${s.d}"${s.ink ? ' class="ink"' : ''}/>`; ghost += `<path d="${s.d}"/>`; }
+    $('#stage').innerHTML = `<defs>${PSH}</defs><g class="g-past">${past}</g><g class="g-ghost">${ghost}</g><g class="g-cur" id="gCur">${cur}</g>
+      <g id="aim"><circle class="aim-ring" r="7"/></g>${PENCIL}`;
+    // tracing paper on the sketchpad shows everything up to this step
+    $('#trace').toggleAttribute('hidden', !prefs.trace);
+    $('#trace').innerHTML = item.steps.slice(0, G.step + 1).flatMap(s => s.g).map(s => `<path d="${s.d}"/>`).join('');
+  }
   Demo.setup();
-  // tracing paper on the sketchpad shows everything up to this step
-  $('#trace').toggleAttribute('hidden', !prefs.trace);
-  $('#trace').innerHTML = ch.steps.slice(0, G.step + 1).flatMap(s => s.g).map(s => `<path d="${s.d}"/>`).join('');
 }
 function goStep(i, cheer) {
-  if (i < 0 || i >= G.ch.steps.length || i === G.step) return;
+  if (i < 0 || i >= curItem().steps.length || i === G.step) return;
   G.step = i; renderStep();
-  if (cheer) toast(CHEERS[Math.floor(Math.random() * CHEERS.length)]);
+  const list = G.mode === 'art' ? ART_CHEERS : CHEERS;
+  if (cheer) toast(list[Math.floor(Math.random() * list.length)]);
 }
 function next() {
-  if (G.step === G.ch.steps.length - 1) return celebrate();
+  if (G.step === curItem().steps.length - 1) return celebrate();
   Sfx.play('next'); goStep(G.step + 1, true);
 }
 function back() { if (G.step > 0) { Sfx.play('back'); goStep(G.step - 1); } }
@@ -1287,13 +1984,16 @@ function paintSpeed() {
 function peek() {
   const el = $('#peek');
   if (!el.hidden) { el.hidden = true; return; }
-  el.innerHTML = `<span class="peek-tag">Sneak peek! 👀</span>${artSVG(G.ch)}`; el.hidden = false; Sfx.play('pop');
+  el.classList.toggle('artpaper', G.mode === 'art');
+  el.innerHTML = `<span class="peek-tag">${G.mode === 'art' ? 'The finished drawing 👀' : 'Sneak peek! 👀'}</span>${G.mode === 'art' ? drawingSVG(G.les, 'pk') : artSVG(G.ch)}`;
+  el.hidden = false; Sfx.play('pop');
   clearTimeout(peek.t); peek.t = setTimeout(() => { el.hidden = true; }, 3200);
 }
 
 /* =====================================================================
-   9. CELEBRATION
+   10. CELEBRATION
    ===================================================================== */
+const photos = {};
 function confetti() {
   const host = $('#confetti'), colors = ['#ff6fb5', '#ffd23f', '#7c6cff', '#22b866', '#1ea5e0', '#ff9334'];
   host.replaceChildren();
@@ -1304,58 +2004,96 @@ function confetti() {
   }
   clearTimeout(confetti.t); confetti.t = setTimeout(() => host.replaceChildren(), 4500);
 }
-function nextPal() {
-  const i = CHARS.indexOf(G.ch), rest = [...CHARS.slice(i + 1), ...CHARS.slice(0, i)];
-  return rest.find(c => !isDone(c.id)) || rest[0];
+function nextUp(list, item, done) {
+  const i = list.indexOf(item), rest = [...list.slice(i + 1), ...list.slice(0, i)];
+  return rest.find(x => !done(x.id)) || rest[0];
 }
 function celebrate() {
-  const ch = G.ch, first = !isDone(ch.id);
-  if (first) { prefs.done.push(ch.id); save(); }
+  const art = G.mode === 'art', item = curItem(), list = art ? prefs.art : prefs.done, first = !list.includes(item.id);
+  if (first) { list.push(item.id); save(); }
   Sfx.play('win'); confetti(); Demo.stop(); $('#toast').classList.remove('show');
-  $('#cTitle').textContent = `You drew ${ch.name}! 🎉`;
-  $('#cSub').textContent = first ? `+1 star! That's ${doneCount()} of ${CHARS.length} pals.` : 'Even better the second time! 🌈';
-  $('#cArt').innerHTML = artSVG(ch);
-  const snap = Pad.snapshot();
-  $('#cMine').hidden = !snap; $('#cSave').hidden = !snap;
-  if (snap) { $('#cImg').src = snap; $('#cSave').href = snap; $('#cSave').download = `doodle-pals-${ch.id}.png`; }
-  const np = nextPal(); $('#cNext').innerHTML = `Next: ${np.name} ${ico('arrow-right')}`; $('#cNext').dataset.id = np.id;
+  $('#cArt').classList.toggle('artpaper', art); $('#cPhoto').hidden = !art;
+  if (art) {
+    $('#cTitle').textContent = 'Lesson complete! 🎨';
+    $('#cSub').textContent = first ? `+1 star! ${artDone()} of ${LESSONS.length} lessons finished. Now snap a photo of your paper!` : 'Practice makes progress! 🌈';
+    $('#cArt').innerHTML = drawingSVG(item, 'cb');
+    const ph = photos[item.id];
+    $('#cMine').hidden = !ph; $('#cSave').hidden = true; $('#cMineCap').textContent = 'My paper drawing!';
+    if (ph) $('#cImg').src = ph;
+    const nl = nextUp(LESSONS, item, id => prefs.art.includes(id));
+    $('#cNext').innerHTML = `Next lesson ${ico('arrow-right')}`; $('#cNext').dataset.href = `#/lesson/${nl.id}`;
+  } else {
+    $('#cTitle').textContent = `You drew ${item.name}! 🎉`;
+    $('#cSub').textContent = first ? `+1 star! That's ${doneCount()} of ${CHARS.length} pals.` : 'Even better the second time! 🌈';
+    $('#cArt').innerHTML = artSVG(item);
+    const snap = Pad.snapshot();
+    $('#cMine').hidden = !snap; $('#cSave').hidden = !snap; $('#cMineCap').textContent = 'Your drawing!';
+    if (snap) { $('#cImg').src = snap; $('#cSave').href = snap; $('#cSave').download = `doodle-pals-${item.id}.png`; }
+    const np = nextUp(CHARS, item, isDone);
+    $('#cNext').innerHTML = `Next: ${np.name} ${ico('arrow-right')}`; $('#cNext').dataset.href = `#/draw/${np.id}`;
+  }
+  $('#cHome').innerHTML = `${ico('house')} ${art ? 'All lessons' : 'All pals'}`;
   $('#gDone').hidden = false;
   $('#celebrate').hidden = false; $('#cNext').focus();
 }
 function closeCelebrate() { $('#celebrate').hidden = true; $('#confetti').replaceChildren(); }
 
 /* =====================================================================
-   10. ROUTER + WIRING
+   11. ROUTER + WIRING
    ===================================================================== */
 function showLibrary() {
   Demo.stop(); if ('speechSynthesis' in window) speechSynthesis.cancel();
-  closeCelebrate(); document.title = 'Doodle Pals';
+  closeCelebrate(); document.title = libMode === 'art' ? 'Art School · Doodle Pals' : 'Doodle Pals';
   $('#guide').hidden = true; $('#library').hidden = false; renderLibrary();
 }
 function route() {
-  const m = location.hash.match(/^#\/draw\/([\w-]+)/);
-  if (m && byId[m[1]]) { closeCelebrate(); openGuide(byId[m[1]]); } else showLibrary();
+  const h = location.hash, m = h.match(/^#\/(draw|lesson)\/([\w-]+)/);
+  if (m && m[1] === 'draw' && byId[m[2]]) { closeCelebrate(); openGuide(byId[m[2]]); }
+  else if (m && m[1] === 'lesson' && lessonById[m[2]]) { closeCelebrate(); openLesson(lessonById[m[2]]); }
+  else {
+    const mode = h.startsWith('#/art') ? 'art' : 'pals', switched = mode !== libMode;
+    libMode = mode; showLibrary();
+    if (switched) window.scrollTo(0, 0);
+  }
 }
 const go = id => { location.hash = `#/draw/${id}`; };
-const home = () => { if (location.hash.startsWith('#/draw/')) location.hash = '#/'; else showLibrary(); };
+const home = () => { if (/^#\/(draw|lesson)\//.test(location.hash)) location.hash = G.mode === 'art' ? '#/art' : '#/'; else showLibrary(); };
 
 function wire() {
   document.querySelectorAll('[data-ico]').forEach(el => { el.innerHTML = ico(el.dataset.ico); });
   paintSound();
   $('#soundBtn').onclick = toggleSound; $('#soundBtn2').onclick = toggleSound;
+  $('#tabPals').onclick = () => { Sfx.play('pop'); location.hash = '#/'; };
+  $('#tabArt').onclick = () => { Sfx.play('pop'); location.hash = '#/art'; };
   $('#library').addEventListener('click', e => {
+    const lessonBtn = e.target.closest('.art-card'); if (lessonBtn) { Sfx.play('tap'); location.hash = `#/lesson/${lessonBtn.dataset.lesson}`; return; }
     const card = e.target.closest('.pal-card'); if (card) { Sfx.play('tap'); return go(card.dataset.id); }
-    const chip = e.target.closest('.chip'); if (chip) { filter = chip.dataset.f; Sfx.play('pop'); renderLibrary(); }
+    const kit = e.target.closest('.kit-item');
+    if (kit) { const id = kit.dataset.kit; prefs.kit = prefs.kit.includes(id) ? prefs.kit.filter(k => k !== id) : [...prefs.kit, id]; save(); Sfx.play('pop'); renderArtHome(); return; }
+    const chip = e.target.closest('.chip');
+    if (chip) { if (libMode === 'art') artFilter = chip.dataset.f; else filter = chip.dataset.f; Sfx.play('pop'); renderLibrary(); }
   });
-  $('#surpriseBtn').onclick = () => { const left = CHARS.filter(c => !isDone(c.id)), pool = left.length ? left : CHARS; Sfx.play('tap'); go(pool[Math.floor(Math.random() * pool.length)].id); };
-  $('#resetBtn').onclick = () => { if (confirm('Erase all your stars and start over?')) { prefs.done = []; save(); renderLibrary(); } };
+  $('#surpriseBtn').onclick = () => {
+    Sfx.play('tap');
+    if (libMode === 'art') { const left = LESSONS.filter(L => !prefs.art.includes(L.id)), pool = left.length ? left : LESSONS; location.hash = `#/lesson/${pool[Math.floor(Math.random() * pool.length)].id}`; return; }
+    const left = CHARS.filter(c => !isDone(c.id)), pool = left.length ? left : CHARS; go(pool[Math.floor(Math.random() * pool.length)].id);
+  };
+  $('#resetBtn').onclick = () => { if (confirm('Erase all your stars and start over?')) { prefs.done = []; prefs.art = []; save(); renderLibrary(); } };
   $('#homeBtn').onclick = () => { Sfx.play('back'); home(); };
   $('#nextBtn').onclick = next; $('#backBtn').onclick = back;
   $('#dots').addEventListener('click', e => { const d = e.target.closest('.dot'); if (d) { Sfx.play('pop'); goStep(+d.dataset.step); } });
-  $('#speakBtn').onclick = () => speak(`Step ${G.step + 1}. ${G.ch.steps[G.step].t}`);
+  $('#speakBtn').onclick = () => { const st = curItem().steps[G.step]; speak(`Step ${G.step + 1}. ${st.t}${G.mode === 'art' && st.tip ? ` Artist tip: ${st.tip}` : ''}`); };
   $('#speedBtn').onclick = () => { prefs.fast = !prefs.fast; save(); paintSpeed(); Sfx.play(prefs.fast ? 'next' : 'back'); };
   $('#playBtn').onclick = () => { Demo.setPlaying(!Demo.playing); Sfx.play('pop'); };
   $('#peekBtn').onclick = peek; $('#peek').onclick = peek;
+  $('#gridBtn').onclick = () => {
+    const on = $('#refGrid').hasAttribute('hidden'); $('#refGrid').toggleAttribute('hidden', !on); $('#gridBtn').setAttribute('aria-pressed', on); Sfx.play('pop');
+    if (on) toast('Grid trick: draw a light 4 × 4 grid on your paper too! 📐');
+  };
+  $('#squintBtn').onclick = () => {
+    const on = !$('#refWrap').classList.contains('squint'); $('#refWrap').classList.toggle('squint', on); $('#squintBtn').setAttribute('aria-pressed', on); Sfx.play('pop');
+    if (on) toast('Squint like an artist: see only light & dark! 😑');
+  };
   $('#swatches').addEventListener('click', e => {
     const sw = e.target.closest('.swatch');
     if (sw) { Pad.color = sw.dataset.color; Pad.eraser = false; }
@@ -1367,8 +2105,15 @@ function wire() {
   $('#undoBtn').onclick = () => Pad.undo();
   $('#clearBtn').onclick = () => Pad.clear();
   $('#traceBtn').onclick = () => { prefs.trace = !prefs.trace; save(); $('#trace').toggleAttribute('hidden', !prefs.trace); Sfx.play('pop'); paintTools(); };
-  $('#cNext').onclick = () => { closeCelebrate(); go($('#cNext').dataset.id); };
-  $('#cAgain').onclick = () => { closeCelebrate(); Pad.strokes.length = 0; Pad.redraw(); G.step = 0; renderStep(); Demo.start(); };
+  $('#cPhotoIn').onchange = e => {
+    const file = e.target.files && e.target.files[0]; e.target.value = '';
+    if (!file || G.mode !== 'art') return;
+    if (photos[G.les.id]) URL.revokeObjectURL(photos[G.les.id]);
+    photos[G.les.id] = URL.createObjectURL(file);
+    $('#cImg').src = photos[G.les.id]; $('#cMine').hidden = false; Sfx.play('pop'); toast('Look at that! You\'re a real artist 📸');
+  };
+  $('#cNext').onclick = () => { closeCelebrate(); location.hash = $('#cNext').dataset.href; };
+  $('#cAgain').onclick = () => { closeCelebrate(); if (G.mode === 'pal') { Pad.strokes.length = 0; Pad.redraw(); } G.step = 0; renderStep(); Demo.start(); };
   $('#cHome').onclick = () => { closeCelebrate(); home(); };
   document.addEventListener('keydown', e => {
     if (!$('#celebrate').hidden) { if (e.key === 'Escape') { closeCelebrate(); Demo.start(); } return; }
@@ -1379,6 +2124,11 @@ function wire() {
 }
 
 Pad.init(); wire(); route();
+// prepare the Art School lessons in spare moments so the tab opens instantly
+const whenIdle = window.requestIdleCallback || (f => setTimeout(f, 120));
+let toBuild = 0;
+const buildNext = () => { if (toBuild < LESSONS.length) { buildLesson(LESSONS[toBuild++]); whenIdle(buildNext); } };
+whenIdle(buildNext);
 })();
 </script>
 </body>
