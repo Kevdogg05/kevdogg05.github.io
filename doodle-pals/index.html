@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Doodle Pals</title>
-<meta name="description" content="Doodle Pals: learn to draw 54 cartoon characters step by step with an animated pencil guide and a practice sketchpad.">
+<meta name="description" content="Doodle Pals: learn to draw 60 cartoon characters step by step with an animated pencil guide and a practice sketchpad.">
 <meta name="theme-color" content="#fff6ea">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%8F%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -362,7 +362,7 @@
   </header>
 
   <div class="grid grid-cols-2 gap-3 mb-4" role="tablist" aria-label="Choose what to learn">
-    <button id="tabPals" class="mode-tab btn3d" role="tab" aria-selected="true" style="--c:#f35fae;--csh:#c93d88"><span class="mode-emoji" aria-hidden="true">🐱</span><span><b>Cartoon Pals</b><small>54 cute characters</small></span></button>
+    <button id="tabPals" class="mode-tab btn3d" role="tab" aria-selected="true" style="--c:#f35fae;--csh:#c93d88"><span class="mode-emoji" aria-hidden="true">🐱</span><span><b>Cartoon Pals</b><small id="palCount">60 cute characters</small></span></button>
     <button id="tabArt" class="mode-tab btn3d" role="tab" aria-selected="false" style="--c:#7a5af8;--csh:#5838d6"><span class="mode-emoji" aria-hidden="true">🎨</span><span><b>Art School</b><small>Real paper &amp; pencil</small></span></button>
   </div>
 
@@ -370,7 +370,7 @@
     <div class="grid place-items-center w-16 h-16 rounded-2xl bg-[#ffd23f] text-white shadow-[0_4px_0_#dda600] text-3xl shrink-0" aria-hidden="true" data-ico="trophy"></div>
     <div class="flex-1 min-w-[200px]">
       <div class="flex flex-wrap items-baseline gap-x-3">
-        <span class="text-2xl font-bold"><span id="progCount">0 of 54</span> <span id="progNoun">pals drawn</span></span>
+        <span class="text-2xl font-bold"><span id="progCount">0 of 60</span> <span id="progNoun">pals drawn</span></span>
         <span id="rank" class="text-lg font-semibold text-[#f35fae]"></span>
       </div>
       <div class="prog-track mt-2" role="progressbar" aria-label="Pals drawn" aria-valuemin="0" id="progBarWrap"><div id="progBar" class="prog-fill" style="width:0"></div></div>
@@ -594,9 +594,10 @@ const flower = (x, y, s, petal, mid) => [S(scallop(x, y, s, s, 5, 1), petal), S(
 const snow = (x, y, s, dl = 0) => [90, 30, -30].map(a => { const [x1, y1] = pol(x, y, s, a), [x2, y2] = pol(x, y, s, a + 180); return S(P`M${x1} ${y1}L${x2} ${y2}`, null, { sc: '#7cc4ff', w: 3.5, a: 'twinkle', dl }); });
 
 /* =====================================================================
-   2. CHARACTER LIBRARY — 54 pals, 6 themes, every one fully drawable
+   2. CHARACTER LIBRARY — 60 pals, 7 themes, every one fully drawable
    ===================================================================== */
 const CATS = [
+  { id: 'kids', name: 'Cool Kids', emoji: '🧒', blurb: 'Cartoon friends of every look', c: '#e8574e', t: '#ffe9e6', sh: '#bb3a32' },
   { id: 'space', name: 'Space Pals', emoji: '🚀', blurb: 'Out-of-this-world friends', c: '#7c6cff', t: '#efeaff', sh: '#5b4bd6' },
   { id: 'myth', name: 'Mythical Beasts', emoji: '🦄', blurb: 'Magic, sparkles and dragons', c: '#f35fae', t: '#ffeaf5', sh: '#c93d88' },
   { id: 'food', name: 'Food Friends', emoji: '🍩', blurb: 'Snacks with smiles', c: '#ff9334', t: '#fff1e2', sh: '#d8701a' },
@@ -1054,6 +1055,81 @@ add('sunny', 'Sunny', 'Sunshine', 'garden', 'bounce', [
   ['Give Sunny cool sunglasses! 😎', [S(E(82, 92, 14, 10), K.dark, { ink: 1 }), S(E(118, 92, 14, 10), K.dark, { ink: 1 }), S('M96 90Q100 86 104 90', null, { w: 4 }), S('M68 90L58 86'), S('M132 90L142 86'), S('M74 88L80 84', null, { sc: '#ffffff', w: 3, deco: 1 }), S('M110 88L116 84', null, { sc: '#ffffff', w: 3, deco: 1 })]],
 ]);
 
+/* ---------------- COOL KIDS ---------------- */
+/* Shared kid pieces: eyes sit at y 86, the body hangs under a chin at about y 122 */
+const kidFace = (o = {}) => face(100, 86, { g: 17, k: 1.12, es: 1.25, my: 12, ...o });
+const kidNose = () => S('M96.5 93Q100 96.5 103.5 93', null, { w: 3 });
+const kidBrows = (w = 3.5) => [S('M75 74Q83 69 91 73', null, { w }), S('M125 74Q117 69 109 73', null, { w })];
+const kidEars = (ex, skin, sides = [-1, 1]) => sides.flatMap(s => [
+  S(P`M${100 + s * ex} 74C${100 + s * (ex + 10)} 72 ${100 + s * (ex + 12)} 92 ${100 + s * ex} 94`, skin, { z: -1 }),
+  S(P`M${100 + s * (ex + 3)} 79Q${100 + s * (ex + 8)} 84 ${100 + s * (ex + 3)} 89`, null, { z: -0.9, w: 2.5 })]);
+const kidTop = (skin, top) => [S('M92 116V134H108V116', skin, { z: -3 }), S('M72 132Q100 126 128 132L144 148L135 156L131 150L132 168H68L69 150L65 156L56 148Z', top, { z: -2 })];
+function kidLegs(skin, bottom, shoes, kind = 'shorts') {
+  const out = [S('M60 152Q55 164 57 174', skin, { tw: 7, z: -2.6 }), S(C(57, 178, 5.5), skin, { z: -2.6 }), S('M140 152Q145 164 143 174', skin, { tw: 7, z: -2.6 }), S(C(143, 178, 5.5), skin, { z: -2.6 })];
+  if (kind === 'pants') out.push(S('M70 166H130L128 186H104L100 176L96 186H72Z', bottom, { z: -2.4 }));
+  else {
+    out.push(kind === 'skirt' ? S('M69 164H131L139 180H61Z', bottom, { z: -2.5 }) : S('M70 166H130L132 180H104L100 174L96 180H68Z', bottom, { z: -2.4 }));
+    out.push(S('M86 179V186', skin, { tw: 7, z: -3 }), S('M114 179V186', skin, { tw: 7, z: -3 }));
+  }
+  out.push(S(E(84, 190, 10, 4.5), shoes, { z: -2.9 }), S(E(116, 190, 10, 4.5), shoes, { z: -2.9 }));
+  return out;
+}
+const freckles = (y = 96) => [[70, y], [75, y + 3], [78, y - 1], [130, y], [125, y + 3], [122, y - 1]].map(([x, yy]) => S(C(x, yy, 1.6), '#a0522d', { ns: 1, w: 2 }));
+
+add('zuri', 'Zuri', 'Puff Buns', 'kids', 'bounce', [
+  ["Draw a big round circle for Zuri's face — like a cookie! 🍪", [S(C(100, 80, 42), '#8d5524')]],
+  ['Add her hair: a cap on top, then two puffy cloud buns on the sides. ☁️', [S('M58 76C57 46 76 32 100 32C124 32 143 46 142 76C132 62 118 56 100 56C82 56 68 62 58 76Z', '#3b2621', { z: 1 }), S(scallop(56, 42, 24, 24, 12, 1.1), '#3b2621', { z: -1, a: 'bob', o: [56, 42] }), S(scallop(144, 42, 24, 24, 12, 1.1), '#3b2621', { z: -1, a: 'bob', o: [144, 42], dl: .3 })]],
+  ['Big shiny eyes with lash flicks at the outer corners, thick eyebrows, a tiny nose and a smile.', [...kidFace(), S('M77 83L71 78', null, { w: 3 }), S('M123 83L129 78', null, { w: 3 }), ...kidBrows(5), kidNose()]],
+  ['Add ears on the sides, a neck, and a T-shirt — like a wide letter T. 👕', [...kidEars(41, '#8d5524'), ...kidTop('#8d5524', '#ffcf3f')]],
+  ['Draw noodle arms with round hands, shorts and two bean-shaped shoes.', kidLegs('#8d5524', '#5b8def', '#ff7aa8')],
+  ['Finish with pink hair ties, curly swirls in her puffs and a heart on her shirt! 💖', [S(ER(67, 51, 8, 4, -49), '#ff7aa8', { z: 1.5 }), S(ER(133, 51, 8, 4, 49), '#ff7aa8', { z: 1.5 }), S(spiral(52, 40, 1, 7, 1.4), null, { sc: '#6e4a3a', w: 2.5, a: 'bob', o: [56, 42] }), S(spiral(148, 40, 1, 7, 1.4), null, { sc: '#6e4a3a', w: 2.5, a: 'bob', o: [144, 42], dl: .3 }), S(heart(100, 150, 7), '#ff7aa8')]],
+]);
+
+add('mei', 'Mei', 'Bob & Bangs', 'kids', 'sway', [
+  ['Draw a heart-shaped face — round on top with a soft point at the chin. 💗', [S('M100 40C128 40 142 60 141 82C140 104 120 120 100 124C80 120 60 104 59 82C58 60 72 40 100 40Z', '#ffdcb5')]],
+  ['Draw her bob haircut: a big rounded box behind her face, then bangs with a zig-zag edge. ✂️', [S('M52 120C46 92 46 56 62 40C76 26 124 26 138 40C154 56 154 92 148 120Z', '#2b2733', { z: -4 }), S('M60 76C58 46 78 32 100 32C122 32 142 46 140 76L131 68L122 74L111 66L100 73L89 66L78 74L69 68Z', '#2b2733', { z: 1 })]],
+  ['Draw big shiny eyes, a tiny nose and a sweet smile.', [...kidFace(), kidNose()]],
+  ['Add a neck and a T-shirt top. Her ears hide under her hair!', kidTop('#ffdcb5', '#b38cff')],
+  ['Draw a skirt like a triangle with the top cut off, then arms, legs and shoes.', kidLegs('#ffdcb5', '#b38cff', '#ff6b6b', 'skirt')],
+  ['Add a star clip in her hair, a white collar and a shine on her hair! ⭐', [S(star(126, 50, 12, 6), K.yellow, { z: 2, a: 'twinkle' }), S('M88 131Q94 140 100 133Q106 140 112 131', '#fff'), S('M66 46Q76 38 88 37', null, { sc: '#6c6680', w: 4, z: 1.5 })]],
+]);
+
+add('leo', 'Leo', 'Curly Top', 'kids', 'hop', [
+  ["Draw a soft square for Leo's face — like a slice of toast! 🍞", [S('M62 54Q62 40 78 40H122Q138 40 138 54V96Q138 122 100 122Q62 122 62 96Z', '#e0ac69')]],
+  ['Make his curly hair with a bumpy cloud shape across the top. ☁️', [S(scallop(100, 46, 46, 22, 14, 1.1), '#6b4226', { z: 1 })]],
+  ['Draw big shiny eyes, eyebrows, a tiny nose and a happy open smile.', [...kidFace({ m: 'open' }), ...kidBrows(), kidNose()]],
+  ['Add ears, a neck and a hoodie — draw it just like a T-shirt.', [...kidEars(38, '#e0ac69'), ...kidTop('#e0ac69', '#3ec18c')]],
+  ['Draw arms and hands, long jeans, and two sneakers. 👟', kidLegs('#e0ac69', '#4a6fb5', '#ff9334', 'pants')],
+  ['Add a hoodie pocket, two strings and freckles on his cheeks!', [S('M86 152H114Q116 160 112 165H88Q84 160 86 152Z', '#35a97b'), S('M95 134V146', null, { w: 3 }), S('M105 134V146', null, { w: 3 }), S(C(95, 148, 2), '#fff', { w: 2 }), S(C(105, 148, 2), '#fff', { w: 2 }), ...freckles()]],
+]);
+
+add('priya', 'Priya', 'Side Braid', 'kids', 'bob', [
+  ['Draw a tall oval face, like an egg standing up. 🥚', [S(E(100, 80, 40, 44), '#c68642')]],
+  ['Draw hair with a middle part, like curtains, then a braid: stack little ovals like beads! 📿', [S('M60 86C56 48 76 32 100 32C124 32 144 48 140 86C136 62 118 50 100 52C82 50 64 62 60 86Z', '#2a1d1a', { z: 1 }), S('M100 34V51', null, { sc: '#5a4540', w: 2.5, z: 1.2 }), ...[[142, 92], [141, 104], [139, 116], [137, 128], [135, 140]].map(([x, y]) => S(E(x, y, 7.5, 6.5), '#2a1d1a', { z: 0.5 }))]],
+  ['Draw big shiny eyes, eyebrows, a tiny nose and a smile.', [...kidFace(), ...kidBrows(4), kidNose()]],
+  ['Add an ear on the left, a neck and a top. The braid hides her other ear!', [...kidEars(39, '#c68642', [-1]), ...kidTop('#c68642', '#2ec4b6')]],
+  ['Draw a skirt, arms with round hands, little legs and shoes.', kidLegs('#c68642', '#ff9f43', '#7c6cff', 'skirt')],
+  ['Add a hair tie and a tuft at the end of the braid, and a flower clip! 🌸', [S(E(134, 149, 5, 3.5), '#ff7aa8', { z: 0.6 }), S('M131 152Q126 162 128 168Q133 163 134 155Q136 163 141 167Q141 159 137 152Z', '#2a1d1a', { z: 0.55 }), ...lay(flower(70, 52, 8, '#ff7aa8', K.yellow), 2)]],
+]);
+
+add('sam', 'Sam', 'Cap & Glasses', 'kids', 'wobble', [
+  ["Draw a big round circle for Sam's face.", [S(C(100, 82, 42), '#f1c27d')]],
+  ['Give Sam a baseball cap: a half-circle dome, and a brim that sticks out like a duck bill! 🧢', [S('M59 70C60 44 78 32 100 32C122 32 140 44 141 70Z', '#ff5a5a', { z: 1 }), S('M118 70Q150 62 168 72Q164 82 140 80Q124 78 118 70Z', '#e64545', { z: 1.2 })]],
+  ['Draw dot eyes, a nose and a big grin, then round glasses around the eyes. 👓', [...kidFace({ m: 'open' }), kidNose(), S(C(83, 86, 12), '#e8f6ff', { fo: .35, z: 0.5 }), S(C(117, 86, 12), '#e8f6ff', { fo: .35, z: 0.5 }), S('M95 85Q100 81 105 85', null, { z: 0.5 })]],
+  ['Add ears, a neck and a T-shirt.', [...kidEars(41, '#f1c27d'), ...kidTop('#f1c27d', '#4f8ef7')]],
+  ['Draw arms, shorts, little legs and big sneakers.', kidLegs('#f1c27d', '#3d3552', '#ffffff')],
+  ['Add tufts of hair under the cap, a button on top and a lightning bolt on his shirt! ⚡', [S('M60 70Q55 76 60 80Q62 75 66 72Z', '#7a4a2a', { z: 0.8 }), S('M140 70Q145 76 140 80Q138 75 134 72Z', '#7a4a2a', { z: 0.8 }), S(C(100, 32, 4), '#e64545', { z: 1.3 }), S('M104 138L93 152H101L96 164L109 149H101Z', K.yellow)]],
+]);
+
+add('ava', 'Ava', 'Ponytail', 'kids', 'jfloat', [
+  ['Draw an oval face, a little wider at the top.', [S(E(100, 82, 41, 44), '#ffd9c2')]],
+  ['Draw side-swept hair, then a bouncy ponytail shaped like a big comma!', [S('M59 82C54 48 76 32 102 32C128 32 146 50 141 84C134 66 122 58 110 54C96 60 74 64 59 82Z', '#e0773a', { z: 1 }), S('M124 38C150 24 174 50 168 84C164 104 154 116 146 124C150 104 154 84 150 70C146 56 136 48 126 46Z', '#e0773a', { z: -1, a: 'wag', o: [128, 40] })]],
+  ['Draw big shiny eyes, eyebrows, a tiny nose and a smile.', [...kidFace(), ...kidBrows(), kidNose()]],
+  ['Add ears, a neck and the top of her dress.', [...kidEars(40, '#ffd9c2'), ...kidTop('#ffd9c2', '#ff8fc4')]],
+  ['Draw the skirt of her dress, arms with round hands, little legs and shoes.', kidLegs('#ffd9c2', '#ff8fc4', '#ffcf3f', 'skirt')],
+  ['Add a big bow on her ponytail, freckles and a heart pocket! 🎀', [S('M127 40C116 25 101 29 105 42C108 51 119 48 127 40Z', '#7c6cff', { z: 2 }), S('M127 40C138 25 153 29 149 42C146 51 135 48 127 40Z', '#7c6cff', { z: 2 }), S(C(127, 40, 5), '#9d90ff', { z: 2 }), ...freckles(), S(heart(112, 152, 6), '#fff')]],
+]);
+
 /* index shapes; split multi-part paths so the pencil lifts between them */
 const byId = {};
 CHARS.forEach(ch => {
@@ -1272,7 +1348,7 @@ const ht = (reg, o = {}) => A('hatch', hatch(reg, o), { clip: o.noclip ? null : 
 const dt = (reg, dens, o = {}) => A('dots', stipple(reg, dens, o), { o: o.o });
 const sd = (outer, inner, o = {}) => A('strands', strands(outer, inner, o), { o: o.o, w: o.w, tool: o.tool });
 const tn = (d, o = {}) => A('tone', d, { m: o.m, op: o.op ?? .4, blur: o.blur ?? 3, grad: o.grad, clip: o.clip, tool: o.tool });
-const er = (d, o = {}) => A('erase', d, { w: o.w, tool: o.tool ?? 'kneaded' });
+const er = (d, o = {}) => A('erase', d, { w: o.w, o: o.o, tool: o.tool ?? 'kneaded' });
 const clr = m => A('clear', m, { tool: 'eraser' });
 const lb = (x, y, text, o = {}) => ({ k: 'label', x, y, text, anchor: o.anchor ?? 'middle', size: o.size });
 const nt = (d, o = {}) => ({ k: 'note', d, fill: o.fill });
@@ -1384,14 +1460,53 @@ lesson('cube', 'Shade a Cube', 'tech', 2, 'Three sides, three values', ['HB', '2
 /* ---------------- REAL PEOPLE ---------------- */
 const EGG = 'M100 30C136 30 154 62 152 98C150 136 128 168 100 170C72 168 50 136 48 98C46 62 64 30 100 30Z';
 const EYE_L = 'M69 100Q79.5 93 90 100Q79.5 105 69 100Z';
+lesson('faceshapes', 'Face Shapes', 'people', 1, 'Oval, round, square, heart and more', ['HB', '2B', 'eraser'], () => {
+  /* [name, centre x, centre y, half-width at the eye line, eye y, chin y, outline] */
+  const F = [
+    ['oval', 40, 54, 20, 54, 81, (x, y) => E(x, y, 20, 27)],
+    ['round', 100, 54, 24, 56, 80, (x, y) => C(x, y + 2, 24)],
+    ['square', 160, 54, 20, 54, 81, (x, y) => P`M${x - 20} ${y - 12}C${x - 20} ${y - 30} ${x + 20} ${y - 30} ${x + 20} ${y - 12}V${y + 14}Q${x + 20} ${y + 27} ${x + 8} ${y + 27}H${x - 8}Q${x - 20} ${y + 27} ${x - 20} ${y + 14}Z`],
+    ['heart', 40, 142, 22, 142, 170, (x, y) => P`M${x} ${y - 27}C${x + 18} ${y - 27} ${x + 23} ${y - 14} ${x + 22} ${y - 2}C${x + 20} ${y + 12} ${x + 10} ${y + 22} ${x} ${y + 28}C${x - 10} ${y + 22} ${x - 20} ${y + 12} ${x - 22} ${y - 2}C${x - 23} ${y - 14} ${x - 18} ${y - 27} ${x} ${y - 27}Z`],
+    ['long', 100, 142, 17, 142, 172, (x, y) => E(x, y, 17, 30)],
+    ['diamond', 160, 142, 21, 142, 170, (x, y) => P`M${x} ${y - 27}C${x + 10} ${y - 27} ${x + 14} ${y - 16} ${x + 21} ${y - 2}C${x + 22} ${y + 6} ${x + 12} ${y + 20} ${x} ${y + 28}C${x - 12} ${y + 20} ${x - 22} ${y + 6} ${x - 21} ${y - 2}C${x - 14} ${y - 16} ${x - 10} ${y - 27} ${x} ${y - 27}Z`],
+  ].map(([name, x, y, w, ey, cy, f]) => ({ name, x, y, w, ey, cy, d: f(x, y) }));
+  const feats = ({ x, ey, cy }) => {
+    const eye = P`M${x - 12} ${ey}Q${x - 8} ${ey - 3} ${x - 4} ${ey}Q${x - 8} ${ey + 2} ${x - 12} ${ey}Z`, brow = P`M${x - 13} ${ey - 5}Q${x - 9} ${ey - 8} ${x - 4} ${ey - 6}`;
+    const ny = (ey + cy) / 2, my = ny + (cy - ny) / 3;
+    return [ln(eye, { o: .8, w: 1.2 }), ln(mx(eye, 2 * x), { o: .8, w: 1.2 }), dk(P`M${x - 8} ${ey}l.1 .1M${x + 8} ${ey}l.1 .1`, { w: 2.6 }), ln(brow, { o: .7, w: 1.4 }), ln(mx(brow, 2 * x), { o: .7, w: 1.4 }),
+      ln(P`M${x - 2.5} ${ny}Q${x} ${ny + 2} ${x + 2.5} ${ny}`, { o: .7, w: 1.2 }), ln(P`M${x - 5} ${my}Q${x} ${my + 3} ${x + 5} ${my}`, { o: .8, w: 1.3 })];
+  };
+  const curls = (cx, cy, rx, ry, a0, a1, n) => {
+    const pts = Array.from({ length: n + 1 }, (_, i) => pol(0, 0, 1, a0 + (a1 - a0) * i / n)).map(([c, s]) => [cx + rx * c, cy + ry * s]);
+    return pts.slice(1).reduce((d, p, i) => d + P`A${Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]) * .58} ${Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]) * .58} 0 0 1 ${p[0]} ${p[1]}`, P`M${pts[0][0]} ${pts[0][1]}`);
+  };
+  const [ov, ro, sq, he, lo, di] = F;
+  const hair = [
+    P`M${ov.x + 5} ${ov.y - 29}C${ov.x - 16} ${ov.y - 32} ${ov.x - 26} ${ov.y - 16} ${ov.x - 25} ${ov.y + 4}C${ov.x - 24} ${ov.y + 18} ${ov.x - 26} ${ov.y + 28} ${ov.x - 23} ${ov.y + 34}M${ov.x + 5} ${ov.y - 29}C${ov.x + 22} ${ov.y - 30} ${ov.x + 27} ${ov.y - 12} ${ov.x + 25} ${ov.y + 6}C${ov.x + 24} ${ov.y + 20} ${ov.x + 26} ${ov.y + 28} ${ov.x + 23} ${ov.y + 34}M${ov.x + 5} ${ov.y - 29}C${ov.x - 2} ${ov.y - 20} ${ov.x - 12} ${ov.y - 16} ${ov.x - 20} ${ov.y - 13}`,
+    curls(ro.x, ro.y + 2, 29, 29, 165, 375, 12),
+    P`M${sq.x - 21} ${sq.y - 8}C${sq.x - 24} ${sq.y - 28} ${sq.x - 12} ${sq.y - 34} ${sq.x} ${sq.y - 33}C${sq.x + 12} ${sq.y - 34} ${sq.x + 24} ${sq.y - 28} ${sq.x + 21} ${sq.y - 8}M${sq.x - 20} ${sq.y - 14}L${sq.x - 14} ${sq.y - 21}L${sq.x - 9} ${sq.y - 15}L${sq.x - 3} ${sq.y - 22}L${sq.x + 3} ${sq.y - 16}L${sq.x + 9} ${sq.y - 22}L${sq.x + 14} ${sq.y - 16}L${sq.x + 20} ${sq.y - 21}`,
+    P`M${he.x - 22} ${he.y - 2}C${he.x - 25} ${he.y - 22} ${he.x - 14} ${he.y - 31} ${he.x} ${he.y - 31}C${he.x + 14} ${he.y - 31} ${he.x + 25} ${he.y - 22} ${he.x + 22} ${he.y - 2}` + C(he.x, he.y - 37, 7) + P`M${he.x - 10} ${he.y - 25}Q${he.x - 6} ${he.y - 29} ${he.x - 3} ${he.y - 30}M${he.x + 10} ${he.y - 25}Q${he.x + 6} ${he.y - 29} ${he.x + 3} ${he.y - 30}`,
+    P`M${lo.x - 20} ${lo.y + 10}C${lo.x - 24} ${lo.y - 16} ${lo.x - 16} ${lo.y - 34} ${lo.x} ${lo.y - 34}C${lo.x + 16} ${lo.y - 34} ${lo.x + 24} ${lo.y - 16} ${lo.x + 20} ${lo.y + 10}M${lo.x - 20} ${lo.y + 10}Q${lo.x - 18} ${lo.y + 13} ${lo.x - 15} ${lo.y + 11}M${lo.x + 20} ${lo.y + 10}Q${lo.x + 18} ${lo.y + 13} ${lo.x + 15} ${lo.y + 11}M${lo.x - 16} ${lo.y - 13}Q${lo.x} ${lo.y - 18} ${lo.x + 16} ${lo.y - 13}`,
+    P`M${di.x - 20} ${di.y - 6}C${di.x - 22} ${di.y - 26} ${di.x - 10} ${di.y - 32} ${di.x} ${di.y - 32}C${di.x + 10} ${di.y - 32} ${di.x + 22} ${di.y - 26} ${di.x + 20} ${di.y - 6}` + curls(di.x - 27, di.y - 16, 7, 7, 0, 360, 7) + curls(di.x + 27, di.y - 16, 7, 7, 0, 360, 7),
+  ];
+  return [
+    st('Faces come in different shapes! Lightly draw the first three: an OVAL (like an egg), a ROUND face (like a ball) and a SQUARE face with a wide jaw.', 'HB', 1, 'Look at your family — which face shape does each person have?', [F.slice(0, 3).map(f => [ln(f.d, { o: .75 }), lb(f.x, f.y + 40, f.name, { size: 9 })])]),
+    st('Now a HEART face (wide on top, pointy chin), a LONG face, and a DIAMOND face (wide cheekbones, narrow on top and bottom).', 'HB', 1, 'Real faces are often a mix of two shapes — that is what makes everyone look different.', [F.slice(3).map(f => [ln(f.d, { o: .75 }), lb(f.x, f.y + 40, f.name, { size: 9 })])]),
+    st('Draw a light cross on every face: a line down the middle, and the eye line across the MIDDLE of the face.', 'HB', 1, 'Same rule for every shape: the eyes sit halfway down the head!', [F.map(f => gl(P`M${f.x} ${f.y - 30}V${f.cy + 2}M${f.x - f.w} ${f.ey}H${f.x + f.w}`))]),
+    st('Add simple features: eyes on the line, the nose halfway down to the chin, then the mouth and eyebrows.', 'HB', 2, 'The features hardly change — only the face shape does. Yet every face looks like a different person!', [F.map(feats)]),
+    st('Give each face a different hairstyle: long hair, curls, short spikes, a bun, a bob and two puffs!', 'HB', 2, 'Hair sits ABOVE the head, so leave a little space between the hair and the top of the face.', [hair.map(d => ln(d, { o: .8 }))]),
+    st('Softly shade one side of each face, then erase the guidelines. Which shape looks most like YOU?', '2B', 1, 'Next time you see a friend, try to spot their face shape first.', [F.map((f, i) => ht(rAnd(rD(f.d), rIf(x => x > f.x + f.w * .45)), { a: 70, gap: 1.8, o: .2, seed: 20 + i })), clr(scrub(14, 22, 186, 174, 14))]),
+  ];
+});
+
 lesson('facemap', 'Face Proportions', 'people', 2, 'Where everything goes on a real face', ['HB', 'eraser'], () => [
   st('Lightly draw an upside-down egg for the head.', 'HB', 1, 'Draw light "ghost lines" first. They are your map, not the final drawing.', [gl(EGG)]),
-  st('Draw a line down the middle and one across the middle. The eyes sit on this middle line — lower than most people think!', 'HB', 1, 'Measure: hold your pencil against the egg to find the halfway point.', [gl('M100 30V170'), gl('M48 100H152'), lb(156, 103, 'eyes', { anchor: 'start' })]),
-  st('Nose line: halfway between the eye line and the chin. Mouth line: one third of the way from the nose to the chin.', 'HB', 1, 'Most beginners put the nose too low. Measure!', [gl('M78 135H122'), gl('M82 147H118'), lb(147, 138, 'nose', { anchor: 'start' }), lb(141, 151, 'mouth', { anchor: 'start' })]),
+  st('Draw a line down the middle and one across the middle. The eyes sit on this middle line — lower than most people think!', 'HB', 1, 'Beginners almost always draw the eyes too high. Measure to find the halfway point!', [gl('M100 30V170'), gl('M48 100H152'), lb(156, 103, 'eyes', { anchor: 'start' })]),
+  st('Nose line: halfway between the eye line and the chin. Mouth line: one third of the way from the nose to the chin.', 'HB', 1, 'Check: eyebrows to the bottom of the nose, and the nose to the chin, are about the same distance.', [gl('M78 135H122'), gl('M82 147H118'), lb(147, 138, 'nose', { anchor: 'start' }), lb(141, 151, 'mouth', { anchor: 'start' })]),
   st('A face is about five eyes wide. Mark five equal spaces on the eye line — the eyes go in spaces 2 and 4.', 'HB', 2, 'There is exactly one eye-width of space between the two eyes.', [[68.8, 89.6, 110.4, 131.2].map(x => gl(P`M${x} 95V105`)), ln(EYE_L, { o: .8 }), ln(mx(EYE_L), { o: .8 }), ln(C(79.5, 99.5, 3.4), { o: .8, fill: '#3c3b43' }), ln(C(120.5, 99.5, 3.4), { o: .8, fill: '#3c3b43' }), lb(100, 91, '1 eye', { size: 7 })]),
   st('Nose: about as wide as the space between the eyes. The corners of the mouth line up under the middle of each eye.', 'HB', 2, 'Use your pencil like a ruler — hold it straight down from each eye.', [ln('M93 127Q89 135 95 136Q100 139 105 136Q111 135 107 127', { o: .8 }), ln('M80 147Q90 144 100 147Q110 144 120 147', { o: .85 }), ln('M86 151Q100 157 114 151', { o: .5 }), nt('M79.5 104V146'), nt('M120.5 104V146')]),
   st('Ears fit between the eye line and the nose line. Add eyebrows just above the eyes, and the neck.', 'HB', 2, 'Necks are wide — almost as wide as the jaw. Not a thin stick!', [['M49 101C41 96 38 112 41 122C43 131 47 135 52 134', 'M67 90Q78 85 91 89', 'M77 158C77 172 75 184 71 196'].flatMap(d => [d, mx(d)]).map((d, i) => ln(d, { o: i === 2 || i === 3 ? .9 : .8, w: i === 2 || i === 3 ? 2 : undefined }))]),
-  st('Hair grows ABOVE the skull, so it sits higher than the egg. Add the hairline and jaw, then erase your guidelines!', 'HB', 2, 'Erase gently with a kneaded eraser so you don\'t smudge your work.', [ln('M50 100C50 136 72 168 100 170C128 168 150 136 150 100', { o: .85 }), ln('M46 104C38 54 64 16 100 16C136 16 162 54 154 104', { o: .85 }), ln('M51 86C58 62 82 58 100 60C118 58 142 62 149 86', { o: .7 }), clr(scrub(48, 30, 152, 170, 12))]),
+  st('Hair grows ABOVE the skull, so it sits higher than the egg. Add the hairline and jaw, then erase your guidelines!', 'HB', 2, 'Pro trick: turn your drawing upside down. Mistakes jump out when your brain stops seeing "a face"!', [ln('M50 100C50 136 72 168 100 170C128 168 150 136 150 100', { o: .85 }), ln('M46 104C38 54 64 16 100 16C136 16 162 54 154 104', { o: .85 }), ln('M51 86C58 62 82 58 100 60C118 58 142 62 149 86', { o: .7 }), clr(scrub(48, 30, 152, 170, 12))]),
 ]);
 
 lesson('eye', 'A Realistic Eye', 'people', 3, 'Iris, shine, lashes and brows', ['HB', '2B', '4B', 'kneaded'], () => {
@@ -1419,7 +1534,7 @@ lesson('eye', 'A Realistic Eye', 'people', 3, 'Iris, shine, lashes and brows', [
     st('Lightly draw an almond shape — pointy at the inner corner (near the nose), rounder at the outer corner.', 'HB', 1, 'Real eyes are not footballs! The top curve is higher; the bottom curve is flatter.', [gl(upD), gl(loD)]),
     st('Draw the iris: a big circle tucked under the top lid. The top of it hides under the lid!', 'HB', 2, 'If you can see white above the iris, the eye looks surprised or scared.', [ln('M86.6 76A23 23 0 1 0 109.4 76', { o: .8 })]),
     st('Lightly circle a little shine, then shade the pupil very dark — but never color over the shine!', '4B', 3, 'The shine (called a catchlight) is what makes an eye look alive.', [gl(shine.d), ln(pupil.d, { o: .9 }), ht(rAnd(pupil, rNot(shine)), { a: 45, gap: 1, o: .85 })]),
-    st('Iris: draw lines from the pupil out to the edge, like spokes on a bike wheel. Then darken the outer rim and the top.', '2B', 2, 'The dark ring around the iris is called the limbal ring. It makes eyes look real!', [A('line', spokes, { o: .5, w: .9 }), ht(rAnd(irisVis, rNot(rC(ix, iy, 19.5))), { a: 30, gap: 1.2, o: .55 }), ht(rAnd(irisVis, rNot(pupil), rIf((x, y) => y < 88)), { a: 0, gap: 1.6, o: .4, seed: 4 })]),
+    st('Iris: draw lines from the pupil out to the edge, like spokes on a bike wheel. Then darken the outer rim and the top.', '2B', 2, 'The dark outer ring is called the limbal ring. A cotton swab softens the iris.', [A('line', spokes, { o: .5, w: .9 }), ht(rAnd(irisVis, rNot(rC(ix, iy, 19.5))), { a: 30, gap: 1.2, o: .55 }), ht(rAnd(irisVis, rNot(pupil), rIf((x, y) => y < 88)), { a: 0, gap: 1.6, o: .4, seed: 4 })]),
     st('Darken the top lid line — it is the thickest, darkest line of the eye. Add the crease above it, following the same curve.', '2B', 3, 'Keep the bottom lid line lighter and thinner than the top.', [dk(upD, { w: 2.8 }), ln('M40 84C70 50 130 44 168 80', { o: .55 }), ln(loD, { o: .45, w: 1.3 })]),
     st('The white of the eye is NOT pure white! Softly shade the corners and just under the top lid. Add the little tear duct.', 'HB', 1, 'This shading makes the eyeball look round and wet.', [ht(rAnd(almond, rNot(iris), rIf(x => x < 74 || x > 122)), { a: 70, gap: 2, o: .2, seed: 5 }), ht(rAnd(almond, lidShadow, rNot(shine)), { a: 10, gap: 1.6, o: .3, seed: 6 }), ln('M30 105Q37 99 42 106Q37 111 30 105', { o: .6, w: 1.2 })]),
     st('Eyelashes: flick each lash out from the lid in a curve — press, then lift. They get longer toward the outer corner.', '2B', 2, 'Lashes grow in little clumps, not like a perfect comb.', [A('dark', lash, { w: 1.2, o: .9 }), A('line', low, { w: 1, o: .7 })]),
@@ -1471,10 +1586,11 @@ lesson('hair', 'Flowing Hair', 'people', 2, 'Big shapes, clumps and shine', ['HB
   const hairClip = outerL + 'L64 172C66 150 62 128 62 104C62 78 74 56 95 50Z' + outerR + 'L138 172C136 150 140 126 139 102C139 78 122 58 95 50Z';
   return [
     st('Lightly draw the face shape. Hair always sits ON TOP of the head, so leave room above it.', 'HB', 1, 'Hair has thickness! It puffs up above the skull.', [gl(faceG)]),
-    st('Draw the outline of all the hair as ONE big shape — like a hood around the face. Add the part line.', 'HB', 2, 'Think of hair as a big shape first, not single hairs.', [ln(outerL, { o: .75 }), ln(outerR, { o: .75 }), ln(innerL, { o: .6 }), ln(innerR, { o: .6 }), ln('M88 30C90 38 92 45 95 50', { o: .6 })]),
+    st('Draw the outline of all the hair as ONE big shape — like a hood around the face. Add the part line.', 'HB', 2, 'Think big shapes, not single hairs — artists draw the impression of hair, never every strand.', [ln(outerL, { o: .75 }), ln(outerR, { o: .75 }), ln(innerL, { o: .6 }), ln(innerR, { o: .6 }), ln('M88 30C90 38 92 45 95 50', { o: .6 })]),
     st('Split the hair into big clumps with long, flowing lines that follow the way the hair falls.', 'HB', 2, 'Start each line at the part and let it flow down like a waterfall.', [sd(outerL, innerL, { n: 4, seed: 2, trim: .05, o: .55, w: 1.2 }), sd(outerR, innerR, { n: 4, seed: 3, trim: .05, o: .55, w: 1.2 })]),
-    st('Shade the darkest parts: near the part, under the clumps and close to the face. Use long strokes in the direction the hair grows!', '2B', 2, 'Flick each stroke off at the end so it tapers like real hair.', [sd(outerL, innerL, { n: 34, seed: 4, dist: r => r ** .6 }), sd(outerR, innerR, { n: 34, seed: 5, dist: r => r ** .6 }), sd(outerL, innerL, { n: 16, seed: 6, trim: .1, to: .35, o: .6 }), sd(outerR, innerR, { n: 16, seed: 7, trim: .1, to: .35, o: .6 })]),
-    st('Leave a band of white paper where light hits the top of the head — the shine. Lift it out with your kneaded eraser.', 'kneaded', 1, 'Shiny hair has a light band that curves around the head like a halo.', [A('erase', 'M46 70C66 48 134 46 156 70', { w: 7, tool: 'kneaded', clip: hairClip }), A('erase', 'M48 82C68 62 132 60 154 82', { w: 3, tool: 'kneaded', clip: hairClip })]),
+    st('With a soft 2B, cover all the hair with a LIGHT layer of long strokes going the same way the hair flows.', '2B', 1, 'This first layer is your map of the hair\'s direction. Keep it light!', [sd(outerL, innerL, { n: 30, seed: 4, o: .3 }), sd(outerR, innerR, { n: 30, seed: 5, o: .3 })]),
+    st('Blend it softly with a tissue. Then go darker near the part, under the clumps and close to the face, with long strokes that taper at the ends.', '2B', 2, 'Flick each stroke off at the end so it tapers like real hair.', [tn(hairClip, { op: .2, blur: 3, clip: hairClip, tool: 'tissue', m: loops(56, 60, 60, 160, 8, 5) + loops(144, 60, 148, 160, 8, 5).replace('M', 'L') }), sd(outerL, innerL, { n: 34, seed: 14, dist: r => r ** .6 }), sd(outerR, innerR, { n: 34, seed: 15, dist: r => r ** .6 }), sd(outerL, innerL, { n: 16, seed: 6, trim: .1, to: .35, o: .6 }), sd(outerR, innerR, { n: 16, seed: 7, trim: .1, to: .35, o: .6 })]),
+    st('Highlights go in LAST. Lift a band of shine where light hits the top of the head with your kneaded eraser.', 'kneaded', 1, 'Shiny hair has a light band that curves around the head like a halo.', [A('erase', 'M46 70C66 48 134 46 156 70', { w: 7, tool: 'kneaded', clip: hairClip }), A('erase', 'M48 82C68 62 132 60 154 82', { w: 3, tool: 'kneaded', clip: hairClip })]),
     st('Add a few loose flyaway hairs, draw the jaw and chin, then erase the face guideline.', '2B', 1, 'Only draw a FEW single hairs — too many looks messy.', [A('strands', 'M58 58C50 48 46 42 38 44M150 66C160 56 166 54 172 56M146 168C150 176 156 180 162 182', { o: .5 }), ln('M63 118C69 136 84 147 100 148C116 147 131 136 137 118', { o: .7 }), clr(scrub(62, 48, 138, 148, 7))]),
   ];
 });
@@ -1488,9 +1604,38 @@ lesson('body', 'Body Proportions', 'people', 2, 'Measure a person in "heads"', [
     st('Draw 9 short lines evenly spaced from top to bottom. That makes 8 boxes — each box is one "head" tall.', 'HB', 1, 'Grown-ups are about 7½ to 8 heads tall. Kids your age are about 6 heads tall!', [Array.from({ length: 9 }, (_, k) => gl(P`M74 ${12 + 22 * k}H126`)), Array.from({ length: 8 }, (_, k) => lb(68, 26 + 22 * k, String(k + 1), { anchor: 'end', size: 8 }))]),
     st('Draw the head in the top box — an oval.', 'HB', 2, 'Everything else is measured with this head.', [ln(E(100, 23, 8.5, 11), { o: .8 })]),
     st('Draw a stick skeleton: shoulders about 2 heads wide, hips about 1½. Elbows reach the waist, wrists reach the hips, knees go in box 6.', 'HB', 1, 'Arms are longer than you think — fingertips reach the middle of the thigh!', [skel.map(d => gl(d, { o: .7 }))]),
-    st('Add simple shapes on the skeleton: an oval chest, a hip shape, and long ovals for the arms and legs.', 'HB', 1, 'Artists call this a "mannequin". It helps you see the body in 3D.', [gl(shapes.join(''), { o: .6 })]),
+    st('Add simple shapes on the skeleton: an oval chest, a hip shape, and long ovals for arms and legs — a "mannequin".', 'HB', 1, 'Grown-up men often have wider, boxier shoulders; women often have wider hips.', [gl(shapes.join(''), { o: .6 })]),
     st('Draw the real outline over your shapes with smooth curves. Let\'s give her a simple dress!', 'HB', 2, 'Use the shapes like a map, but smooth out the bumps.', [ln(side, { o: .85 }), ln(mx(side), { o: .85 })]),
     st('Finish with hair, a face and shoes. Then erase all the guidelines and box lines!', '2B', 2, 'Practice by drawing people at the park or on TV — quick and loose!', [ln('M90.5 25C88 10 112 10 109.5 25', { o: .85 }), both('M91 21C89 32 87 40 84 46').map(d => ln(d, { o: .7 })), dk('M96.5 22.5l.1 .1', { w: 2.2 }), dk('M103.5 22.5l.1 .1', { w: 2.2 }), ln('M98 28Q100 29.5 102 28', { o: .7, w: 1 }), clr(scrub(60, 8, 140, 190, 10))]),
+  ];
+});
+
+lesson('profile', 'Side View Face', 'people', 3, 'Draw a face from the side (a profile)', ['HB', '2B', 'eraser'], () => {
+  const prof = 'M72 44C64 54 60 72 61 90C61 96 63 99 62 102C56 112 48 120 44 126C44 130 50 132 58 132C56 136 53 138 54 141C56 143 58 144 59 145C56 147 54 149 55 151C57 155 60 156 60 158C58 162 58 166 60 168C68 172 84 172 96 168C108 164 116 152 120 140';
+  const back = 'M72 44C90 30 134 30 150 52C162 70 160 100 150 116C146 122 141 127 137 131';
+  const hairTop = 'M70 48C80 30 120 24 142 34C152 39 157 50 157 62', hairLine = 'M70 48C78 62 98 82 116 98C120 92 134 90 140 104C142 112 140 124 137 131';
+  const crown = 'M70 48Q112 52 156 64';
+  const pull = (n, seed) => {
+    const pts = samplePath(hairLine, 80), rnd = seeded(seed);
+    let d = '';
+    for (let k = 0; k < n; k++) {
+      const [sx, sy] = pts[Math.min(80, Math.floor((k + rnd()) / n * 80))], mxp = (sx + 157) / 2, myp = (sy + 64) / 2, ox = mxp - 108, oy = myp - 82, L = Math.hypot(ox, oy) || 1, push = 5 + rnd() * 5;
+      d += P`M${sx + (rnd() - .5) * 2} ${sy + (rnd() - .5) * 2}Q${mxp + ox / L * push} ${myp + oy / L * push} ${155 + rnd() * 2} ${61 + rnd() * 6}`;
+    }
+    return d;
+  };
+  const tailO = 'M160 60C178 64 186 92 178 120C174 134 166 146 160 154', tailI = 'M158 70C168 86 168 112 162 130C160 140 158 148 160 154';
+  const ladder = [[52, 'hairline'], [92, 'brow'], [132, 'nose'], [170, 'chin']];
+  const jawSh = rP([[88, 171], [98, 168], [112, 158], [121, 141], [136, 132], [134, 150], [122, 162], [104, 177], [88, 181]]);
+  const nape = rP([[127, 142], [137, 131], [134, 152], [137, 178], [146, 200], [128, 200], [124, 170]]);
+  return [
+    st('Lightly draw a big circle for the skull, a line down the front of the face, and a jaw line.', 'HB', 1, 'From the side, most of the head is BEHIND the face — leave lots of room for it!', [gl(C(108, 82, 46)), gl('M62 80V170'), gl('M60 170Q100 170 120 140')]),
+    st('Draw four lines across, like a ladder: hairline, brow, bottom of the nose, and chin. The three spaces are all the same size.', 'HB', 1, 'Measure the spaces with your pencil. Equal spaces = a face that looks right.', [ladder.map(([y, t]) => [gl(P`M40 ${y}H160`), lb(162, y + 2.5, t, { anchor: 'start', size: 7 })])]),
+    st('Slowly draw the face edge: forehead, a dip between the eyes, the nose, the lips, then the chin and under the jaw.', 'HB', 2, 'Go slowly, like a bumpy mountain road! The nose tip sits on the nose line.', [ln(prof, { o: .85 })]),
+    st('The side-view eye is a sideways "V" — only HALF of a front eye! Put it back from the nose. Add the brow, nostril and mouth corner.', '2B', 2, 'Drawing a whole front-view eye on a side view is the most common mistake.', [ln('M66 99Q72 96.5 78 102', { o: .9, w: 1.8 }), ln('M67 107Q73 107.5 78 102.5', { o: .7 }), ln(E(68.8, 103, 2, 3.6), { o: .9, fill: '#3c3b43' }), dk('M66 99L62.5 96M68.5 98L66 94.5', { w: 1.2 }), ln('M62 91Q70 87 82 89', { w: 2.2, o: .8 }), ln('M53 124C57 120 63 123 61 130', { o: .7 }), dk('M51 129Q54 127 57 129.5', { w: 1.6 }), ln('M59 145.5L65 146.5', { o: .8 })]),
+    st('The ear sits just behind the middle of the head, between the brow and nose lines. Then draw the back of the head and the neck.', 'HB', 2, 'From the side, necks lean forward a little.', [ln('M118 102C124 94 138 96 138 112C138 126 130 136 122 136C119 136 118 133 120 130', { o: .85 }), ln('M124 108C130 106 132 114 128 120C126 122 124 124 124 126', { o: .6 }), ln(back, { o: .8 }), ln('M86 170C86 180 85 190 82 200', { o: .8 }), ln('M137 131C134 152 137 178 146 200', { o: .8 })]),
+    st('Ponytail: draw the hairline (it goes around the top of the ear), then long strokes that all flow back to the hair tie. Add the tail.', '2B', 2, 'Every strand points to the hair tie — that makes it look pulled back.', [ln(hairTop, { o: .8 }), ln(hairLine, { o: .6 }), A('strands', pull(22, 31), { o: .55, w: 1 }), sd(hairTop, crown, { n: 8, seed: 34, trim: .04, o: .5, w: 1 }), ln(ER(158, 65, 4, 7, 20), { o: .9, fill: '#58565e' }), ln(tailO, { o: .8 }), ln(tailI, { o: .7 })]),
+    st('Light comes from the front. Shade the hair, under the jaw, the back of the neck and inside the ear, then erase the guides!', '2B', 2, 'The shadow under the jaw makes the head pop off the neck.', [ht(jawSh, { a: 20, gap: 1.6, o: .38 }), ht(nape, { a: 75, gap: 1.8, o: .26, seed: 3 }), ht(rE(128, 116, 5, 10), { a: 60, gap: 1.4, o: .3, seed: 4 }), ht(rAnd(rE(72, 99, 9, 5), rIf((x, y) => y < 99)), { a: 10, gap: 1.6, o: .2, seed: 5 }), sd(tailO, tailI, { n: 16, seed: 32, trim: .1, o: .5 }), A('strands', pull(40, 33), { o: .42 }), sd(hairTop, crown, { n: 14, seed: 35, trim: .06, o: .4 }), clr(scrub(40, 34, 164, 172, 12))]),
   ];
 });
 
@@ -1505,11 +1650,47 @@ lesson('portrait', 'Shade a Portrait', 'people', 3, 'Put it all together like a 
   return [
     st('Start with your face map: an egg, a center line, the eye line, and the nose and mouth lines.', 'HB', 1, 'Every portrait starts with the same light map — even for professional artists.', [gl(EGG), gl('M100 30V170'), gl('M48 100H152'), gl('M78 135H122'), gl('M82 147H118')]),
     st('Place the features: almond eyes with irises, eyebrows, the nose and the lips.', 'HB', 2, 'Draw features lightly first. You will darken the best lines later.', [ln(EYE_L, { o: .85 }), ln(mx(EYE_L), { o: .85 }), ln(C(79.5, 99.5, 3.6), { o: .9, fill: '#3c3b43' }), ln(C(120.5, 99.5, 3.6), { o: .9, fill: '#3c3b43' }), ln('M67 90Q78 85 91 89', { w: 2 }), ln(mx('M67 90Q78 85 91 89'), { w: 2 }), ln(nose, { o: .8 }), ln('M80 147Q90 144 100 147Q110 144 120 147', { o: .9 }), ln('M86 151Q100 157 114 151', { o: .5 })]),
-    st('Draw the hair as big shapes over the head (a bob!), then the neck and shoulders.', 'HB', 2, 'The hair covers the ears in this style — draw what you can actually see.', [ln(outerL, { o: .8 }), ln(outerR, { o: .8 }), ln(innerL, { o: .7 }), ln(innerR, { o: .7 }), ln('M77 157C77 172 75 184 71 194', { o: .8 }), ln(mx('M77 157C77 172 75 184 71 194'), { o: .8 }), ln('M71 194Q50 195 28 200', { o: .7 }), ln(mx('M71 194Q50 195 28 200'), { o: .7 })]),
-    st('The light comes from the left. Softly shade the right side of the face and under the cheekbone.', 'HB', 1, 'Shading only one side makes the face look round and real.', [sun(16, 16), ht(shadeR, { a: 75, gap: 1.8, o: .17 }), ht(rAnd(face, rE(128, 126, 18, 11)), { a: 30, gap: 2, o: .16, seed: 3 })]),
+    st('Draw the hair as big shapes over the head (a bob!), then the neck and shoulders.', 'HB', 2, 'Block in the hair before you finish the face — it frames everything else.', [ln(outerL, { o: .8 }), ln(outerR, { o: .8 }), ln(innerL, { o: .7 }), ln(innerR, { o: .7 }), ln('M77 157C77 172 75 184 71 194', { o: .8 }), ln(mx('M77 157C77 172 75 184 71 194'), { o: .8 }), ln('M71 194Q50 195 28 200', { o: .7 }), ln(mx('M71 194Q50 195 28 200'), { o: .7 })]),
+    st('Shade the hair FIRST with long strokes, following the way it falls. It is the darkest part of this portrait.', '4B', 3, 'Put your darkest dark down early — then it is easy to judge how dark everything else should be.', [sd(outerL, innerL, { n: 36, seed: 10, dist: r => r ** .7, o: .55 }), sd(outerR, innerR, { n: 36, seed: 11, dist: r => r ** .7, o: .55 })]),
+    st('Light comes from the left. Squint, and shade the shadow side of the face as ONE soft shape.', 'HB', 1, 'Faces are shapes of light and shadow, not lines. Let tiny specks of white paper show through.', [sun(16, 16), ht(shadeR, { a: 75, gap: 1.8, o: .17 }), ht(rAnd(face, rE(128, 126, 18, 11)), { a: 30, gap: 2, o: .16, seed: 3 })]),
     st('Add the darker shadows: eye sockets, the side of the nose, under the nose, under the lip, and a big shadow on the neck.', '2B', 2, 'These are "form shadows" — places that turn away from the light.', [ht(rAnd(rE(79.5, 95, 15, 9), rNot(rD(EYE_L))), { a: 10, gap: 1.8, o: .18, seed: 4 }), ht(rAnd(rE(120.5, 95, 15, 9), rNot(rD(mx(EYE_L)))), { a: 10, gap: 1.8, o: .26, seed: 5 }), ht(rP([[103, 104], [107, 104], [109, 126], [111, 134], [104, 132]]), { a: 80, gap: 1.6, o: .3, seed: 6 }), ht(rE(100, 140, 9, 2.6), { a: 0, gap: 1.2, o: .45, seed: 7 }), ht(rE(100, 156, 11, 3), { a: 0, gap: 1.3, o: .32, seed: 8 }), ht(neckSh, { a: 10, gap: 1.6, o: .42, seed: 9 })]),
-    st('Shade the hair dark with long strokes, then lift a shine band across the top with your kneaded eraser.', '4B', 3, 'Hair is usually the darkest value in a portrait.', [sd(outerL, innerL, { n: 36, seed: 10, dist: r => r ** .7, o: .55 }), sd(outerR, innerR, { n: 36, seed: 11, dist: r => r ** .7, o: .55 }), A('erase', 'M44 50C62 30 138 28 156 50', { w: 6, tool: 'kneaded', clip: hairClip })]),
-    st('Blend the skin with a tissue, lift highlights on the forehead, nose and cheek, draw the jaw, and erase your guidelines!', 'tissue', 1, 'Step back and look. Squint — do the darks and lights look right?', [tn(rect(124, 76, 160, 172), { op: .16, blur: 4, clip: EGG, m: loops(132, 90, 138, 160, 6, 5) }), tn(neckSh.d, { op: .25, blur: 3, m: loops(80, 164, 120, 166, 5, 4) }), ln('M50 100C50 136 72 168 100 170C128 168 150 136 150 100', { o: .8, tool: 'HB' }), er('M93 62Q100 59 107 62', { w: 2.5 }), er('M99 108L99.4 124', { w: 2 }), er('M66 114Q70 112 74 114', { w: 2 }), clr(scrub(48, 30, 152, 170, 12))]),
+    st('Blend the shadows gently with a tissue, draw the jaw, and erase your guidelines.', 'tissue', 1, 'Never blend with your finger — skin is oily and leaves smudgy marks on the paper.', [tn(rect(124, 76, 160, 172), { op: .16, blur: 4, clip: EGG, m: loops(132, 90, 138, 160, 6, 5) }), tn(neckSh.d, { op: .25, blur: 3, m: loops(80, 164, 120, 166, 5, 4) }), ln('M50 100C50 136 72 168 100 170C128 168 150 136 150 100', { o: .8, tool: 'HB' }), clr(scrub(48, 30, 152, 170, 12))]),
+    st('Highlights go in LAST: lift a shine band across the hair, and light spots on the forehead, nose and cheek with your kneaded eraser.', 'kneaded', 1, 'Turn your drawing upside down and squint — do the darks and lights look right?', [A('erase', 'M44 50C62 30 138 28 156 50', { w: 6, tool: 'kneaded', clip: hairClip }), er('M93 62Q100 59 107 62', { w: 2.5 }), er('M99 108L99.4 124', { w: 2 }), er('M66 114Q70 112 74 114', { w: 2 })]),
+  ];
+});
+
+lesson('portrait2', 'Portrait: Curly Hair', 'people', 3, 'Two-circle face, full features and sun-ray curls', ['HB', '2B', '4B', 'tissue', 'kneaded'], () => {
+  const faceD = 'M58 86C60 62 80 50 100 50C120 50 140 62 142 86C145 100 143 116 136 132C128 150 114 164 100 166C86 164 72 150 64 132C57 116 55 100 58 86Z', face = rD(faceD);
+  const eyeL = 'M64 96Q73 88 88 99Q75 104 64 96Z', lidL = 'M64 96Q73 88 88 99', brow = 'M61 87Q71 80 87 84';
+  const nose = 'M87 121C80 127 83 134 90 133C93 131 97 133 100 134C103 133 107 131 110 133C117 134 120 127 113 121';
+  const lipU = 'M79 144Q85 138 92 136Q97 134 100 137Q103 134 108 136Q115 138 121 144', seam = 'M78 144Q90 147 100 146Q110 147 122 144', lipL = 'M82 146Q100 163 118 146';
+  /* the afro: a big bumpy cloud, cut away where the face and neck are */
+  const hairR = rAnd(rE(100, 76, 78, 66), rNot(face), rIf((x, y) => y < 132 - Math.max(0, Math.abs(x - 100) - 36) * .77));
+  const rim = [[64, 132], [53, 123.5], [41.5, 114.5], ...Array.from({ length: 21 }, (_, i) => pol(100, 76, 1, 153 + 234 * i / 20)).map(([c, s]) => [100 + 78 * (c - 100), 76 + 66 * (s - 76)]), [158.5, 114.5], [147, 123.5], [136, 132]];
+  const afro = rim.slice(1).reduce((d, p, i) => { const r = Math.hypot(p[0] - rim[i][0], p[1] - rim[i][1]) * .6; return d + P`A${r} ${r} 0 0 1 ${p[0]} ${p[1]}`; }, P`M${rim[0][0]} ${rim[0][1]}`);
+  let rays = '', small = '';
+  for (let a = 140; a <= 400; a += 10) {
+    for (const [off, from, r] of [[0, 0, 2.6], [5, .45, 1.8]]) {
+      const t = (a + off) * Math.PI / 180, dx = Math.cos(t), dy = Math.sin(t);
+      let s0 = null, s1 = null;
+      for (let s = 0; s < 110; s += 1) { const x = 100 + dx * s, y = 100 + dy * s; if (hairR.in(x, y)) { s0 ??= s; s1 = s; } else if (s0 != null) break; }
+      if (s0 == null || s1 - s0 < 10) continue;
+      const a0 = s0 + 2 + (s1 - s0) * from, a1 = s1 - 3, n = Math.max(1, Math.round((a1 - a0) / 6));
+      const d = loops(100 + dx * a0, 100 + dy * a0, 100 + dx * a1, 100 + dy * a1, r, n);
+      if (off) small += d; else rays += d;
+    }
+  }
+  const hollowPts = [[59, 112], [70, 115], [83, 123], [80, 128], [67, 124], [60, 120]], hollow = rP(hollowPts);
+  const neck = 'M77 150C79 166 78 180 73 196', neckSh = rP([[76, 152], [100, 166], [124, 152], [125, 178], [100, 186], [75, 178]]);
+  return [
+    st('Lightly draw a big circle, then a smaller circle overlapping the bottom of it. Add a line down the middle and the eye line.', 'HB', 1, 'Two circles make a great map for a face with full cheeks and a soft, round jaw.', [gl(C(100, 80, 44)), gl(C(100, 128, 38)), gl('M100 30V172'), gl('M50 98H150')]),
+    st('Draw the face around your circles: wide, high cheekbones, then a soft, rounded jaw down to the chin.', 'HB', 2, 'Look at real faces and photos — every face is different. Draw the one you see!', [ln(faceD, { o: .8 })]),
+    st('Draw almond eyes set a little wide apart, tilting up at the outside corners. Add round irises and short, thick, curved eyebrows.', 'HB', 2, 'Leave a tiny white dot in each iris — the shine.', [ln(eyeL, { o: .85 }), ln(mx(eyeL), { o: .85 }), dk(lidL, { w: 2 }), dk(mx(lidL), { w: 2 }), dk('M64 96L60 93', { w: 1.4 }), dk(mx('M64 96L60 93'), { w: 1.4 }), ln(C(76.5, 96.6, 4), { o: .9, fill: '#3c3b43' }), ln(C(123.5, 96.6, 4), { o: .9, fill: '#3c3b43' }), dk(brow, { w: 3.2 }), dk(mx(brow), { w: 3.2 })]),
+    st('Draw a wide, rounded nose. Then the lips: the top lip rises from the corners to a soft Cupid\'s bow; the bottom lip is full and round.', 'HB', 2, 'Nose wings line up under the inner eye corners, or a bit wider.', [ln('M93 102C94 110 92 116 89 121', { o: .35 }), ln(mx('M93 102C94 110 92 116 89 121'), { o: .35 }), ln(nose, { o: .8 }), dk('M88 129Q91 127 94 130', { w: 1.6 }), dk(mx('M88 129Q91 127 94 130'), { w: 1.6 }), ln(lipU, { o: .8 }), dk(seam, { w: 1.8 }), ln(lipL, { o: .6 })]),
+    st('Draw the neck, then the hair as one big bumpy cloud — much bigger than the head!', 'HB', 2, 'Curly hair grows out AND up, so the cloud goes far past the top and sides of the head.', [ln(neck, { o: .8 }), ln(mx(neck), { o: .8 }), ln('M73 196Q50 196 28 200', { o: .7 }), ln(mx('M73 196Q50 196 28 200'), { o: .7 }), ln(afro, { o: .8 })]),
+    st('Fill the hair with a soft dark-gray layer. Then draw curls growing out from the face like sun rays, with smaller curls in between.', '2B', 2, 'Use dark gray, not solid black, so the curls still show on top.', [ht(hairR, { a: 60, gap: 1.7, o: .3 }), A('line', rays, { o: .55, w: 1 }), A('line', small, { o: .45, w: .9 })]),
+    st('Cover the face with an even tone and blend it with a tissue. Add darker tone at the edges, under the cheekbones and on the neck.', '2B', 2, 'Squint! Find the darkest darks first, then the middle tones.', [ht(face, { a: 70, gap: 2.2, o: .1, seed: 3 }), tn(faceD, { op: .34, blur: 3, clip: faceD, tool: 'tissue', m: loops(70, 72, 130, 150, 10, 6) }), ht(rAnd(face, rNot(rE(100, 106, 34, 46))), { a: 75, gap: 1.6, o: .22, seed: 4 }), ht(rAnd(face, hollow), { a: 35, gap: 1.5, o: .22, seed: 5 }), ht(rAnd(face, rP(hollowPts.map(([x, y]) => [200 - x, y]))), { a: 145, gap: 1.5, o: .22, seed: 6 }), ht(neckSh, { a: 10, gap: 1.5, o: .45, seed: 7 })]),
+    st('Highlights go in LAST: lift shine on the forehead, nose, cheekbones and lips, and dab bright spots in the curls. Erase the guides!', 'kneaded', 1, 'Highlights make skin glow. Turn your drawing upside down to check it!', [er('M92 63Q100 60 108 63', { w: 3, o: .7 }), er('M99.7 108L100 118', { w: 1.8, o: .75 }), er('M98.5 126.5Q100 125.6 101.5 126.5', { w: 2, o: .8 }), er('M68 109Q73 106 79 107', { w: 2.2, o: .65 }), er(mx('M68 109Q73 106 79 107'), { w: 2.2, o: .65 }), er('M95 151Q100 153 105 151', { w: 1.8, o: .75 }), er('M97 160Q100 160.8 103 160', { w: 1.8, o: .6 }), er('M75.2 95.2l.1 .1', { w: 2 }), er('M122.2 95.2l.1 .1', { w: 2 }), er('M46 56l.1 .1M58 40l.1 .1M72 28l.1 .1M40 74l.1 .1M54 66l.1 .1M66 50l.1 .1M86 30l.1 .1', { w: 4 }), clr(scrub(50, 30, 150, 172, 12))]),
   ];
 });
 
@@ -1697,6 +1878,7 @@ function renderLibrary() {
   const art = libMode === 'art', total = art ? LESSONS.length : CHARS.length, n = art ? artDone() : doneCount();
   $('#tabPals').setAttribute('aria-selected', !art); $('#tabArt').setAttribute('aria-selected', art);
   $('#palsHome').hidden = art; $('#artHome').hidden = !art;
+  $('#palCount').textContent = `${CHARS.length} cute characters`;
   $('#progCount').textContent = `${n} of ${total}`; $('#progNoun').textContent = art ? 'lessons finished' : 'pals drawn';
   $('#progBar').style.width = `${n / total * 100}%`;
   $('#progBarWrap').setAttribute('aria-valuemax', total); $('#progBarWrap').setAttribute('aria-valuenow', n);
