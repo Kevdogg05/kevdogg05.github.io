@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-nunito), ui-rounded, system-ui, sans-serif;
+  --font-display: var(--font-fredoka), ui-rounded, system-ui, sans-serif;
+}
+
+@theme {
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pop: pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+  --animate-shake: shake 0.4s ease-in-out;
+  --animate-stripes: stripes 0.8s linear infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-3deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(3deg);
+    }
+  }
+  @keyframes pop {
+    from {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20%,
+    60% {
+      transform: translateX(-10px);
+    }
+    40%,
+    80% {
+      transform: translateX(10px);
+    }
+  }
+  @keyframes stripes {
+    to {
+      background-position: 40px 0;
+    }
+  }
+}
+
+/* Kids' sky: soft sunny gradient with a few blurred colour clouds. */
+.kid-sky {
+  background:
+    radial-gradient(40rem 26rem at 10% -5%, rgb(255 214 10 / 0.45), transparent 70%),
+    radial-gradient(36rem 24rem at 95% 10%, rgb(255 95 210 / 0.3), transparent 70%),
+    radial-gradient(44rem 30rem at 50% 110%, rgb(46 230 255 / 0.35), transparent 70%),
+    linear-gradient(180deg, #eef6ff 0%, #f7f0ff 55%, #fff7ea 100%);
+}
+
+/* The castle logo (src/components/CastleLogo.tsx). Every animation starts and
+   ends at rest, so with reduced motion the castle simply stands still. */
+.castle-crown,
+.castle-flag,
+.castle-sparkle {
+  transform-box: fill-box;
+}
+.castle-crown {
+  transform-origin: 50% 100%;
+  animation: castle-crown 2.6s ease-in-out infinite;
+}
+.castle-flag {
+  transform-origin: 0% 50%;
+  animation: castle-flag 1.3s ease-in-out infinite;
+}
+.castle-window {
+  animation: castle-window 3.2s ease-in-out infinite;
+}
+.castle-sparkle {
+  transform-origin: 50% 50%;
+  animation: castle-sparkle 2.2s ease-in-out infinite;
+}
+@keyframes castle-crown {
+  0%,
+  50%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2.5px) rotate(-8deg);
+  }
+  75% {
+    transform: translateY(-2.5px) rotate(8deg);
+  }
+}
+@keyframes castle-flag {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(-14deg) scaleX(0.82);
+  }
+}
+@keyframes castle-window {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes castle-sparkle {
+  0%,
+  100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1) rotate(90deg);
+    opacity: 1;
+  }
+}
+
+/* Rainbow progress bar with moving stripes. */
+.rainbow-bar {
+  background-image:
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.25) 0 10px, transparent 10px 20px),
+    linear-gradient(90deg, #ff5fd2, #ff9f1c, #ffd60a, #7cff4f, #2ee6ff, #b69cff);
+  background-size:
+    40px 40px,
+    100% 100%;
+}
+
+/* Video scrubber: native range input (keyboard and screen-reader friendly), restyled. */
+.scrubber {
+  appearance: none;
+  height: 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  background: linear-gradient(
+    90deg,
+    var(--scrub-fill, #ffd60a) var(--progress, 0%),
+    rgb(255 255 255 / 0.35) var(--progress, 0%)
+  );
+}
+.scrubber::-webkit-slider-thumb {
+  appearance: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  background: white;
+  border: 3px solid var(--scrub-fill, #ffd60a);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
+}
+.scrubber::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: white;
+  border: 3px solid var(--scrub-fill, #ffd60a);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
