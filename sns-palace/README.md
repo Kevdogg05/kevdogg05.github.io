@@ -10,6 +10,12 @@ Built with Next.js 16 (App Router, TypeScript, Tailwind CSS 4), Supabase
 (PostgreSQL) for metadata and Cloudinary for video storage and streaming. A
 fully offline mode swaps those for SQLite and local files.
 
+**Project page:** https://kevdogg05.github.io/sns-palace/, with screenshots,
+setup steps and a QR code. It's `index.html` and `site/` in this folder, served by
+GitHub Pages; the app itself runs on your own computer. The QR code comes as
+`site/qr-code.svg` (plain, for printing at any size) and `site/qr-code.png`
+(a branded "Scan to open on your phone" card).
+
 ## How it works
 
 ```
@@ -69,6 +75,14 @@ npm run sample        # optional: makes data/samples/talking-demo.mp4 to upload
 
 Open the app, type the family PIN, upload a video, then visit **Grown-ups**
 (`/parent`) with the parent PIN to review and approve it.
+
+## Adding the kids' devices
+
+Open the parent room and press **Add a device**. It shows a QR code of the
+address SnS Palace is running at; scan it with a tablet or phone on your home
+Wi-Fi and it opens the PIN pad. If you opened SnS Palace as `localhost`, the
+dialog explains that other devices need the computer's network address (such as
+`http://192.168.1.20:3000`) and the code follows whichever address you use.
 
 ## Production setup: Supabase + Cloudinary
 
@@ -183,6 +197,7 @@ the parent session.
 
 ```
 sns-palace/
+├── index.html, site/          # the GitHub Pages project page, screenshots and QR codes
 ├── supabase/schema.sql        # videos table, RLS lockdown, claim_next_video() queue function
 ├── .env.local.example         # every setting, documented
 ├── src/

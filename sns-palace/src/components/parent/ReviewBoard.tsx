@@ -3,6 +3,7 @@
 import { Database, HardDrive, House, Lock, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AddDeviceButton } from "@/components/parent/AddDeviceButton";
 import { ReviewCard } from "@/components/parent/ReviewCard";
 import { usePolling } from "@/hooks/usePolling";
 import { api, goToUnlock } from "@/lib/api";
@@ -64,7 +65,8 @@ export function ReviewBoard() {
             </p>
           </div>
         </div>
-        <nav className="flex items-center gap-2" aria-label="Parent tools">
+        <nav className="flex flex-wrap items-center gap-2" aria-label="Parent tools">
+          <AddDeviceButton />
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-300 hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-violet-400"

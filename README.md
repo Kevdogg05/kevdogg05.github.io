@@ -12,7 +12,9 @@ own machine. No HeyGen services or accounts are involved.
 >
 > **SnS Palace**, a private family video studio (kids upload, an automatic editor
 > trims and captions, parents approve), lives in `sns-palace/` and also runs
-> locally. See [sns-palace/README.md](sns-palace/README.md).
+> locally. See [sns-palace/README.md](sns-palace/README.md). Its project page,
+> with screenshots, setup steps and a QR code, is `sns-palace/index.html`:
+> https://kevdogg05.github.io/sns-palace/
 
 ## Status
 

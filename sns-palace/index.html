@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SnS Palace</title>
+  <!-- The project page for SnS Palace, served by GitHub Pages. The app itself
+       is the Next.js project in this folder and runs on your own computer. -->
+  <meta name="description" content="A private, self-hosted video studio for kids: they upload, an automatic editor trims the pauses and adds big colourful captions, and a grown-up approves every video before it reaches the family feed.">
+  <meta name="theme-color" content="#7c3aed">
+  <link rel="icon" href="src/app/icon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://kevdogg05.github.io/sns-palace/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SnS Palace: a private video studio for kids">
+  <meta property="og:description" content="Kids upload, an automatic editor trims and captions, grown-ups approve. Self-hosted, no YouTube, no strangers.">
+  <meta property="og:url" content="https://kevdogg05.github.io/sns-palace/">
+  <meta property="og:image" content="https://kevdogg05.github.io/sns-palace/site/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    @font-face { font-family: "Fredoka"; src: url("worker/fonts/Fredoka-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+    :root {
+      --ink: #1e1b4b;
+      --text: #334155;
+      --muted: #64748b;
+      --violet: #7c3aed;
+      --violet-deep: #6d28d9;
+      --pink: #ff5fd2;
+      --sky: #2ee6ff;
+      --sun: #ffd60a;
+      --lime: #7cff4f;
+      --card: rgb(255 255 255 / 0.85);
+      --ring: rgb(124 58 237 / 0.18);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font: 17px/1.6 ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(44rem 28rem at 8% -6%, rgb(255 214 10 / 0.42), transparent 70%),
+        radial-gradient(40rem 26rem at 96% 6%, rgb(255 95 210 / 0.28), transparent 70%),
+        radial-gradient(50rem 32rem at 50% 104%, rgb(46 230 255 / 0.3), transparent 70%),
+        linear-gradient(180deg, #eef6ff 0%, #f7f0ff 55%, #fff7ea 100%);
+      background-color: #f7f0ff;
+    }
+    a { color: var(--violet-deep); }
+    a:focus-visible, button:focus-visible { outline: 3px solid var(--violet); outline-offset: 3px; border-radius: 10px; }
+    img { max-width: 100%; height: auto; display: block; }
+    h1, h2, h3, .display { font-family: "Fredoka", ui-rounded, system-ui, sans-serif; font-weight: 700; color: var(--violet-deep); letter-spacing: -0.01em; }
+    h2 { font-size: clamp(28px, 4vw, 38px); line-height: 1.15; margin: 0 0 10px; }
+    h3 { font-size: 21px; margin: 0 0 4px; color: var(--ink); }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+    section { padding: 44px 0; }
+    .section-lead { color: var(--muted); max-width: 62ch; margin: 0 0 26px; }
+    p { text-wrap: pretty; }
+
+    header.top { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px); background: rgb(247 240 255 / 0.78); border-bottom: 1px solid var(--ring); }
+    header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 60px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: "Fredoka", sans-serif; font-size: 22px; color: var(--violet-deep); }
+    .brand img { width: 34px; height: 34px; }
+    .top nav { display: flex; gap: 2px; }
+    .top nav a { color: var(--muted); text-decoration: none; font-weight: 700; font-size: 14px; padding: 6px 10px; border-radius: 10px; }
+    .top nav a:hover { color: var(--violet-deep); background: rgb(124 58 237 / 0.08); }
+
+    .hero { padding: 48px 0 28px; text-align: center; }
+    .castle { width: 168px; height: 168px; margin: 0 auto; border-radius: 40px; display: grid; place-items: center;
+      background: linear-gradient(135deg, #e879f9, #7c3aed); box-shadow: 0 18px 40px rgb(124 58 237 / 0.35); animation: float 6s ease-in-out infinite; }
+    .castle svg { width: 146px; height: 146px; }
+    .pill { display: inline-block; margin-top: 26px; background: rgb(255 255 255 / 0.75); border: 2px solid var(--ring); color: var(--violet); border-radius: 999px; padding: 4px 14px; font-size: 14px; font-weight: 800; letter-spacing: 0.04em; }
+    .hero h1 { font-size: clamp(52px, 9vw, 88px); line-height: 1; margin: 14px 0 14px; }
+    .lead { font-size: clamp(17px, 2.2vw, 20px); max-width: 60ch; margin: 0 auto; color: var(--text); }
+    .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 26px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; text-decoration: none; font: 700 17px "Fredoka", ui-rounded, sans-serif; letter-spacing: 0.01em;
+      border-radius: 999px; padding: 12px 22px; background: #fff; color: var(--violet-deep); box-shadow: 0 0 0 3px var(--ring); transition: transform .15s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn.primary { color: #fff; background: linear-gradient(90deg, #d946ef, #7c3aed); box-shadow: 0 5px 0 #5b21b6; }
+    .btn.primary:active { transform: translateY(3px); box-shadow: none; }
+    .note { max-width: 680px; margin: 28px auto 0; background: rgb(255 214 10 / 0.18); border: 2px solid rgb(255 214 10 / 0.6); color: #713f12; border-radius: 18px; padding: 12px 16px; font-size: 15px; font-weight: 600; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card { background: var(--card); border-radius: 24px; padding: 20px; box-shadow: 0 0 0 3px var(--ring), 0 10px 30px rgb(124 58 237 / 0.08); }
+    .card p { margin: 6px 0 0; color: var(--text); font-size: 16px; }
+    .num { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; color: #fff; font: 700 22px "Fredoka", sans-serif; margin-bottom: 12px; }
+    .c1 { background: #ec4899; } .c2 { background: #0ea5e9; } .c3 { background: #22c55e; }
+
+    .shots { display: grid; gap: 20px; }
+    figure { margin: 0; }
+    figure img { border-radius: 22px; box-shadow: 0 0 0 4px #fff, 0 20px 50px rgb(76 29 149 / 0.18); background: #fff; }
+    figcaption { color: var(--muted); font-size: 15px; margin-top: 12px; }
+    .phones { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 620px; margin: 0 auto; }
+    .phones img { width: 100%; border-radius: 30px; }
+    .pair { display: grid; grid-template-columns: 1.65fr 1fr; gap: 24px; align-items: center; }
+
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .features .card h3::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 10px; background: var(--dot, var(--violet)); vertical-align: 2px; }
+
+    pre { background: #1e1b4b; color: #ede9fe; border-radius: 18px; padding: 18px 20px; overflow-x: auto; font-size: 14.5px; line-height: 1.7; margin: 14px 0; }
+    pre .c { color: #a5b4fc; }
+    .run { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    /* Let wide content (the code block) scroll inside its column instead of widening the page. */
+    .run > *, .pair > *, .steps > *, .features > * { min-width: 0; }
+    .run ul { margin: 8px 0 0; padding-left: 20px; }
+    .run li { margin: 4px 0; }
+
+    .share { display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: center; }
+    .share img.qr { width: 240px; height: 240px; padding: 10px; background: #fff; border-radius: 24px; box-shadow: 0 0 0 6px #8b5cf6; }
+    .share .url { font-family: ui-monospace, monospace; font-size: 15px; color: var(--muted); overflow-wrap: anywhere; margin: 6px 0 16px; }
+    .share .cta { justify-content: flex-start; margin-top: 0; }
+    .share small { display: block; margin-top: 14px; color: var(--muted); font-size: 14px; }
+
+    footer { border-top: 1px solid var(--ring); padding: 28px 0 44px; color: var(--muted); font-size: 14px; }
+    footer p { margin: 4px 0; }
+
+    /* The castle: same drawing and motion as the app's logo. */
+    .castle-crown, .castle-flag, .castle-sparkle { transform-box: fill-box; }
+    .castle-crown { transform-origin: 50% 100%; animation: castle-crown 2.6s ease-in-out infinite; }
+    .castle-flag { transform-origin: 0% 50%; animation: castle-flag 1.3s ease-in-out infinite; }
+    .castle-flag.left { transform-origin: 100% 50%; }
+    .castle-window { animation: castle-window 3.2s ease-in-out infinite; }
+    .castle-sparkle { transform-origin: 50% 50%; animation: castle-sparkle 2.2s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+    @keyframes castle-crown { 0%, 50%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-2.5px) rotate(-8deg); } 75% { transform: translateY(-2.5px) rotate(8deg); } }
+    @keyframes castle-flag { 0%, 100% { transform: skewY(0) scaleX(1); } 50% { transform: skewY(-14deg) scaleX(0.82); } }
+    @keyframes castle-window { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    @keyframes castle-sparkle { 0%, 100% { transform: scale(0) rotate(0); opacity: 0; } 50% { transform: scale(1) rotate(90deg); opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+
+    @media (max-width: 860px) {
+      .steps, .features, .run, .pair { grid-template-columns: 1fr; }
+      .share { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+      .share .cta { justify-content: center; }
+      .top nav a:not(.keep) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="#top"><img src="src/app/icon.svg" alt="" width="34" height="34">SnS Palace</a>
+      <nav aria-label="Sections">
+        <a href="#how">How it works</a>
+        <a href="#inside">What's inside</a>
+        <a href="#run">Run it</a>
+        <a class="keep" href="#share">QR code</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap">
+        <div class="castle" aria-hidden="true">
+          <svg viewBox="0 0 64 64" focusable="false">
+            <g stroke="#3d1a55" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M13 18V6.5M51 18V6.5" fill="none"/>
+              <g stroke-width="1.4">
+                <path class="castle-flag left" d="M13 7L4 10.25L13 13.5Z" fill="#ffd60a"/>
+                <path class="castle-flag" style="animation-delay:-0.6s" d="M51 7L60 10.25L51 13.5Z" fill="#7cff4f"/>
+              </g>
+              <rect x="7" y="30" width="12" height="26" fill="#fff1fb"/>
+              <rect x="45" y="30" width="12" height="26" fill="#fff1fb"/>
+              <path d="M5 31L13 17L21 31Z" fill="#2ee6ff"/>
+              <path d="M43 31L51 17L59 31Z" fill="#2ee6ff"/>
+              <path d="M19 56V22H23V25H26.3V22H30.3V25H33.7V22H37.7V25H41V22H45V56Z" fill="#fff1fb"/>
+              <path d="M27.5 56V48.5a4.5 4.5 0 0 1 9 0V56Z" fill="#3d1a55"/>
+              <path d="M4 56H60" fill="none"/>
+              <g stroke-width="1.5" fill="#ffd60a">
+                <path class="castle-window" d="M11.5 44v-3a1.5 1.5 0 0 1 3 0v3z"/>
+                <path class="castle-window" style="animation-delay:-1.1s" d="M49.5 44v-3a1.5 1.5 0 0 1 3 0v3z"/>
+                <path class="castle-window" style="animation-delay:-2.2s" d="M23 36v-3a1.5 1.5 0 0 1 3 0v3z"/>
+                <path class="castle-window" style="animation-delay:-0.5s" d="M38 36v-3a1.5 1.5 0 0 1 3 0v3z"/>
+              </g>
+              <g class="castle-crown">
+                <path d="M23.5 19V10.5L28 14L32 6.5L36 14L40.5 10.5V19Z" fill="#ffd60a"/>
+                <path d="M23.5 16.5H40.5" fill="none" stroke-width="1.5"/>
+                <g stroke-width="1.2">
+                  <circle cx="32" cy="12.6" r="1.6" fill="#ff5fd2"/>
+                  <circle cx="23.5" cy="9.6" r="1.4" fill="#ffd60a"/>
+                  <circle cx="32" cy="5.6" r="1.4" fill="#ffd60a"/>
+                  <circle cx="40.5" cy="9.6" r="1.4" fill="#ffd60a"/>
+                </g>
+              </g>
+            </g>
+            <g fill="#fff">
+              <g transform="translate(18.5 4.5) scale(1.2)"><path class="castle-sparkle" d="M0-3L.8-.8L3 0L.8.8L0 3L-.8.8L-3 0L-.8-.8Z"/></g>
+              <g transform="translate(45.5 4) scale(1.05)"><path class="castle-sparkle" style="animation-delay:-0.8s" d="M0-3L.8-.8L3 0L.8.8L0 3L-.8.8L-3 0L-.8-.8Z"/></g>
+              <g transform="translate(43.5 17.5) scale(0.75)"><path class="castle-sparkle" style="animation-delay:-1.5s" d="M0-3L.8-.8L3 0L.8.8L0 3L-.8.8L-3 0L-.8-.8Z"/></g>
+            </g>
+          </svg>
+        </div>
+        <span class="pill">PRIVATE · SELF-HOSTED · MADE FOR KIDS</span>
+        <h1>SnS Palace</h1>
+        <p class="lead">Our family's own video studio. Kids share their videos, an automatic editor trims the long pauses and adds big colourful captions, and a grown-up approves every video before it reaches the family feed. No YouTube, no strangers, no ads.</p>
+        <div class="cta">
+          <a class="btn primary" href="#share">Get the QR code</a>
+          <a class="btn" href="#run">Run it at home</a>
+          <a class="btn" href="https://github.com/Kevdogg05/kevdogg05.github.io/tree/main/sns-palace">Source on GitHub</a>
+        </div>
+        <p class="note">This page tells you about SnS Palace. The app itself runs on your own computer, so only your household can open it, and every device needs the family PIN.</p>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="wrap">
+        <h2>How it works</h2>
+        <p class="section-lead">Three steps, and nothing reaches the feed without a grown-up's OK.</p>
+        <div class="steps">
+          <div class="card">
+            <div class="num c1">1</div>
+            <h3>Kids share a video</h3>
+            <p>They type the family PIN, drag a video in (or tap the big button), give it a name and hit <b>Send it!</b></p>
+          </div>
+          <div class="card">
+            <div class="num c2">2</div>
+            <h3>It edits itself</h3>
+            <p>Pauses longer than 1.5 seconds are trimmed, words are written on screen karaoke-style, and the video is shrunk for quick playback.</p>
+          </div>
+          <div class="card">
+            <div class="num c3">3</div>
+            <h3>A grown-up approves</h3>
+            <p>In the parent room you see the raw video next to the edit, with what was cut, and choose <b>Approve for Feed</b> or <b>Delete</b>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="see">
+      <div class="wrap shots">
+        <h2 id="see">Take a look</h2>
+        <figure>
+          <img src="site/img/feed.webp" width="1600" height="1250" loading="lazy" alt="The SnS Palace home page: the castle logo, a big drag-and-drop area with a Choose a video button, a note that one video is waiting for a grown-up, and three approved videos in colourful cards.">
+          <figcaption>The kids' page: share a video, then watch the family feed. Only approved videos show up here.</figcaption>
+        </figure>
+        <div class="pair">
+          <figure>
+            <img src="site/img/review.webp" width="1600" height="1146" loading="lazy" alt="The parent review card for a video: the raw upload and the automatic edit side by side, a cut map showing four pauses removed, and stats: 24 words, 19 seconds raw, 9.7 seconds edited, 49 percent shorter.">
+            <figcaption>The parent room: raw upload and edit side by side, with the cuts, word count and lengths.</figcaption>
+          </figure>
+          <div>
+            <div class="phones">
+              <img src="site/img/phone-unlock.webp" width="600" height="1298" loading="lazy" alt="The family PIN pad on a phone, with the castle logo and big number buttons.">
+              <img src="site/img/phone-feed.webp" width="600" height="1298" loading="lazy" alt="The video feed on a phone, with one big card per video.">
+            </div>
+            <figcaption style="text-align:center">On a phone: the family PIN pad, then the feed.</figcaption>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="inside">
+      <div class="wrap">
+        <h2>What's inside</h2>
+        <p class="section-lead">Built to keep kids' videos inside the family.</p>
+        <div class="features">
+          <div class="card" style="--dot:#ec4899"><h3>Two PINs</h3><p>A family PIN opens the app; a separate grown-up PIN opens the parent room, which locks itself again after 30 minutes.</p></div>
+          <div class="card" style="--dot:#0ea5e9"><h3>Smart trimming</h3><p>Long pauses are cut, but never through a word, even a whisper, and a quiet video is never trimmed to nothing.</p></div>
+          <div class="card" style="--dot:#f59e0b"><h3>Kid-sized captions</h3><p>Big, bold, rainbow captions in the lower third, with each word lighting up as it is spoken.</p></div>
+          <div class="card" style="--dot:#22c55e"><h3>Private storage</h3><p>Videos live in your own Supabase and Cloudinary accounts as private files, or entirely on your computer in offline mode.</p></div>
+          <div class="card" style="--dot:#8b5cf6"><h3>No location data</h3><p>Phones hide GPS coordinates inside videos. Every edit, preview and thumbnail is saved without them.</p></div>
+          <div class="card" style="--dot:#ef4444"><h3>Speech stays home</h3><p>Captions can come from Whisper running on your own computer, so the audio never leaves the house.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="run">
+      <div class="wrap">
+        <h2>Run it at home</h2>
+        <p class="section-lead">SnS Palace runs on a computer in your house (or a small home server). Every phone and tablet on your Wi-Fi can then open it.</p>
+        <div class="run">
+          <div class="card">
+            <h3>You need</h3>
+            <ul>
+              <li>Node.js 22.13 or newer</li>
+              <li>ffmpeg (<code>brew install ffmpeg</code> or <code>sudo apt install ffmpeg</code>)</li>
+              <li>Optional: Python 3 for on-computer captions</li>
+              <li>Optional: free Supabase and Cloudinary accounts (or use offline mode)</li>
+            </ul>
+            <p style="margin-top:14px">Once it's running, open the parent room and press <b>Add a device</b>: it shows a QR code that opens SnS Palace on a kid's tablet in one scan.</p>
+          </div>
+          <div>
+<pre><span class="c"># get the code and install</span>
+git clone https://github.com/Kevdogg05/kevdogg05.github.io.git
+cd kevdogg05.github.io/sns-palace
+npm install
+
+<span class="c"># set the PINs (see the comments in the file)</span>
+cp .env.local.example .env.local
+
+<span class="c"># start the app and the video editor</span>
+npm run dev:all</pre>
+            <p>Full setup, including Supabase and Cloudinary: <a href="https://github.com/Kevdogg05/kevdogg05.github.io/blob/main/sns-palace/README.md">the SnS Palace README</a>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="share">
+      <div class="wrap">
+        <div class="card share">
+          <img class="qr" src="site/qr-code.svg" width="240" height="240" alt="QR code linking to https://kevdogg05.github.io/sns-palace/">
+          <div>
+            <h2>Scan or share this page</h2>
+            <p class="url" id="share-url">https://kevdogg05.github.io/<wbr><span style="white-space:nowrap">sns-palace/</span></p>
+            <div class="cta">
+              <button class="btn primary" type="button" id="share-btn">Copy link</button>
+              <a class="btn" href="site/qr-code.png" download="sns-palace-qr.png">Download QR card</a>
+            </div>
+            <small>This code opens this page. To open your own SnS Palace on a tablet, use <b>Add a device</b> in the parent room.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>SnS Palace is built with Next.js, Supabase, Cloudinary, ffmpeg and Whisper.</p>
+      <p>Captions and headings use the Fredoka font (SIL Open Font License).</p>
+    </div>
+  </footer>
+
+  <script>
+    // Use the phone's share sheet where there is one; otherwise copy the link.
+    const button = document.getElementById("share-btn");
+    const url = document.getElementById("share-url").textContent.trim();
+    if (navigator.share) button.textContent = "Share link";
+    button.addEventListener("click", async () => {
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "SnS Palace", url });
+          return;
+        }
+        await navigator.clipboard.writeText(url);
+        button.textContent = "Link copied";
+      } catch (error) {
+        if (error && error.name === "AbortError") return; // share sheet dismissed
+        button.textContent = "Copy failed: select the link above";
+      }
+      setTimeout(() => { button.textContent = navigator.share ? "Share link" : "Copy link"; }, 2000);
+    });
+  </script>
+</body>
+</html>
