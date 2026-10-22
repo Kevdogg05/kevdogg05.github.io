@@ -9,6 +9,9 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Robots-Tag", value: "noindex, nofollow" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+  // Once a browser has reached SnS Palace over https, it never falls back to
+  // plain http. Browsers ignore this on http:// (home network) addresses.
+  { key: "Strict-Transport-Security", value: "max-age=31536000" },
 ];
 
 const nextConfig: NextConfig = {

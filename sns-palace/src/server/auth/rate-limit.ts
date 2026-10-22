@@ -1,11 +1,14 @@
 // Brute-force protection for the PIN pad.
 //
-// Two layers, both in memory (SnS Palace runs as one server process):
+// Three layers, all in memory (SnS Palace runs as one server process):
 // - per client: 5 wrong PINs locks that client out for 1 minute, doubling on
 //   every further lockout up to an hour;
 // - household-wide: 20 wrong PINs in 15 minutes from anywhere locks the PIN pad
 //   for 15 minutes. The client key comes from X-Forwarded-For, which a client
-//   can forge, so this global cap is what actually bounds guessing.
+//   can forge, so these global caps are what actually bound guessing;
+// - per day: at most 100 wrong PINs in any 24 hours. Online, that keeps a
+//   patient guesser to 100 tries a day instead of nearly 2,000. Devices that
+//   are already unlocked keep working while the PIN pad is locked.
 
 export interface PinLimiterOptions {
   perClientAttempts: number;
@@ -14,6 +17,8 @@ export interface PinLimiterOptions {
   globalAttempts: number;
   globalWindowMs: number;
   globalLockoutMs: number;
+  dailyAttempts: number;
+  dailyWindowMs: number;
 }
 
 const DEFAULTS: PinLimiterOptions = {
@@ -23,6 +28,8 @@ const DEFAULTS: PinLimiterOptions = {
   globalAttempts: 20,
   globalWindowMs: 15 * 60_000,
   globalLockoutMs: 15 * 60_000,
+  dailyAttempts: 100,
+  dailyWindowMs: 24 * 60 * 60_000,
 };
 
 interface ClientState {
@@ -37,6 +44,8 @@ export class PinLimiter {
   private readonly clients = new Map<string, ClientState>();
   private globalFailures: number[] = [];
   private globalLockedUntil = 0;
+  /** Times of the latest wrong PINs, oldest first, at most dailyAttempts of them. */
+  private dailyFailures: number[] = [];
 
   constructor(options: Partial<PinLimiterOptions> = {}) {
     this.options = { ...DEFAULTS, ...options };
@@ -45,7 +54,11 @@ export class PinLimiter {
   /** Milliseconds the client must wait before trying again; 0 if it may try now. */
   retryAfter(client: string, now = Date.now()): number {
     const clientWait = (this.clients.get(client)?.lockedUntil ?? 0) - now;
-    return Math.max(0, clientWait, this.globalLockedUntil - now);
+    const { dailyAttempts, dailyWindowMs } = this.options;
+    // Full for the day: wait until the oldest of those failures is a day old.
+    const dailyWait =
+      this.dailyFailures.length >= dailyAttempts ? this.dailyFailures[0] + dailyWindowMs - now : 0;
+    return Math.max(0, clientWait, this.globalLockedUntil - now, dailyWait);
   }
 
   recordFailure(client: string, now = Date.now()): void {
@@ -71,6 +84,10 @@ export class PinLimiter {
       this.globalLockedUntil = now + o.globalLockoutMs;
       this.globalFailures = [];
     }
+
+    this.dailyFailures = this.dailyFailures.filter((at) => now - at < o.dailyWindowMs);
+    this.dailyFailures.push(now);
+    if (this.dailyFailures.length > o.dailyAttempts) this.dailyFailures.splice(0, this.dailyFailures.length - o.dailyAttempts);
     this.prune(now);
   }
 

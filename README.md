@@ -11,8 +11,9 @@ own machine. No HeyGen services or accounts are involved.
 > https://kevdogg05.github.io/open-avatar-studio/
 >
 > **SnS Palace**, a private family video studio (kids upload, an automatic editor
-> trims and captions, parents approve), lives in `sns-palace/` and also runs
-> locally. See [sns-palace/README.md](sns-palace/README.md). Its project page,
+> trims and captions, parents approve), lives in `sns-palace/`. It runs locally,
+> or online with one click on Render (`render.yaml` at the top of this
+> repository). See [sns-palace/README.md](sns-palace/README.md). Its project page,
 > with screenshots, setup steps and a QR code, is `sns-palace/index.html`:
 > https://kevdogg05.github.io/sns-palace/
 

@@ -3,6 +3,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { formatWait } from "@/lib/format";
 import type { SessionState } from "@/lib/types";
 import { sessionRoles } from "@/server/auth/guard";
 import { pinLimiter } from "@/server/auth/rate-limit";
@@ -49,7 +50,7 @@ export const POST = route(async (request: NextRequest) => {
   const wait = pinLimiter.retryAfter(client);
   if (wait > 0) {
     const seconds = Math.ceil(wait / 1000);
-    throw new HttpError(429, `Too many tries. Wait ${seconds} seconds and try again.`, {
+    throw new HttpError(429, `Too many tries. Wait ${formatWait(seconds)} and try again.`, {
       "Retry-After": String(seconds),
     });
   }

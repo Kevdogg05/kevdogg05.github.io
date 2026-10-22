@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { CastleLogo } from "@/components/CastleLogo";
 import { api, ApiError } from "@/lib/api";
+import { formatWait } from "@/lib/format";
 
 const MAX_DIGITS = 12;
 
@@ -57,10 +58,9 @@ export function PinPad() {
       setShake((n) => n + 1);
       const message = caught instanceof ApiError ? caught.message : "Something went wrong. Try again.";
       setError(message);
-      const seconds = /Wait (\d+) seconds/.exec(message)?.[1];
-      if (caught instanceof ApiError && caught.status === 429 && seconds) {
+      if (caught instanceof ApiError && caught.status === 429 && caught.retryAfter) {
         setNow(Date.now());
-        setWaitUntil(Date.now() + Number(seconds) * 1000);
+        setWaitUntil(Date.now() + caught.retryAfter * 1000);
       }
       setBusy(false);
     }
@@ -127,7 +127,7 @@ export function PinPad() {
             : pin.split("").map((_, i) => <span key={i} className={`size-4 rounded-full animate-pop ${theme.dot}`} />)}
         </div>
         <p role="status" aria-live="polite" className={`mb-4 min-h-6 text-center text-sm font-bold ${parent ? "text-rose-300" : "text-rose-600"}`}>
-          {locked ? `Too many tries. Wait ${secondsLeft} seconds.` : (error ?? <span className="sr-only">{pin.length} digits entered</span>)}
+          {locked ? `Too many tries. Wait ${formatWait(secondsLeft)}.` : (error ?? <span className="sr-only">{pin.length} digits entered</span>)}
         </p>
 
         <div className="grid grid-cols-3 gap-3" role="group" aria-label="Number pad">

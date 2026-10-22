@@ -1,5 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { fitDimensions, MediaError, parseProbe, renderArgs, renderFilterGraph } from "./media";
+import { fitDimensions, MediaError, parseProbe, ProcessError, renderArgs, renderFilterGraph, run } from "./media";
+
+describe("run", () => {
+  it("says when a tool was killed rather than failing on its own", async () => {
+    const error = await run("sh", ["-c", "echo working >&2; kill -KILL $$"]).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ProcessError);
+    expect(error).toMatchObject({ code: null, signal: "SIGKILL", stderrTail: "working" });
+    expect((error as Error).message).toMatch(/^sh was stopped by SIGKILL \(often: the server ran out of memory\)/);
+  });
+
+  it("reports the exit code of a failed tool", async () => {
+    const error = await run("sh", ["-c", "echo nope >&2; exit 3"]).catch((e: unknown) => e);
+    expect(error).toMatchObject({ code: 3, signal: null, message: "sh exited with code 3:\nnope" });
+  });
+});
 
 describe("parseProbe", () => {
   const phone = {
@@ -81,6 +95,7 @@ describe("render command", () => {
     normalizeAudio: true,
     crf: 23,
     preset: "medium",
+    threads: 0,
   };
 
   it("trims and joins the kept pieces, then scales, captions and levels in one graph", () => {
@@ -115,6 +130,19 @@ describe("render command", () => {
     expect(args.slice(0, webmStart).at(-1)).toBe("edited.mp4");
     expect(args.slice(webmStart)).toEqual(expect.arrayContaining(["libvpx-vp9", "libopus", "-map_metadata", "edited.webm"]));
     expect(args.at(-1)).toBe("edited.webm");
+  });
+
+  it("caps decoder, filter and encoder threads when asked, and leaves them to ffmpeg otherwise", () => {
+    expect(renderArgs({ ...options, webmOutput: "edited.webm" })).not.toContain("-threads");
+
+    const args = renderArgs({ ...options, webmOutput: "edited.webm", threads: 2 });
+    const input = args.indexOf("-i");
+    expect(args.slice(0, input)).toEqual(expect.arrayContaining(["-filter_complex_threads", "2", "-threads", "2"]));
+    // Once for the decoder, then once for each of the two encoders.
+    expect(args.filter((arg) => arg === "-threads")).toHaveLength(3);
+    const webmStart = args.indexOf("[vw]");
+    expect(args.slice(input, webmStart)).toContain("-threads");
+    expect(args.slice(webmStart)).toContain("-threads");
   });
 
   it("encodes web-friendly H.264 and strips location metadata", () => {

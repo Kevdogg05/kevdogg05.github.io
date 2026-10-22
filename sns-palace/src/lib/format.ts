@@ -10,6 +10,13 @@ export function formatDuration(seconds: number | null | undefined): string {
   return h ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
 }
 
+/** How long a PIN lockout lasts: "45 seconds", "12 minutes", "5 hours". */
+export function formatWait(seconds: number): string {
+  if (seconds < 120) return `${seconds} seconds`;
+  const minutes = Math.ceil(seconds / 60);
+  return minutes < 120 ? `${minutes} minutes` : `${Math.ceil(minutes / 60)} hours`;
+}
+
 /** 4.25 → "4.3 s" */
 export function formatSeconds(seconds: number): string {
   return `${seconds < 10 ? seconds.toFixed(1) : Math.round(seconds)} s`;

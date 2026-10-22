@@ -21,8 +21,14 @@ export class ProcessError extends Error {
     readonly command: string,
     readonly code: number | null,
     readonly stderrTail: string,
+    readonly signal: NodeJS.Signals | null = null,
   ) {
-    super(`${command} exited with code ${code}:\n${stderrTail}`);
+    // The system kills a process with SIGKILL when the machine runs out of memory.
+    const how =
+      code !== null
+        ? `exited with code ${code}`
+        : `was stopped by ${signal ?? "a signal"}${signal === "SIGKILL" ? " (often: the server ran out of memory)" : ""}`;
+    super(`${command} ${how}:\n${stderrTail}`);
     this.name = "ProcessError";
   }
 }
@@ -51,13 +57,13 @@ export function run(command: string, args: string[], options: RunOptions = {}): 
       options.signal?.removeEventListener("abort", onAbort);
       reject(error.code === "ENOENT" ? new Error(`${command} was not found. Is it installed and on PATH?`) : error);
     });
-    child.on("close", (code) => {
+    child.on("close", (code, signal) => {
       options.signal?.removeEventListener("abort", onAbort);
       const out = Buffer.concat(stdout).toString("utf8");
       const err = Buffer.concat(stderr).toString("utf8");
       if (options.signal?.aborted) return reject(options.signal.reason ?? new Error("Aborted"));
       if (code === 0) return resolve({ stdout: out, stderr: err });
-      reject(new ProcessError(command, code, err.trim().split("\n").slice(-12).join("\n")));
+      reject(new ProcessError(command, code, err.trim().split("\n").slice(-12).join("\n"), signal));
     });
   });
 }
@@ -159,6 +165,17 @@ const STRIP_METADATA = ["-map_metadata", "-1", "-map_chapters", "-1"];
 const H264 = ["-c:v", "libx264", "-profile:v", "high", "-pix_fmt", "yuv420p", "-fpsmax", "30"];
 const WEB = ["-movflags", "+faststart"];
 
+/**
+ * Thread limits for the decoder, the filters and each encoder. 0 lets ffmpeg
+ * pick, which means one thread per CPU it can see: in a small cloud container
+ * that is every CPU of the host, and the extra threads' frame buffers can use
+ * more memory than the container has.
+ */
+const decodeThreads = (threads: number) => (threads > 0 ? ["-threads", String(threads)] : []);
+const filterThreads = (threads: number, option: "-filter_threads" | "-filter_complex_threads") =>
+  threads > 0 ? [option, String(threads)] : [];
+const encodeThreads = decodeThreads;
+
 /** One representative frame from early in the video, as a JPEG. */
 export function thumbnailArgs(input: string, output: string, info: MediaInfo, maxLong = 640): string[] {
   const { width, height } = fitDimensions(info.width, info.height, maxLong);
@@ -177,15 +194,22 @@ export function thumbnailArgs(input: string, output: string, info: MediaInfo, ma
 }
 
 /** A small, fast copy of the untouched upload that every browser can play. */
-export function previewArgs(input: string, output: string, info: MediaInfo, maxLong = 854): string[] {
+export function previewArgs(
+  input: string,
+  output: string,
+  info: MediaInfo,
+  { maxLong = 854, threads = 0 }: { maxLong?: number; threads?: number } = {},
+): string[] {
   const { width, height } = fitDimensions(info.width, info.height, maxLong);
   return [
     ...BASE,
+    ...filterThreads(threads, "-filter_threads"),
+    ...decodeThreads(threads),
     "-i", input,
     "-map", "0:v:0",
     ...(info.hasAudio ? ["-map", "0:a:0"] : []),
     "-vf", `scale=${width}:${height}:flags=bicubic,setsar=1`,
-    ...H264, "-preset", "veryfast", "-crf", "28",
+    ...H264, "-preset", "veryfast", "-crf", "28", ...encodeThreads(threads),
     "-c:a", "aac", "-b:a", "96k", "-ac", "2",
     ...STRIP_METADATA,
     ...WEB,
@@ -219,12 +243,16 @@ export interface RenderOptions {
   normalizeAudio: boolean;
   crf: number;
   preset: string;
+  /** See decodeThreads; 0 lets ffmpeg pick. */
+  threads: number;
 }
 
 const t = (seconds: number) => seconds.toFixed(3);
 
 /** The filtergraph that cuts, joins, scales, captions and levels the video in one pass. */
-export function renderFilterGraph(o: Omit<RenderOptions, "input" | "output" | "webmOutput" | "crf" | "preset"> & { webm: boolean }): string {
+export function renderFilterGraph(
+  o: Omit<RenderOptions, "input" | "output" | "webmOutput" | "crf" | "preset" | "threads"> & { webm: boolean },
+): string {
   const n = o.kept.length;
   const parts: string[] = [];
   const range = (i: number) => `start=${t(o.kept[i].start)}:end=${t(o.kept[i].end)}`;
@@ -259,17 +287,20 @@ export function renderArgs(o: RenderOptions): string[] {
         // encoded about 10x faster than "good" here (good caps cpu-used at 5).
         "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", String(Math.min(63, o.crf + 10)),
         "-deadline", "realtime", "-cpu-used", "8", "-row-mt", "1", "-pix_fmt", "yuv420p", "-fpsmax", "30",
+        ...encodeThreads(o.threads),
         ...STRIP_METADATA,
         o.webmOutput,
       ]
     : [];
   return [
     ...BASE,
+    ...filterThreads(o.threads, "-filter_complex_threads"),
+    ...decodeThreads(o.threads),
     "-i", o.input,
     "-filter_complex", renderFilterGraph({ ...o, webm: Boolean(o.webmOutput) }),
     "-map", "[v]",
     ...(o.hasAudio ? ["-map", "[a]", "-c:a", "aac", "-b:a", "128k", "-ac", "2"] : []),
-    ...H264, "-preset", o.preset, "-crf", String(o.crf),
+    ...H264, "-preset", o.preset, "-crf", String(o.crf), ...encodeThreads(o.threads),
     ...STRIP_METADATA,
     ...WEB,
     o.output,

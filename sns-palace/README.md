@@ -12,7 +12,8 @@ fully offline mode swaps those for SQLite and local files.
 
 **Project page:** https://kevdogg05.github.io/sns-palace/, with screenshots,
 setup steps and a QR code. It's `index.html` and `site/` in this folder, served by
-GitHub Pages; the app itself runs on your own computer. The QR code comes as
+GitHub Pages. The app itself runs on your own computer, or online so it works
+away from home too (see [Use it from anywhere](#use-it-from-anywhere)). The QR code comes as
 `site/qr-code.svg` (plain, for printing at any size) and `site/qr-code.png`
 (a branded "Scan to open on your phone" card).
 
@@ -102,6 +103,101 @@ without the browser's address bar.
 in `public/icons/` and `src/app/apple-icon.png`. Browsers fetch these without
 cookies, so they are the only files outside the PIN gate besides build assets.
 
+## Use it from anywhere
+
+On your own computer, SnS Palace only works while that computer is on, and only
+on your home Wi-Fi. Put it on a hosting service instead and it runs around the
+clock at its own `https://` address: kids can post from a grandparent's house,
+you can post for them from work, and everyone sees new videos on any Wi-Fi or
+mobile data with the home computer switched off.
+
+The [`Dockerfile`](Dockerfile) packs the web app, the editing worker, ffmpeg
+and on-device speech recognition into one container, and keeps everything (the
+database, the videos and the speech model) on a disk mounted at `/data`. No
+Supabase or Cloudinary account is needed.
+
+### One click: Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Kevdogg05/kevdogg05.github.io)
+
+1. Press the button and sign in to [Render](https://render.com) with GitHub.
+   Render reads [`render.yaml`](../render.yaml) at the top of this repository: one
+   web service called `sns-palace` with a 10 GB disk.
+2. Type a `FAMILY_PIN` and a `PARENT_PIN` when asked. Anyone on the internet
+   can reach the PIN pad, so use **6 or more digits for both**, and two
+   different PINs. `SESSION_SECRET` is generated for you.
+3. Press **Deploy Blueprint**. The paid plan needs a card on file. The first
+   build takes about 10 minutes.
+4. Open the address Render shows (something like
+   `https://sns-palace-ab12.onrender.com`) and type the family PIN. Then open
+   **Grown-ups → Add a device** and scan the code with each tablet and phone.
+   Over https, Android installs it as a full app too.
+
+**Cost** (Render's prices in October 2026): the Standard instance (2 GB memory,
+1 CPU) is $25 a month and the 10 GB disk $2.50, so about **$27.50 a month**.
+Editing a video and recognising its speech need about 1 GB on top of the app,
+so the $7 Starter instance (512 MB) runs out of memory while editing.
+
+- **Updates:** every change pushed to `sns-palace/` on `main` redeploys on its
+  own. SnS Palace is offline for a minute or two while it restarts.
+- **Backups:** Render snapshots the disk every day; restore one from the
+  service's **Disks** page.
+- **More room:** raise the disk size on the same page. Disks can grow but never
+  shrink.
+- **Region:** `render.yaml` uses Oregon (US West). To host it nearer home, change
+  `region:` before the first deploy. It can't be moved afterwards.
+
+### Cheaper: Railway (about $5 a month)
+
+[Railway](https://railway.com) bills for the memory and CPU the container
+actually uses, and its $5-a-month Hobby plan includes $5 of use. SnS Palace
+idles at about 250 MB, so a family's videos usually fit inside that. Two catches:
+a Hobby disk (volume) holds at most 5 GB, roughly 50 to 100 phone clips with
+their edits, and requests are capped at 15 minutes, which limits very big
+uploads on slow connections.
+
+1. **New Project → Deploy from GitHub repo**, and pick this repository.
+2. In the service's **Settings**, set **Root Directory** to `sns-palace`.
+   Railway finds the Dockerfile there.
+3. Under **Variables**, add `FAMILY_PIN`, `PARENT_PIN` (6+ digits each) and
+   `SESSION_SECRET` (`openssl rand -base64 48`).
+4. Add a **volume** to the service, mounted at `/data`.
+5. Under **Settings → Networking**, press **Generate Domain** and open it.
+
+### Anywhere else with Docker
+
+Any machine with Docker and at least 2 GB of memory can run the same image: a
+VPS, a NAS, or a computer you leave on.
+
+```bash
+docker build -t sns-palace .
+docker run -d --restart unless-stopped -p 3000:3000 -v sns-palace-data:/data \
+  -e FAMILY_PIN=... -e PARENT_PIN=... -e SESSION_SECRET=... sns-palace
+```
+
+Pass the settings one by one rather than with `--env-file .env.local`. Your
+home `.env.local` points `LOCAL_DATA_DIR` and `WHISPER_PYTHON` at folders on your
+computer, and inside the container the videos must go to `/data`. Put HTTPS in
+front before opening it to the internet, for example with Caddy, a Cloudflare
+Tunnel or Tailscale Funnel.
+
+### Good to know
+
+- **Videos already on your computer stay there.** The online copy starts empty;
+  upload the ones you want again.
+- **Captions** use faster-whisper inside the container. The `base.en` model
+  (about 150 MB) downloads into `/data/models` the first time a video is edited.
+  To use OpenAI instead, set `TRANSCRIBER=openai` and `OPENAI_API_KEY`.
+- **Supabase and Cloudinary** still work online: set `DATABASE_DRIVER`,
+  `STORAGE_DRIVER` and their keys as in
+  [Production setup](#production-setup-supabase--cloudinary). Keep the disk
+  anyway for the speech model, or it downloads again after every restart.
+- **Uploads** in the container may take up to an hour to arrive
+  (`UPLOAD_TIMEOUT_MINUTES`, default 60), so a long video over mobile data still
+  gets through.
+- **The container** runs as an unprivileged user, caps ffmpeg at two threads
+  (`FFMPEG_THREADS`), and restarts as a whole if the app or the worker stops.
+
 ## Production setup: Supabase + Cloudinary
 
 1. **Supabase**: create a project, open *SQL Editor*, paste
@@ -149,7 +245,10 @@ worker warns at startup when faster-whisper is missing.
   a proxy, so it authenticates first thing in the handler.
 - **Brute-force limits.** 5 wrong PINs locks a device out (1 minute, doubling up
   to an hour), and 20 wrong PINs household-wide in 15 minutes locks the pad for
-  everyone, which also covers attackers rotating forged IP headers.
+  everyone, which also covers attackers rotating forged IP headers. On top of
+  that, the pad takes at most 100 wrong PINs in any 24 hours, so guessing a
+  6-digit PIN online would take over ten years on average. Devices that are already unlocked keep
+  working during a lockout.
 - **Private media.** Cloudinary assets use the `authenticated` delivery type,
   so nothing is reachable by URL. The server signs URLs per request and streams
   the bytes through `/api/media`, so signatures never reach a browser. Kids can
@@ -162,10 +261,14 @@ worker warns at startup when faster-whisper is missing.
 - **Location stripped.** Phone videos embed GPS coordinates; edited videos,
   previews and thumbnails are written without metadata.
 - CSRF checks on every state change, `X-Frame-Options: DENY`,
-  `Referrer-Policy: no-referrer`, `noindex` everywhere.
+  `Referrer-Policy: no-referrer`, `noindex` everywhere, and HSTS once it is
+  served over HTTPS.
 
-Serve it over HTTPS (a reverse proxy such as Caddy, or a VPN like Tailscale)
-before reaching it from outside your home network.
+Serve it over HTTPS before reaching it from outside your home network. The
+hosting options in [Use it from anywhere](#use-it-from-anywhere) do that for
+you; on your own machine, use a reverse proxy such as Caddy or a VPN like
+Tailscale. Session cookies are marked `Secure` whenever the site is served over
+HTTPS.
 
 ## The editing pipeline
 
@@ -216,6 +319,7 @@ the parent session.
 ```
 sns-palace/
 ├── index.html, site/          # the GitHub Pages project page, screenshots and QR codes
+├── Dockerfile, docker/        # the one-container image: web app + worker + ffmpeg + faster-whisper
 ├── supabase/schema.sql        # videos table, RLS lockdown, claim_next_video() queue function
 ├── .env.local.example         # every setting, documented
 ├── src/
@@ -250,10 +354,11 @@ WebAssembly) to check the queue function, constraints and grants.
 
 ## Known limitations
 
-- An upload is a single streaming request, and `next start` (Node's HTTP server)
-  ends any request that takes longer than 5 minutes to arrive. That's plenty on
-  home Wi-Fi, but very large files over a slow connection can time out. Resumable
-  chunked uploads are a good Phase 2 step.
+- An upload is a single streaming request. `npm start` (Node's HTTP server)
+  ends any request that takes longer than 5 minutes to arrive. The Docker image
+  raises that to an hour, though a host can cap it lower (Railway: 15 minutes).
+  If the connection drops, the upload starts over. Resumable chunked uploads
+  are a good Phase 2 step.
 - The PIN lockout counters live in the web server's memory: a restart clears
   them, and several app instances don't share them.
 - Media streams through the Next.js server (to keep Cloudinary URLs private),

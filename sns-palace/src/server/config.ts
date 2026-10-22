@@ -166,6 +166,7 @@ const pipelineSchema = z
     VIDEO_PRESET: z
       .enum(["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower"])
       .default("medium"),
+    FFMPEG_THREADS: z.coerce.number().int().min(0).max(64).default(0),
     FFMPEG_PATH: z.string().default("ffmpeg"),
     FFPROBE_PATH: z.string().default("ffprobe"),
     WORKER_POLL_MS: z.coerce.number().int().min(250).max(60_000).default(3000),
@@ -191,6 +192,7 @@ const pipelineSchema = z
     outputMaxSize: env.OUTPUT_MAX_SIZE,
     crf: env.VIDEO_CRF,
     preset: env.VIDEO_PRESET,
+    threads: env.FFMPEG_THREADS,
     ffmpeg: env.FFMPEG_PATH,
     ffprobe: env.FFPROBE_PATH,
     pollMs: env.WORKER_POLL_MS,

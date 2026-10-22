@@ -41,6 +41,7 @@ const config: PipelineConfig = {
   outputMaxSize: 1280,
   crf: 30,
   preset: "ultrafast",
+  threads: 2,
   ffmpeg: "ffmpeg",
   ffprobe: "ffprobe",
   pollMs: 100,
