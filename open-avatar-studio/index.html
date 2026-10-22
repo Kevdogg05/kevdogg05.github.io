@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenAvatarStudio</title>
+  <meta name="description" content="A self-hosted, open-source alternative to HeyGen: type a script, pick a voice, upload a portrait and get a talking-avatar video, rendered on your own machine.">
+  <meta name="theme-color" content="#09090b">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://kevdogg05.github.io/open-avatar-studio/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OpenAvatarStudio: AI avatar videos on your own machine">
+  <meta property="og:description" content="Open-source and self-hosted. Script in, talking-head video out, with Coqui TTS, Wav2Lip, SadTalker and GFPGAN.">
+  <meta property="og:url" content="https://kevdogg05.github.io/open-avatar-studio/">
+  <meta property="og:image" content="https://kevdogg05.github.io/open-avatar-studio/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #09090b;
+      --panel: #131318;
+      --line: rgb(255 255 255 / 0.08);
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --faint: #71717a;
+      --accent: #a78bfa;
+      --accent-strong: #8b5cf6;
+      --ok: #34d399;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(50rem 28rem at 90% -8%, rgb(124 58 237 / 0.22), transparent 70%),
+        radial-gradient(36rem 22rem at -10% 40%, rgb(79 70 229 / 0.12), transparent 70%),
+        var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    a { color: var(--accent); }
+    img { max-width: 100%; height: auto; display: block; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+    header.top { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); background: rgb(9 9 11 / 0.8); border-bottom: 1px solid var(--line); }
+    header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 56px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 700; letter-spacing: -0.01em; }
+    .brand img { width: 30px; height: 30px; }
+    .brand i { font-style: normal; color: var(--accent); }
+    .top nav { display: flex; gap: 6px; }
+    .top nav a { color: var(--muted); text-decoration: none; font-size: 14px; padding: 6px 10px; border-radius: 8px; }
+    .top nav a:hover { color: var(--text); background: rgb(255 255 255 / 0.05); }
+
+    .hero { padding: 56px 0 32px; text-align: center; }
+    .pill { display: inline-block; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 3px 12px; font-size: 13px; }
+    h1 { font-size: clamp(32px, 6vw, 56px); line-height: 1.08; letter-spacing: -0.03em; margin: 18px auto 16px; max-width: 16ch; }
+    h1 em { font-style: normal; background: linear-gradient(90deg, #c4b5fd, #818cf8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lead { color: var(--muted); font-size: clamp(16px, 2.2vw, 19px); max-width: 62ch; margin: 0 auto; }
+    .cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 15px; text-decoration: none; border: 1px solid var(--line); color: var(--text); background: rgb(255 255 255 / 0.04); cursor: pointer; font-family: inherit; }
+    .btn:hover { background: rgb(255 255 255 / 0.08); }
+    .btn.primary { background: linear-gradient(90deg, #7c3aed, #4f46e5); border-color: transparent; color: #fff; box-shadow: 0 8px 30px rgb(124 58 237 / 0.35); }
+    .btn.primary:hover { filter: brightness(1.1); }
+    .note { max-width: 62ch; margin: 22px auto 0; font-size: 14px; color: var(--muted); border: 1px solid rgb(251 191 36 / 0.25); background: rgb(251 191 36 / 0.06); border-radius: 12px; padding: 10px 14px; }
+    .note strong { color: var(--warn); }
+
+    .shot { margin: 28px auto 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 30px 80px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(124 58 237 / 0.15); background: #000; }
+
+    section { padding: 48px 0; }
+    h2 { font-size: clamp(24px, 3.4vw, 32px); letter-spacing: -0.02em; margin: 0 0 8px; }
+    .sub { color: var(--muted); margin: 0 0 24px; max-width: 70ch; }
+
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; counter-reset: step; list-style: none; padding: 0; margin: 0; }
+    .steps li { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+    .steps li::before { counter-increment: step; content: "Step " counter(step); display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); }
+    .steps b { display: block; font-size: 17px; margin: 2px 0 4px; }
+    .steps p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .feature { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+    .feature h3 { margin: 0 0 6px; font-size: 16px; }
+    .feature h3::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-strong); margin-right: 8px; vertical-align: 2px; }
+    .feature p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .gallery { display: grid; grid-template-columns: 1fr 260px; gap: 16px; align-items: start; }
+    .gallery figure { margin: 0; }
+    .gallery figcaption { color: var(--faint); font-size: 13px; margin-top: 8px; }
+    .gallery .frame { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .gallery .phone { border-radius: 28px; border: 6px solid #27272a; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px; }
+    th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--faint); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; background: rgb(255 255 255 / 0.02); }
+    tr:last-child td { border-bottom: 0; }
+    td small { color: var(--faint); display: block; }
+    .tag { display: inline-block; font-size: 12px; border-radius: 6px; padding: 1px 7px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+    .tag.ok { color: var(--ok); border-color: rgb(52 211 153 / 0.3); }
+    .tag.warn { color: var(--warn); border-color: rgb(251 191 36 / 0.3); }
+
+    pre { background: #0d0d12; border: 1px solid var(--line); border-radius: 14px; padding: 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.7; margin: 0; }
+    pre .c { color: var(--faint); }
+    .reqs { color: var(--muted); font-size: 14px; margin: 14px 0 0; }
+
+    .share { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+    .share img { background: #fff; border-radius: 12px; padding: 8px; width: 220px; height: 220px; }
+    .share .url { font-family: ui-monospace, monospace; font-size: 14px; color: var(--muted); word-break: break-all; margin: 6px 0 14px; }
+    .share .cta { justify-content: flex-start; margin-top: 0; }
+
+    footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--faint); font-size: 13px; }
+    footer p { margin: 4px 0; }
+
+    @media (max-width: 860px) {
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .features { grid-template-columns: repeat(2, 1fr); }
+      .gallery { grid-template-columns: 1fr; }
+      .gallery .phone-fig { max-width: 300px; margin: 0 auto; }
+    }
+    @media (max-width: 560px) {
+      .top nav a.hide-sm { display: none; }
+      .hero { padding-top: 36px; }
+      .steps, .features { grid-template-columns: 1fr; }
+      .share { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+      .share .cta { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="#top"><img src="icon.svg" alt="" width="30" height="30"><span>OpenAvatar<i>Studio</i></span></a>
+      <nav>
+        <a class="hide-sm" href="#features">Features</a>
+        <a class="hide-sm" href="#engines">Engines</a>
+        <a href="#run">Run it</a>
+        <a href="https://github.com/Kevdogg05/kevdogg05.github.io">Source</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="wrap hero">
+      <span class="pill">Open source · Self-hosted · No HeyGen services</span>
+      <h1>AI avatar videos, <em>on your own machine</em></h1>
+      <p class="lead">Type a script, pick a voice and upload a portrait. OpenAvatarStudio turns it into a talking-head video using open models for speech, lip-sync and face animation, all running on your own computer.</p>
+      <div class="cta">
+        <a class="btn primary" href="#run">Run it yourself</a>
+        <a class="btn" href="https://github.com/Kevdogg05/kevdogg05.github.io">View the source</a>
+      </div>
+      <p class="note"><strong>No hosted demo.</strong> The studio needs Python and several gigabytes of AI models, so it runs on your computer or server rather than on this website. This page shows what it does and how to set it up.</p>
+      <div class="shot"><img src="img/dashboard.webp" width="1440" height="1180" alt="The OpenAvatarStudio dashboard: script, voice and avatar settings on the left, a rendered video in the preview on the right, and the render pipeline steps below it."></div>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <h2>How it works</h2>
+        <p class="sub">Every video goes through the same pipeline, with live progress in the dashboard.</p>
+        <ol class="steps">
+          <li><b>Script</b><p>Write what the avatar should say, up to 5,000 characters.</p></li>
+          <li><b>Voice</b><p>Coqui TTS speaks it offline. Six curated voices, or any of 108; ElevenLabs works too.</p></li>
+          <li><b>Animate</b><p>Wav2Lip lip-syncs the photo, or SadTalker animates the whole face with blinks and head motion.</p></li>
+          <li><b>Video</b><p>Optional GFPGAN face enhancement, then a 1280×720 MP4 ready to download.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="wrap">
+        <h2>What's inside</h2>
+        <p class="sub">A Next.js dashboard and a FastAPI backend that orchestrates open-source models.</p>
+        <div class="features">
+          <div class="feature"><h3>Private by design</h3><p>Scripts, photos and videos stay on your machine (unless you opt into ElevenLabs voices). No accounts, no per-minute pricing.</p></div>
+          <div class="feature"><h3>Choose per video</h3><p>Fast mouth-only lip-sync or full-face animation, with a render-time estimate before you start.</p></div>
+          <div class="feature"><h3>Sharper faces</h3><p>GFPGAN restores eyes, teeth and lips that lip-sync models render softly.</p></div>
+          <div class="feature"><h3>Video library</h3><p>Every render is saved with a poster frame. Replay, download, render again or delete.</p></div>
+          <div class="feature"><h3>Queue and cancel</h3><p>Line up several videos while one renders, and cancel any of them within seconds.</p></div>
+          <div class="feature"><h3>One-command setup</h3><p>One script per engine installs it at a pinned version and downloads its models; the large weights are checksum-verified.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap gallery">
+        <figure>
+          <div class="frame"><img src="img/library.webp" width="1392" height="333" alt="The video library with three finished videos, each showing a poster frame, its length and actions to download, render again or delete." loading="lazy"></div>
+          <figcaption>The video library keeps every render across restarts.</figcaption>
+        </figure>
+        <figure class="phone-fig">
+          <div class="phone"><img src="img/phone.webp" width="780" height="1688" alt="The dashboard on a phone." loading="lazy"></div>
+          <figcaption>The dashboard works on phones too.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="engines">
+      <div class="wrap">
+        <h2>Engines, speed and licences</h2>
+        <p class="sub">Times were measured on a 4-core CPU without a GPU. With an NVIDIA GPU, PyTorch uses it automatically and the heavy engines run far faster. Check each licence before any commercial use.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Engine</th><th>What it does</th><th>10-second clip on CPU</th><th>Licence</th></tr></thead>
+            <tbody>
+              <tr><td><b>Coqui TTS</b><small>VCTK VITS</small></td><td>Offline speech in 108 English voices</td><td>~3 s</td><td><span class="tag ok">Apache-2.0</span></td></tr>
+              <tr><td><b>Wav2Lip</b></td><td>Lip-sync on a still photo</td><td>~20 s</td><td><span class="tag warn">Non-commercial</span></td></tr>
+              <tr><td><b>SadTalker</b></td><td>Whole-face animation: blinks, expressions, head motion</td><td>~16 min</td><td><span class="tag ok">Apache-2.0</span></td></tr>
+              <tr><td><b>GFPGAN</b><small>optional</small></td><td>Face restoration on every frame</td><td>~8 min extra</td><td><span class="tag warn">Apache-2.0, with NVIDIA-licensed parts</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="run">
+      <div class="wrap">
+        <h2>Run it yourself</h2>
+        <p class="sub">The dashboard starts right away with built-in placeholder engines. Add the real ones with one script each.</p>
+<pre><span class="c"># get the code and start the dashboard (http://localhost:3000)</span>
+git clone https://github.com/Kevdogg05/kevdogg05.github.io.git
+cd kevdogg05.github.io
+./dev.sh
+
+<span class="c"># add real engines, then restart ./dev.sh</span>
+sudo apt install espeak-ng            <span class="c"># macOS: brew install espeak-ng</span>
+backend/scripts/setup_coqui.sh        <span class="c"># voices</span>
+backend/scripts/setup_wav2lip.sh      <span class="c"># fast lip-sync</span>
+backend/scripts/setup_sadtalker.sh    <span class="c"># whole-face animation (GPU recommended)</span>
+backend/scripts/setup_gfpgan.sh       <span class="c"># face enhancement</span></pre>
+        <p class="reqs">Needs Node.js 20+ and Python 3.10+, on Linux, macOS or WSL. The full setup, configuration and API reference are in the <a href="https://github.com/Kevdogg05/kevdogg05.github.io#readme">README</a>.</p>
+      </div>
+    </section>
+
+    <section id="share">
+      <div class="wrap">
+        <div class="share">
+          <img src="qr-code.svg" width="220" height="220" alt="QR code linking to https://kevdogg05.github.io/open-avatar-studio/">
+          <div>
+            <h2>Share this page</h2>
+            <p class="url" id="share-url">https://kevdogg05.github.io/open-avatar-studio/</p>
+            <div class="cta">
+              <button class="btn primary" type="button" id="share-btn">Copy link</button>
+              <a class="btn" href="qr-code.png" download="open-avatar-studio-qr.png">Download QR card</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>OpenAvatarStudio is built with Next.js, FastAPI, Coqui TTS, Wav2Lip, SadTalker and GFPGAN.</p>
+      <p>Only animate photos of yourself, or of people who have agreed to it.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Use the phone's share sheet where there is one; otherwise copy the link.
+    const button = document.getElementById("share-btn");
+    const url = document.getElementById("share-url").textContent.trim();
+    if (navigator.share) button.textContent = "Share link";
+    button.addEventListener("click", async () => {
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "OpenAvatarStudio", url });
+          return;
+        }
+        await navigator.clipboard.writeText(url);
+        button.textContent = "Link copied";
+      } catch (error) {
+        if (error && error.name === "AbortError") return; // share sheet dismissed
+        button.textContent = "Copy failed: select the link above";
+      }
+      setTimeout(() => { button.textContent = navigator.share ? "Share link" : "Copy link"; }, 2000);
+    });
+  </script>
+</body>
+</html>
