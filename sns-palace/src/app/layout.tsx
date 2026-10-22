@@ -8,7 +8,10 @@ const nunito = Nunito({ variable: "--font-nunito", subsets: ["latin"] });
 export const metadata: Metadata = {
   title: { default: "SnS Palace", template: "%s · SnS Palace" },
   description: "Our family's private video studio.",
+  applicationName: "SnS Palace",
   robots: { index: false, follow: false },
+  // On iPhone and iPad, "Add to Home Screen" opens it like an app (see manifest.ts).
+  appleWebApp: { capable: true, title: "SnS Palace", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

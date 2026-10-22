@@ -49,9 +49,12 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Everything except build assets, icons and the upload route. Uploads are
-    // excluded because Next.js buffers (and truncates past 10 MB) any request
-    // body that passes through a proxy; /api/upload authenticates itself.
-    "/((?!_next/static|_next/image|favicon\\.ico|icon\\.svg|robots\\.txt|api/upload$).*)",
+    // Everything except build assets, icons, the app manifest and the upload
+    // route. Browsers fetch the manifest and home-screen icons without cookies,
+    // so gating them would break "Add to Home Screen" (they hold nothing
+    // private). Uploads are excluded because Next.js buffers (and truncates
+    // past 10 MB) any request body that passes through a proxy; /api/upload
+    // authenticates itself.
+    "/((?!_next/static|_next/image|favicon\\.ico|icon\\.svg|apple-icon\\.png|icons/|manifest\\.webmanifest|robots\\.txt|api/upload$).*)",
   ],
 };
