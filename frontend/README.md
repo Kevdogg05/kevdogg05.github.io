@@ -9,7 +9,9 @@ npm run dev        # http://localhost:3000, expects the backend on :8000
 ```
 
 Set `NEXT_PUBLIC_API_URL` in `.env.local` if the backend runs somewhere other
-than port 8000 on the same host.
+than port 8000 on the same host (`/` means the page's own origin, as in the
+Docker setup, where a proxy serves both). The `Dockerfile` builds the standalone
+production server; see "Deploy with Docker" in the root README.
 
 | Path | What it holds |
 | --- | --- |

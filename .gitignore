@@ -1,3 +1,6 @@
+# Docker settings (see .env.example)
+/.env
+
 # OpenAvatarStudio backend
 backend/.venv/
 backend/.env
