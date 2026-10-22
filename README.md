@@ -10,9 +10,9 @@ own machine. No HeyGen services or accounts are involved.
 > setup steps and a QR code, is `open-avatar-studio/`:
 > https://kevdogg05.github.io/open-avatar-studio/
 >
-> **StarReel**, a private family video studio (kids upload, an automatic editor
-> trims and captions, parents approve), lives in `starreel/` and also runs
-> locally. See [starreel/README.md](starreel/README.md).
+> **SnS Palace**, a private family video studio (kids upload, an automatic editor
+> trims and captions, parents approve), lives in `sns-palace/` and also runs
+> locally. See [sns-palace/README.md](sns-palace/README.md).
 
 ## Status
 
