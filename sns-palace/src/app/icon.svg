@@ -1,10 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- A still copy of src/components/CastleLogo.tsx for the browser tab. -->
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff5fd2"/>
+      <stop offset="0" stop-color="#e879f9"/>
       <stop offset="1" stop-color="#7c3aed"/>
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="16" fill="url(#g)"/>
-  <path d="M32 11l6.2 12.6 13.9 2-10 9.8 2.4 13.8L32 42.7l-12.5 6.5 2.4-13.8-10-9.8 13.9-2z" fill="#ffd60a" stroke="#3d1a55" stroke-width="3" stroke-linejoin="round"/>
+  <g transform="translate(6.4 7.2) scale(0.8)" stroke="#3d1a55" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M13 18V6.5M51 18V6.5" fill="none"/>
+    <path d="M13 7L4 10.25L13 13.5Z" fill="#ffd60a" stroke-width="1.6"/>
+    <path d="M51 7L60 10.25L51 13.5Z" fill="#7cff4f" stroke-width="1.6"/>
+    <rect x="7" y="30" width="12" height="26" fill="#fff1fb"/>
+    <rect x="45" y="30" width="12" height="26" fill="#fff1fb"/>
+    <path d="M5 31L13 17L21 31Z" fill="#2ee6ff"/>
+    <path d="M43 31L51 17L59 31Z" fill="#2ee6ff"/>
+    <path d="M19 56V22H23V25H26.3V22H30.3V25H33.7V22H37.7V25H41V22H45V56Z" fill="#fff1fb"/>
+    <path d="M27.5 56V48.5a4.5 4.5 0 0 1 9 0V56Z" fill="#3d1a55"/>
+    <path d="M23.5 19V10.5L28 14L32 6.5L36 14L40.5 10.5V19Z" fill="#ffd60a"/>
+    <circle cx="32" cy="12.6" r="1.6" fill="#ff5fd2" stroke-width="1.2"/>
+  </g>
 </svg>

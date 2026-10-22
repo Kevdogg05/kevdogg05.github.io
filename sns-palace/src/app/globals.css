@@ -60,6 +60,71 @@
     linear-gradient(180deg, #eef6ff 0%, #f7f0ff 55%, #fff7ea 100%);
 }
 
+/* The castle logo (src/components/CastleLogo.tsx). Every animation starts and
+   ends at rest, so with reduced motion the castle simply stands still. */
+.castle-crown,
+.castle-flag,
+.castle-sparkle {
+  transform-box: fill-box;
+}
+.castle-crown {
+  transform-origin: 50% 100%;
+  animation: castle-crown 2.6s ease-in-out infinite;
+}
+.castle-flag {
+  transform-origin: 0% 50%;
+  animation: castle-flag 1.3s ease-in-out infinite;
+}
+.castle-window {
+  animation: castle-window 3.2s ease-in-out infinite;
+}
+.castle-sparkle {
+  transform-origin: 50% 50%;
+  animation: castle-sparkle 2.2s ease-in-out infinite;
+}
+@keyframes castle-crown {
+  0%,
+  50%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2.5px) rotate(-8deg);
+  }
+  75% {
+    transform: translateY(-2.5px) rotate(8deg);
+  }
+}
+@keyframes castle-flag {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(-14deg) scaleX(0.82);
+  }
+}
+@keyframes castle-window {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes castle-sparkle {
+  0%,
+  100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1) rotate(90deg);
+    opacity: 1;
+  }
+}
+
 /* Rainbow progress bar with moving stripes. */
 .rainbow-bar {
   background-image:

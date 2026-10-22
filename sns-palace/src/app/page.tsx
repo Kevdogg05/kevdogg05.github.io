@@ -1,5 +1,6 @@
-import { Lock, Star } from "lucide-react";
+import { Lock } from "lucide-react";
 import Link from "next/link";
+import { CastleLogo } from "@/components/CastleLogo";
 import { KidDashboard } from "@/components/kid/KidDashboard";
 
 export default function Home() {
@@ -8,7 +9,7 @@ export default function Home() {
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-5 sm:py-7">
         <div className="flex min-w-0 items-center gap-3">
           <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-fuchsia-400 to-violet-600 shadow-lg motion-safe:animate-float sm:size-14">
-            <Star aria-hidden className="size-7 fill-yellow-300 text-yellow-300 sm:size-8" />
+            <CastleLogo className="size-11 sm:size-13" />
           </div>
           <div className="min-w-0">
             <h1 className="font-display text-3xl leading-none font-bold whitespace-nowrap text-violet-700 sm:text-5xl">

@@ -1,9 +1,10 @@
 "use client";
 
-import { Delete, KeyRound, LoaderCircle, Lock, Star } from "lucide-react";
+import { Delete, KeyRound, LoaderCircle, Lock } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { CastleLogo } from "@/components/CastleLogo";
 import { api, ApiError } from "@/lib/api";
 
 const MAX_DIGITS = 12;
@@ -112,7 +113,7 @@ export function PinPad() {
           ) : (
             <>
               <div className="mx-auto mb-2 grid size-20 place-items-center rounded-3xl bg-gradient-to-br from-fuchsia-400 to-violet-600 shadow-lg motion-safe:animate-float">
-                <Star aria-hidden className="size-11 fill-yellow-300 text-yellow-300" />
+                <CastleLogo className="size-[4.5rem]" />
               </div>
               <h1 className="font-display text-4xl font-bold text-violet-700">SnS Palace</h1>
               <p className="mt-1 font-semibold text-slate-600">Type the secret family number!</p>
