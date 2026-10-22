@@ -22,7 +22,8 @@ from pathlib import Path
 from config import Settings
 from services import media
 from services.audio import TTSProvider
-from services.common import PipelineError, ProgressCallback
+from services.common import PipelineError, ProgressCallback, RenderOptions
+from services.enhance import FaceEnhancer
 from services.video import LipSyncEngine
 
 logger = logging.getLogger(__name__)
@@ -40,17 +41,22 @@ class Stage(str, Enum):
     SCRIPT = "script"
     AUDIO = "audio"
     LIPSYNC = "lipsync"
+    ENHANCE = "enhance"
     ENCODE = "encode"
     DONE = "done"
 
 
-# Share of the overall progress bar each stage owns: (start %, end %).
-STAGE_RANGES = {
-    Stage.SCRIPT: (0, 10),
-    Stage.AUDIO: (10, 40),
-    Stage.LIPSYNC: (40, 92),
-    Stage.ENCODE: (92, 100),
-}
+def stage_ranges(enhance: bool) -> dict[Stage, tuple[int, int]]:
+    """Share of the overall progress bar each stage owns: (start %, end %).
+
+    Animation dominates the run time, and enhancement costs about as much again.
+    """
+    if enhance:
+        return {
+            Stage.SCRIPT: (0, 3), Stage.AUDIO: (3, 10), Stage.LIPSYNC: (10, 55),
+            Stage.ENHANCE: (55, 96), Stage.ENCODE: (96, 100),
+        }
+    return {Stage.SCRIPT: (0, 3), Stage.AUDIO: (3, 10), Stage.LIPSYNC: (10, 94), Stage.ENCODE: (94, 100)}
 
 
 def _now() -> datetime:
@@ -63,6 +69,9 @@ class Job:
     script: str
     voice_id: str
     avatar_id: str
+    engine: str
+    enhance: bool = False
+    head_motion: bool = False
     status: JobStatus = JobStatus.QUEUED
     stage: Stage = Stage.QUEUED
     progress: int = 0
@@ -106,20 +115,41 @@ class Pipeline:
         self,
         settings: Settings,
         tts: TTSProvider,
-        engine: LipSyncEngine,
+        engines: dict[str, LipSyncEngine],
+        enhancer: FaceEnhancer,
         store: JobStore,
     ) -> None:
         self._settings = settings
         self._tts = tts
-        self._engine = engine
+        self._engines = engines
+        self._enhancer = enhancer
         self._store = store
         self._ffmpeg = media.resolve_ffmpeg(settings.ffmpeg_path)
         self._executor = ThreadPoolExecutor(
             max_workers=settings.max_concurrent_jobs, thread_name_prefix="oas-job"
         )
 
-    def submit(self, script: str, voice_id: str, avatar_id: str, avatar_path: Path) -> Job:
-        job = Job(id=uuid.uuid4().hex, script=script, voice_id=voice_id, avatar_id=avatar_id)
+    def submit(
+        self,
+        script: str,
+        voice_id: str,
+        avatar_id: str,
+        avatar_path: Path,
+        *,
+        engine: str,
+        enhance: bool = False,
+        head_motion: bool = False,
+    ) -> Job:
+        """Queue a job. The caller has checked that `engine` exists and is ready."""
+        job = Job(
+            id=uuid.uuid4().hex,
+            script=script,
+            voice_id=voice_id,
+            avatar_id=avatar_id,
+            engine=engine,
+            enhance=enhance,
+            head_motion=head_motion and self._engines[engine].supports_head_motion,
+        )
         self._store.add(job)
         self._executor.submit(self._run, job.id, avatar_path)
         return job
@@ -162,16 +192,28 @@ class Pipeline:
         duration = media.wav_duration(audio_path)
         self._store.update(job_id, audio_path=audio_path, duration_seconds=round(duration, 2))
 
-        # 3. Lip-sync
-        self._enter(job_id, Stage.LIPSYNC, f"Animating avatar ({self._engine.name})")
-        rendered = self._engine.render(
-            avatar, audio_path, work_dir, self._stage_progress(job_id, Stage.LIPSYNC)
+        # 3. Lip-sync / animation
+        engine = self._engines[job.engine]
+        self._enter(job_id, Stage.LIPSYNC, f"Animating avatar ({engine.label})")
+        rendered = engine.render(
+            avatar,
+            audio_path,
+            work_dir,
+            self._stage_progress(job_id, Stage.LIPSYNC),
+            RenderOptions(head_motion=job.head_motion),
         )
+
+        # 3b. Optional face enhancement
+        if job.enhance:
+            self._enter(job_id, Stage.ENHANCE, "Enhancing faces")
+            enhanced = work_dir / "enhanced.mp4"
+            self._enhancer.enhance(rendered, enhanced, self._stage_progress(job_id, Stage.ENHANCE))
+            rendered = enhanced
 
         # 4. Video file
         self._enter(job_id, Stage.ENCODE, "Encoding final video")
         final_path = work_dir / "video.mp4"
-        if self._engine.outputs_web_mp4:
+        if engine.outputs_web_mp4 and not job.enhance:
             shutil.move(rendered, final_path)
         else:
             if not self._ffmpeg:
@@ -193,17 +235,22 @@ class Pipeline:
             video_path=final_path,
         )
 
+    def _range(self, job_id: str, stage: Stage) -> tuple[int, int]:
+        job = self._store.get(job_id)
+        assert job is not None
+        return stage_ranges(job.enhance)[stage]
+
     def _enter(self, job_id: str, stage: Stage, message: str) -> None:
         self._store.update(
             job_id,
             status=JobStatus.RUNNING,
             stage=stage,
-            progress=STAGE_RANGES[stage][0],
+            progress=self._range(job_id, stage)[0],
             message=message,
         )
 
     def _stage_progress(self, job_id: str, stage: Stage) -> ProgressCallback:
-        start, end = STAGE_RANGES[stage]
+        start, end = self._range(job_id, stage)
 
         def report(fraction: float, message: str | None = None) -> None:
             progress = int(start + (end - start) * max(0.0, min(1.0, fraction)))

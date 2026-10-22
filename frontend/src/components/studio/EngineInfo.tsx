@@ -24,16 +24,25 @@ export function EngineInfo({ backend }: { backend: BackendState }) {
       </Panel>
     );
   }
-  const { tts, lipsync, ffmpeg, version } = backend.health;
+  const { tts, engines, enhancer, ffmpeg, version } = backend.health;
+  const ready = engines.filter((e) => e.ready);
   return (
     <Panel
       icon={Cpu}
       title="Render engines"
       aside={<span className="font-mono text-[11px] text-zinc-500">API v{version}</span>}
     >
-      <dl className="grid gap-2 text-xs sm:grid-cols-3">
+      <dl className="grid gap-2 text-xs sm:grid-cols-2 xl:grid-cols-4">
         <EngineRow label="Voice" component={tts} />
-        <EngineRow label="Lip-sync" component={lipsync} />
+        <EngineRow
+          label="Animation"
+          component={{
+            name: ready.map((e) => e.name).join(", ") || "none",
+            ready: ready.length > 0,
+            detail: `${ready.length} of ${engines.length} engines installed`,
+          }}
+        />
+        <EngineRow label="Face enhancer" component={enhancer} />
         <EngineRow label="Encoder" component={ffmpeg} />
       </dl>
     </Panel>

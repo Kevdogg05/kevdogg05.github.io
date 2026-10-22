@@ -15,11 +15,31 @@ class ComponentStatus(BaseModel):
     detail: str
 
 
+class CostEstimateOut(BaseModel):
+    fixed_seconds: float
+    seconds_per_second: float
+
+
+class EngineOut(ComponentStatus):
+    label: str
+    summary: str
+    supports_head_motion: bool
+    # Rough render time on this machine; only reported when running on CPU.
+    cpu_estimate: CostEstimateOut | None
+
+
+class EnhancerOut(ComponentStatus):
+    cpu_estimate: CostEstimateOut | None
+
+
 class HealthResponse(BaseModel):
     status: str
     version: str
+    device: str  # "cpu", "cuda" or "unknown" (while still detecting)
     tts: ComponentStatus
-    lipsync: ComponentStatus
+    lipsync: ComponentStatus  # the default engine
+    engines: list[EngineOut]
+    enhancer: EnhancerOut
     ffmpeg: ComponentStatus
 
 
@@ -45,10 +65,16 @@ class GenerateRequest(BaseModel):
     script: str = Field(min_length=1)
     voice_id: str = Field(min_length=1)
     avatar_id: str = Field(min_length=1)
+    engine: str | None = None  # defaults to OAS_LIPSYNC_ENGINE
+    enhance: bool = False
+    head_motion: bool = False
 
 
 class JobResponse(BaseModel):
     job_id: str
+    engine: str
+    enhance: bool
+    head_motion: bool
     status: JobStatus
     stage: Stage
     progress: int = Field(ge=0, le=100)

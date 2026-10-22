@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimationPanel } from "./AnimationPanel";
 import { AvatarUploader } from "./AvatarUploader";
 import { ControlBar } from "./ControlBar";
 import { EngineInfo } from "./EngineInfo";
@@ -13,6 +14,7 @@ import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 import { useBackend } from "@/hooks/useBackend";
 import { useGenerationJob } from "@/hooks/useGenerationJob";
 import { api } from "@/lib/api";
+import { estimateSpeechSeconds } from "@/lib/format";
 
 export function Studio() {
   const { state: backend, retry } = useBackend();
@@ -21,6 +23,9 @@ export function Studio() {
 
   const [script, setScript] = useState("");
   const [voiceChoice, setVoiceChoice] = useState<string | null>(null);
+  const [engineChoice, setEngineChoice] = useState<string | null>(null);
+  const [headMotion, setHeadMotion] = useState(true);
+  const [enhance, setEnhance] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [startedAt, setStartedAt] = useState<number | null>(null);
@@ -31,6 +36,10 @@ export function Studio() {
   // Default to the first voice until the user picks one.
   const voiceId =
     voiceChoice && voices.some((v) => v.id === voiceChoice) ? voiceChoice : (voices[0]?.id ?? "");
+  const health = online ? backend.health : null;
+  // The backend's default engine until the user picks one.
+  const engineId = engineChoice ?? health?.lipsync.name ?? "";
+  const engine = health?.engines.find((e) => e.name === engineId);
 
   const running = job?.status === "queued" || job?.status === "running";
   const busy = submitting || running;
@@ -61,7 +70,11 @@ export function Studio() {
               ? "Waiting for the avatar upload to finish…"
               : avatar.state.status !== "ready"
                 ? "Upload an avatar image."
-                : null;
+                : !engine?.ready
+                  ? `${engine?.label ?? "The animation engine"} isn't installed: ${engine?.detail ?? ""}`
+                  : enhance && !health?.enhancer.ready
+                    ? "Face enhancement isn't installed yet."
+                    : null;
   const canGenerate = !busy && blocker === null;
 
   const generate = async () => {
@@ -77,6 +90,9 @@ export function Studio() {
           script,
           voice_id: voiceId,
           avatar_id: avatar.state.uploaded.avatar_id,
+          engine: engineId,
+          enhance,
+          head_motion: headMotion && Boolean(engine?.supports_head_motion),
         }),
       );
     } catch (err) {
@@ -111,11 +127,26 @@ export function Studio() {
             onClear={avatar.clear}
             disabled={busy}
           />
+          <AnimationPanel
+            health={health}
+            engineId={engineId}
+            onEngineChange={setEngineChoice}
+            headMotion={headMotion}
+            onHeadMotionChange={setHeadMotion}
+            enhance={enhance}
+            onEnhanceChange={setEnhance}
+            videoSeconds={estimateSpeechSeconds(script)}
+            disabled={busy}
+          />
         </aside>
 
         <section className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-20" aria-label="Preview">
           <PreviewPlayer job={job} avatarPreviewUrl={previewUrl} connectionError={connectionError} />
-          <PipelineSteps job={job} />
+          <PipelineSteps
+            job={job}
+            enhance={job ? job.enhance : enhance && Boolean(health?.enhancer.ready)}
+            animator={(job ? health?.engines.find((e) => e.name === job.engine) : engine)?.label}
+          />
           <EngineInfo backend={backend} />
         </section>
       </main>

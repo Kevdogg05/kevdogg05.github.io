@@ -22,3 +22,15 @@ export function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+/** Rough render time for `videoSeconds` of output, e.g. "~25 s" or "~1 h 5 min". */
+export function formatEstimate(
+  cost: { fixed_seconds: number; seconds_per_second: number },
+  videoSeconds: number,
+): string {
+  const total = cost.fixed_seconds + cost.seconds_per_second * videoSeconds;
+  if (total < 60) return `~${Math.max(5, Math.round(total / 5) * 5)} s`;
+  const minutes = Math.round(total / 60);
+  if (minutes < 60) return `~${minutes} min`;
+  return `~${Math.floor(minutes / 60)} h ${minutes % 60} min`;
+}

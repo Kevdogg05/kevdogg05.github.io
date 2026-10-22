@@ -1,14 +1,17 @@
-import { AudioLines, Check, FileText, Film, LoaderCircle, ScanFace, X, type LucideIcon } from "lucide-react";
+import {
+  AudioLines,
+  Check,
+  FileText,
+  Film,
+  LoaderCircle,
+  ScanFace,
+  Sparkles,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import type { Job, JobStage } from "@/lib/api";
 
-const STEPS: { stage: JobStage; label: string; icon: LucideIcon }[] = [
-  { stage: "script", label: "Script", icon: FileText },
-  { stage: "audio", label: "Voice", icon: AudioLines },
-  { stage: "lipsync", label: "Lip-sync", icon: ScanFace },
-  { stage: "encode", label: "Video file", icon: Film },
-];
-
-const ORDER: JobStage[] = ["queued", "script", "audio", "lipsync", "encode", "done"];
+const ORDER: JobStage[] = ["queued", "script", "audio", "lipsync", "enhance", "encode", "done"];
 
 type StepState = "pending" | "active" | "done" | "failed";
 
@@ -28,10 +31,28 @@ const STYLES: Record<StepState, string> = {
   failed: "border-red-500/40 bg-red-500/10 text-red-200",
 };
 
-export function PipelineSteps({ job }: { job: Job | null }) {
+interface PipelineStepsProps {
+  job: Job | null;
+  /** Whether the face-enhancement step is part of this run. */
+  enhance: boolean;
+  /** Name of the animation engine, shown on the lip-sync step. */
+  animator?: string;
+}
+
+export function PipelineSteps({ job, enhance, animator }: PipelineStepsProps) {
+  const steps: { stage: JobStage; label: string; icon: LucideIcon }[] = [
+    { stage: "script", label: "Script", icon: FileText },
+    { stage: "audio", label: "Voice", icon: AudioLines },
+    { stage: "lipsync", label: animator ?? "Lip-sync", icon: ScanFace },
+    ...(enhance ? [{ stage: "enhance" as const, label: "Enhance", icon: Sparkles }] : []),
+    { stage: "encode", label: "Video file", icon: Film },
+  ];
   return (
-    <ol className="grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Generation pipeline">
-      {STEPS.map(({ stage, label, icon: Icon }, i) => {
+    <ol
+      className={`grid grid-cols-2 gap-2 ${enhance ? "sm:grid-cols-5" : "sm:grid-cols-4"}`}
+      aria-label="Generation pipeline"
+    >
+      {steps.map(({ stage, label, icon: Icon }, i) => {
         const state = stepState(stage, job);
         return (
           <li

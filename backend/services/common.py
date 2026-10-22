@@ -23,3 +23,21 @@ class ProviderUnavailableError(PipelineError):
 class ProviderStatus:
     ready: bool
     detail: str
+
+
+@dataclass(frozen=True)
+class RenderOptions:
+    """Per-job choices that engines may honour."""
+
+    head_motion: bool = False  # only engines with supports_head_motion use it
+
+
+@dataclass(frozen=True)
+class CostEstimate:
+    """Rough CPU render time: a fixed cost plus seconds per second of video.
+
+    Measured on a 4-core x86 CPU without a GPU; a CUDA GPU is far faster.
+    """
+
+    fixed_seconds: float
+    seconds_per_second: float

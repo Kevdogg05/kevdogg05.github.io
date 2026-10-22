@@ -85,16 +85,22 @@ class Settings:
     elevenlabs_api_key: str = ""
     elevenlabs_model: str = "eleven_multilingual_v2"
 
-    # Lip-sync / rendering: placeholder | wav2lip | sadtalker
+    # Default lip-sync engine (each job may pick another): placeholder | wav2lip | sadtalker
     lipsync_engine: str = "placeholder"
     # scripts/setup_wav2lip.sh installs a patched checkout here.
     wav2lip_dir: Path | None = BACKEND_DIR / "engines" / "Wav2Lip"
     wav2lip_checkpoint: Path | None = None
     wav2lip_python: str = sys.executable
     wav2lip_batch_size: int = 32
-    sadtalker_dir: Path | None = None
+    # scripts/setup_sadtalker.sh installs a patched checkout here.
+    sadtalker_dir: Path | None = BACKEND_DIR / "engines" / "SadTalker"
     sadtalker_python: str = sys.executable
-    sadtalker_extra_args: str = "--still --preprocess full"
+    sadtalker_batch_size: int = 2  # larger batches were slower per frame on CPU
+    sadtalker_extra_args: str = ""
+
+    # Face enhancement (GFPGAN v1.4), scripts/setup_gfpgan.sh
+    face_weights_dir: Path = BACKEND_DIR / "engines" / "gfpgan" / "weights"
+    enhancer_python: str = sys.executable
     engine_timeout_seconds: int = 1800
 
     ffmpeg_path: str = ""
@@ -134,9 +140,12 @@ def load_settings() -> Settings:
         wav2lip_checkpoint=_env_path("OAS_WAV2LIP_CHECKPOINT"),
         wav2lip_python=_env("OAS_WAV2LIP_PYTHON", defaults.wav2lip_python),
         wav2lip_batch_size=_env_int("OAS_WAV2LIP_BATCH_SIZE", defaults.wav2lip_batch_size),
-        sadtalker_dir=_env_path("OAS_SADTALKER_DIR"),
+        sadtalker_dir=_env_path("OAS_SADTALKER_DIR", defaults.sadtalker_dir),
         sadtalker_python=_env("OAS_SADTALKER_PYTHON", defaults.sadtalker_python),
+        sadtalker_batch_size=_env_int("OAS_SADTALKER_BATCH_SIZE", defaults.sadtalker_batch_size),
         sadtalker_extra_args=_env("OAS_SADTALKER_EXTRA_ARGS", defaults.sadtalker_extra_args),
+        face_weights_dir=_env_path("OAS_FACE_WEIGHTS_DIR", defaults.face_weights_dir),
+        enhancer_python=_env("OAS_ENHANCER_PYTHON", defaults.enhancer_python),
         engine_timeout_seconds=_env_int("OAS_ENGINE_TIMEOUT_SECONDS", defaults.engine_timeout_seconds),
         ffmpeg_path=_env("OAS_FFMPEG_PATH"),
     )

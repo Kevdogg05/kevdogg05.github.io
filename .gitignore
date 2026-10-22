@@ -3,6 +3,8 @@ backend/.venv/
 backend/.env
 backend/storage/
 backend/engines/Wav2Lip/
+backend/engines/SadTalker/
+backend/engines/gfpgan/
 __pycache__/
 *.py[cod]
 .pytest_cache/

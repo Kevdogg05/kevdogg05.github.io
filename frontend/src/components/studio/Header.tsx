@@ -60,13 +60,23 @@ function BackendStatus({ backend, onRetry }: HeaderProps) {
       </button>
     );
   }
-  const { tts, lipsync } = backend.health;
+  const { tts, device } = backend.health;
   return (
     <div className="flex items-center gap-2">
       <StatusPill tone="green" label="Backend online" />
       <span className="hidden items-center gap-1.5 lg:flex">
         <EngineChip label="Voice" component={tts} />
-        <EngineChip label="Lip-sync" component={lipsync} />
+        <EngineChip
+          label="Device"
+          component={{
+            name: device === "cuda" ? "GPU" : device === "cpu" ? "CPU" : "detecting…",
+            ready: device !== "unknown",
+            detail:
+              device === "cpu"
+                ? "No GPU found: SadTalker and face enhancement take minutes per video"
+                : "PyTorch is using an NVIDIA GPU",
+          }}
+        />
       </span>
     </div>
   );

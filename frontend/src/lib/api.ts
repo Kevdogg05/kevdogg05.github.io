@@ -1,7 +1,7 @@
 // Typed client for the OpenAvatarStudio FastAPI backend.
 
 export type JobStatus = "queued" | "running" | "completed" | "failed";
-export type JobStage = "queued" | "script" | "audio" | "lipsync" | "encode" | "done";
+export type JobStage = "queued" | "script" | "audio" | "lipsync" | "enhance" | "encode" | "done";
 
 export interface ComponentStatus {
   name: string;
@@ -9,11 +9,33 @@ export interface ComponentStatus {
   detail: string;
 }
 
+/** Rough render time: fixed seconds plus seconds per second of video. */
+export interface CostEstimate {
+  fixed_seconds: number;
+  seconds_per_second: number;
+}
+
+export interface EngineInfo extends ComponentStatus {
+  label: string;
+  summary: string;
+  supports_head_motion: boolean;
+  /** Only reported when the backend runs on CPU. */
+  cpu_estimate: CostEstimate | null;
+}
+
+export interface EnhancerInfo extends ComponentStatus {
+  cpu_estimate: CostEstimate | null;
+}
+
 export interface Health {
   status: string;
   version: string;
+  device: "cpu" | "cuda" | "unknown";
   tts: ComponentStatus;
+  /** The default lip-sync engine. */
   lipsync: ComponentStatus;
+  engines: EngineInfo[];
+  enhancer: EnhancerInfo;
   ffmpeg: ComponentStatus;
 }
 
@@ -37,6 +59,9 @@ export interface UploadedAvatar {
 
 export interface Job {
   job_id: string;
+  engine: string;
+  enhance: boolean;
+  head_motion: boolean;
   status: JobStatus;
   stage: JobStage;
   progress: number;
@@ -53,6 +78,9 @@ export interface GenerateRequest {
   script: string;
   voice_id: string;
   avatar_id: string;
+  engine: string;
+  enhance: boolean;
+  head_motion: boolean;
 }
 
 /**

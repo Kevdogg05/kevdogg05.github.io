@@ -18,18 +18,22 @@ from config import Settings, load_settings
 from schemas import (
     AvatarUploadResponse,
     ComponentStatus,
+    CostEstimateOut,
+    EngineOut,
+    EnhancerOut,
     GenerateRequest,
     HealthResponse,
     JobResponse,
     VoiceOut,
     VoicesResponse,
 )
-from services import media
+from services import hardware, media
 from services.audio import create_tts_provider
-from services.common import PipelineError
+from services.common import CostEstimate, PipelineError
+from services.enhance import FaceEnhancer
 from services.pipeline import Job, JobStore, Pipeline
 from services.storage import AvatarStore, UploadRejected
-from services.video import create_lipsync_engine
+from services.video import create_lipsync_engines
 
 VERSION = "0.1.0"
 MEDIA_PREFIX = "/media"
@@ -43,15 +47,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings.jobs_dir.mkdir(parents=True, exist_ok=True)
 
     tts = create_tts_provider(settings)
-    engine = create_lipsync_engine(settings)
+    engines = create_lipsync_engines(settings)
+    enhancer = FaceEnhancer(settings)
     avatars = AvatarStore(settings.avatars_dir, settings.max_upload_bytes)
     jobs = JobStore()
-    pipeline = Pipeline(settings, tts, engine, jobs)
+    pipeline = Pipeline(settings, tts, engines, enhancer, jobs)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
-        # Load the voice model in the background so the first job doesn't pay for it.
+        # Load the voice model and probe for a GPU in the background so neither
+        # the first job nor the first health check has to wait for them.
         threading.Thread(target=tts.warm_up, name="oas-tts-warmup", daemon=True).start()
+        threading.Thread(target=hardware.detect_device, name="oas-device", daemon=True).start()
         yield
         pipeline.shutdown()
 
@@ -74,6 +81,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def job_response(job: Job) -> JobResponse:
         return JobResponse(
             job_id=job.id,
+            engine=job.engine,
+            enhance=job.enhance,
+            head_motion=job.head_motion,
             status=job.status,
             stage=job.stage,
             progress=job.progress,
@@ -89,14 +99,44 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/health", response_model=HealthResponse)
     def health() -> HealthResponse:
         tts_status = tts.status()
-        engine_status = engine.status()
         ffmpeg = media.resolve_ffmpeg(settings.ffmpeg_path)
+        device = hardware.current_device()
+
+        def estimate(cost: CostEstimate) -> CostEstimateOut | None:
+            if device != "cpu":
+                return None
+            return CostEstimateOut(
+                fixed_seconds=cost.fixed_seconds, seconds_per_second=cost.seconds_per_second
+            )
+
+        engine_list = []
+        for engine in engines.values():
+            engine_status = engine.status()
+            engine_list.append(
+                EngineOut(
+                    name=engine.name,
+                    ready=engine_status.ready,
+                    detail=engine_status.detail,
+                    label=engine.label,
+                    summary=engine.summary,
+                    supports_head_motion=engine.supports_head_motion,
+                    cpu_estimate=estimate(engine.cpu_cost),
+                )
+            )
+        default = next(e for e in engine_list if e.name == settings.lipsync_engine)
+        enhancer_status = enhancer.status()
         return HealthResponse(
             status="ok",
             version=VERSION,
+            device=device,
             tts=ComponentStatus(name=tts.name, ready=tts_status.ready, detail=tts_status.detail),
-            lipsync=ComponentStatus(
-                name=engine.name, ready=engine_status.ready, detail=engine_status.detail
+            lipsync=ComponentStatus(name=default.name, ready=default.ready, detail=default.detail),
+            engines=engine_list,
+            enhancer=EnhancerOut(
+                name=enhancer.name,
+                ready=enhancer_status.ready,
+                detail=enhancer_status.detail,
+                cpu_estimate=estimate(enhancer.cpu_cost),
             ),
             ffmpeg=ComponentStatus(
                 name="ffmpeg", ready=ffmpeg is not None, detail=ffmpeg or "not found"
@@ -144,7 +184,31 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         avatar_path = avatars.find(body.avatar_id)
         if avatar_path is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Avatar not found; upload it again")
-        job = pipeline.submit(body.script, body.voice_id, body.avatar_id, avatar_path)
+        engine_name = body.engine or settings.lipsync_engine
+        engine = engines.get(engine_name)
+        if engine is None:
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_CONTENT,
+                f"Unknown engine '{engine_name}'. Choose one of: {', '.join(engines)}",
+            )
+        # Refuse up front rather than queueing a job that is bound to fail.
+        for label, component_status in [
+            (engine.label, engine.status()),
+            *([("Face enhancement", enhancer.status())] if body.enhance else []),
+        ]:
+            if not component_status.ready:
+                raise HTTPException(
+                    status.HTTP_409_CONFLICT, f"{label} is not ready: {component_status.detail}"
+                )
+        job = pipeline.submit(
+            body.script,
+            body.voice_id,
+            body.avatar_id,
+            avatar_path,
+            engine=engine_name,
+            enhance=body.enhance,
+            head_motion=body.head_motion,
+        )
         return job_response(job)
 
     @app.get("/api/jobs/{job_id}", response_model=JobResponse)
