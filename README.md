@@ -6,7 +6,9 @@ own machine. No HeyGen services or accounts are involved.
 
 > This repository also hosts the static GitHub Pages site (`brain-gate-quest/`,
 > `sewcraft-3d/`). OpenAvatarStudio lives in `frontend/` and `backend/` and runs
-> locally; GitHub Pages does not serve it.
+> locally; GitHub Pages does not serve it. Its project page, with screenshots,
+> setup steps and a QR code, is `open-avatar-studio/`:
+> https://kevdogg05.github.io/open-avatar-studio/
 
 ## Status
 
