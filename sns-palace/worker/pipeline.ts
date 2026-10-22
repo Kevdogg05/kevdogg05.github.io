@@ -150,7 +150,7 @@ export async function processVideo(claimed: VideoRecord, deps: PipelineDeps): Pr
       const thumbFile = path.join(work, "thumbnail.jpg");
       const previewFile = path.join(work, "preview.mp4");
       await run(config.ffmpeg, thumbnailArgs(rawFile, thumbFile, info), { signal });
-      await run(config.ffmpeg, previewArgs(rawFile, previewFile, info), { signal });
+      await run(config.ffmpeg, previewArgs(rawFile, previewFile, info, { threads: config.threads }), { signal });
       const [thumb, preview] = await Promise.all([
         upload(thumbFile, "thumbnail", "jpg", "image/jpeg"),
         upload(previewFile, "preview", "mp4", "video/mp4"),
@@ -229,6 +229,7 @@ export async function processVideo(claimed: VideoRecord, deps: PipelineDeps): Pr
           normalizeAudio: config.normalizeAudio,
           crf: config.crf,
           preset: config.preset,
+          threads: config.threads,
         }),
         { signal, cwd: work },
       );

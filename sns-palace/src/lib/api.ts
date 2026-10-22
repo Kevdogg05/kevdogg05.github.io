@@ -4,6 +4,8 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    /** Seconds to wait before trying again, from a 429's Retry-After header. */
+    readonly retryAfter: number | null = null,
   ) {
     super(message);
     this.name = "ApiError";
@@ -23,7 +25,8 @@ async function errorFrom(response: Response): Promise<ApiError> {
   } catch {
     // Not JSON; keep the generic message.
   }
-  return new ApiError(response.status, message);
+  const retryAfter = Number(response.headers.get("retry-after"));
+  return new ApiError(response.status, message, retryAfter > 0 ? retryAfter : null);
 }
 
 export async function api<T>(url: string, init: RequestInit & { json?: unknown } = {}): Promise<T> {

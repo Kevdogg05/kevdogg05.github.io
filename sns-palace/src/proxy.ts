@@ -12,8 +12,9 @@ const NOT_CONFIGURED = `<!doctype html><meta charset="utf-8"><title>SnS Palace s
 <body style="font:18px/1.5 system-ui;max-width:36rem;margin:15vh auto;padding:0 1rem">
 <h1>SnS Palace isn't set up yet</h1>
 <p>Set <code>FAMILY_PIN</code>, <code>PARENT_PIN</code> and <code>SESSION_SECRET</code> in
-<code>.env.local</code> (see <code>.env.local.example</code>), then restart the server.
-The server log lists exactly what is missing.</p></body>`;
+<code>.env.local</code> (see <code>.env.local.example</code>), or in your hosting service's
+environment settings, then restart the server. The server log lists exactly what is
+missing or invalid.</p></body>`;
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;

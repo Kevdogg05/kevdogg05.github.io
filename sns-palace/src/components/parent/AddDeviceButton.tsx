@@ -3,12 +3,15 @@
 import { Check, Copy, QrCode as QrIcon, TriangleAlert, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { QrCode } from "@/components/QrCode";
+import { addressReach, type AddressReach } from "@/lib/address";
 
-/** Addresses that only work on the computer running SnS Palace. */
-function isThisComputerOnly(url: string): boolean {
-  const host = new URL(url).hostname;
-  return host === "localhost" || host === "[::1]" || host === "0.0.0.0" || host.startsWith("127.");
-}
+const WHO_CAN_SCAN: Record<AddressReach, string> = {
+  "this-computer": "Scan with a tablet or phone on your home Wi-Fi.",
+  "home-network": "Scan with a tablet or phone on your home Wi-Fi.",
+  tailnet:
+    "Scan with a phone or tablet that has the Tailscale app, signed in to your Tailscale account. Then it works at home or away, on any Wi-Fi or mobile data.",
+  anywhere: "Scan with any phone or tablet, at home or away: any Wi-Fi or mobile data works.",
+};
 
 /**
  * Copies text. Home addresses like http://192.168.1.20:3000 aren't "secure
@@ -44,6 +47,7 @@ async function copyText(text: string, container: HTMLElement): Promise<boolean> 
 export function AddDeviceButton() {
   const dialog = useRef<HTMLDialogElement>(null);
   const [url, setUrl] = useState<string | null>(null);
+  const reach = url ? addressReach(url) : "home-network";
   const [copied, setCopied] = useState<boolean | null>(null);
 
   const open = () => {
@@ -89,15 +93,13 @@ export function AddDeviceButton() {
             <X aria-hidden className="size-5" />
           </button>
         </div>
-        <p className="mt-1 text-sm text-slate-400">
-          Scan with a tablet or phone on your home Wi-Fi. It still asks for the family PIN.
-        </p>
+        <p className="mt-1 text-sm text-slate-400">{WHO_CAN_SCAN[reach]} It still asks for the family PIN.</p>
 
         {url ? (
           <>
             <QrCode value={url} label={`QR code for ${url}`} className="mx-auto mt-5 w-full max-w-64 rounded-2xl" />
             <p className="mt-3 text-center font-mono text-sm break-all text-violet-200">{url}</p>
-            {isThisComputerOnly(url) ? (
+            {reach === "this-computer" ? (
               <p className="mt-3 flex gap-2 rounded-xl bg-amber-400/10 p-3 text-sm text-amber-200 ring-1 ring-amber-300/20">
                 <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
                 <span>
@@ -118,7 +120,7 @@ export function AddDeviceButton() {
               <span className="font-bold text-slate-300">Make it an app:</span> on the tablet, open the link, then tap{" "}
               <span className="font-bold text-slate-300">Share → Add to Home Screen</span> (iPhone, iPad) or{" "}
               <span className="font-bold text-slate-300">⋮ → Add to Home screen</span> (Android). It gets the castle icon
-              and opens without the browser bars (on Android, that needs an https:// address).
+              and opens without the browser bars{url.startsWith("https:") ? "." : " (on Android, that needs an https:// address)."}
             </p>
           </>
         ) : null}
