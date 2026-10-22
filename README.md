@@ -9,6 +9,10 @@ own machine. No HeyGen services or accounts are involved.
 > locally; GitHub Pages does not serve it. Its project page, with screenshots,
 > setup steps and a QR code, is `open-avatar-studio/`:
 > https://kevdogg05.github.io/open-avatar-studio/
+>
+> **StarReel**, a private family video studio (kids upload, an automatic editor
+> trims and captions, parents approve), lives in `starreel/` and also runs
+> locally. See [starreel/README.md](starreel/README.md).
 
 ## Status
 
