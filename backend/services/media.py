@@ -12,6 +12,7 @@ from pathlib import Path
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from services.common import PipelineError, ProgressCallback
+from services.external import Supervisor
 
 logger = logging.getLogger(__name__)
 
@@ -88,13 +89,16 @@ def run_ffmpeg(
     with tempfile.TemporaryFile(mode="w+") as stderr:
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=stderr, text=True)
         assert proc.stdout is not None
-        for line in proc.stdout:
-            if not (on_progress and expected_duration):
-                continue
-            key, _, value = line.strip().partition("=")
-            if key == "out_time_us" and value.isdigit():
-                on_progress(min(1.0, int(value) / 1_000_000 / expected_duration))
-        if proc.wait() != 0:
+        with Supervisor("ffmpeg", proc) as supervisor:
+            for line in proc.stdout:
+                if not (on_progress and expected_duration):
+                    continue
+                key, _, value = line.strip().partition("=")
+                if key == "out_time_us" and value.isdigit():
+                    on_progress(min(1.0, int(value) / 1_000_000 / expected_duration))
+            returncode = proc.wait()
+        supervisor.raise_if_stopped()
+        if returncode != 0:
             stderr.seek(0)
             detail = stderr.read().strip()[-500:] or "unknown error"
             raise PipelineError(f"ffmpeg failed: {detail}")
@@ -127,4 +131,13 @@ def to_web_mp4(
         ],
         expected_duration=expected_duration,
         on_progress=on_progress,
+    )
+
+
+def poster_frame(ffmpeg: str, video: Path, dst: Path, *, at_seconds: float = 1.0) -> None:
+    """Save one frame of `video` as a 640px-wide JPEG for the video library."""
+    run_ffmpeg(
+        ffmpeg,
+        ["-ss", f"{at_seconds:.2f}", "-i", str(video), "-frames:v", "1",
+         "-vf", "scale=640:-2", "-q:v", "4", str(dst)],
     )

@@ -21,7 +21,7 @@ function stepState(step: JobStage, job: Job | null): StepState {
   const index = ORDER.indexOf(step);
   if (index < current || job.stage === "done") return "done";
   if (index > current) return "pending";
-  return job.status === "failed" ? "failed" : "active";
+  return job.status === "failed" || job.status === "cancelled" ? "failed" : "active";
 }
 
 const STYLES: Record<StepState, string> = {

@@ -1,6 +1,6 @@
 // Typed client for the OpenAvatarStudio FastAPI backend.
 
-export type JobStatus = "queued" | "running" | "completed" | "failed";
+export type JobStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
 export type JobStage = "queued" | "script" | "audio" | "lipsync" | "enhance" | "encode" | "done";
 
 export interface ComponentStatus {
@@ -59,6 +59,8 @@ export interface UploadedAvatar {
 
 export interface Job {
   job_id: string;
+  script: string;
+  voice_id: string;
   engine: string;
   enhance: boolean;
   head_motion: boolean;
@@ -67,11 +69,33 @@ export interface Job {
   progress: number;
   message: string;
   error: string | null;
+  /** 1 = next to start; only set while queued. */
+  queue_position: number | null;
+  avatar_url: string | null;
   audio_url: string | null;
   video_url: string | null;
+  poster_url: string | null;
   duration_seconds: number | null;
+  /** Time spent rendering so far (or in total, once finished). */
+  render_seconds: number | null;
+  size_bytes: number;
   created_at: string;
   updated_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+}
+
+export interface JobList {
+  jobs: Job[];
+  total: number;
+  /** Queued + running jobs. */
+  active: number;
+  storage_bytes: number;
+  server_time: string;
+}
+
+export function isActive(job: Job): boolean {
+  return job.status === "queued" || job.status === "running";
 }
 
 export interface GenerateRequest {
@@ -112,6 +136,11 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await send(path, init);
+  return (await response.json()) as T;
+}
+
+async function send(path: string, init?: RequestInit): Promise<Response> {
   let response: Response;
   try {
     response = await fetch(`${apiBase()}${path}`, init);
@@ -121,7 +150,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (!response.ok) {
     throw new ApiError(await errorMessage(response), response.status);
   }
-  return (await response.json()) as T;
+  return response;
 }
 
 async function errorMessage(response: Response): Promise<string> {
@@ -157,4 +186,16 @@ export const api = {
     }),
 
   job: (jobId: string) => request<Job>(`/api/jobs/${encodeURIComponent(jobId)}`),
+
+  jobs: (limit = 60) => request<JobList>(`/api/jobs?limit=${limit}`),
+
+  cancelJob: (jobId: string) =>
+    request<Job>(`/api/jobs/${encodeURIComponent(jobId)}/cancel`, { method: "POST" }),
+
+  retryJob: (jobId: string) =>
+    request<Job>(`/api/jobs/${encodeURIComponent(jobId)}/retry`, { method: "POST" }),
+
+  deleteJob: async (jobId: string) => {
+    await send(`/api/jobs/${encodeURIComponent(jobId)}`, { method: "DELETE" });
+  },
 };

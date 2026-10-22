@@ -16,6 +16,7 @@ own machine. No HeyGen services or accounts are involved.
 | 2 | FastAPI backend: avatar upload, `/api/generate` pipeline (Script → Audio → Lip-Sync → Video), job progress, pluggable voice and lip-sync engines | Done |
 | 3 | Real engines: Coqui TTS (VITS, 109 voices) and Wav2Lip lip-sync, one-command setup scripts, live per-batch render progress | Done |
 | 4 | Realistic avatars: SadTalker (blinks, expressions, head motion) and GFPGAN face enhancement, chosen per video in the dashboard with render-time estimates | Done |
+| 5 | Video library: SQLite-backed jobs that survive restarts, a gallery with replay/download/retry/delete, a queue you can add to while rendering, cancel (kills the engine), automatic cleanup | Done |
 
 Out of the box the pipeline runs with **placeholder engines**, so the whole
 flow works end to end without GPUs or model downloads:
@@ -43,12 +44,14 @@ backend/scripts/setup_gfpgan.sh      # GFPGAN face enhancement (optional)
    │
    │  POST /api/avatars/upload   portrait PNG/JPG       → avatar_id
    │  POST /api/generate         script, voice, avatar, engine, options → job (202)
-   │  GET  /api/jobs/{id}        polled every 600 ms    → stage + progress %
+   │  GET  /api/jobs             the library, polled every 1 s while anything renders
+   │  POST /api/jobs/{id}/cancel | /retry,  DELETE /api/jobs/{id}
    │  GET  /media/jobs/{id}/video.mp4
    ▼
  FastAPI (backend/, :8000)
    main.py ─ routes, CORS, static /media
-   services/pipeline.py ─ job store + worker pool, runs each job through:
+   services/jobs.py ─ SQLite job store (storage/oas.db)
+   services/pipeline.py ─ worker pool and queue, runs each job through:
      1. Script    normalise text; fix photo orientation, fit to 1280×720
      2. Audio     services/audio.py    placeholder | coqui | elevenlabs → audio.wav
      3. Animate   services/video.py    wav2lip | sadtalker | placeholder (chosen per job)
@@ -66,7 +69,8 @@ backend/scripts/setup_gfpgan.sh      # GFPGAN face enhancement (optional)
 │   ├── services/
 │   │   ├── audio.py        # TTS providers
 │   │   ├── video.py        # lip-sync engines
-│   │   ├── pipeline.py     # orchestration + job store
+│   │   ├── pipeline.py     # orchestration, queue, cancel/retry/delete, cleanup
+│   │   ├── jobs.py         # SQLite-backed job store
 │   │   ├── storage.py      # avatar upload validation/storage
 │   │   ├── media.py        # ffmpeg helpers
 │   │   └── common.py       # shared types and errors
@@ -129,7 +133,8 @@ Backend settings come from environment variables or `backend/.env` (copy
 | `OAS_CORS_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | Extra allowed origins (any `localhost` port is always allowed) |
 | `OAS_MAX_UPLOAD_MB` | `10` | Avatar size limit |
 | `OAS_MAX_SCRIPT_CHARS` | `5000` | Script length limit |
-| `OAS_MAX_CONCURRENT_JOBS` | `1` | Parallel renders (lip-sync models usually fill a GPU) |
+| `OAS_MAX_CONCURRENT_JOBS` | `1` | Parallel renders (lip-sync models usually fill a GPU); the rest queue |
+| `OAS_RETENTION_DAYS` | `0` | Delete finished videos, and avatar uploads no video uses, after this many days (`0` keeps everything) |
 | `OAS_FFMPEG_PATH` | auto | Explicit ffmpeg binary |
 
 The frontend talks to port 8000 on whatever host served the page. Set
@@ -263,6 +268,26 @@ instead of every frame, which halves the CPU cost for the same result.
 > commercial use. Check both, and Wav2Lip's terms, before using this
 > commercially.
 
+## Video library
+
+Every video is recorded in `backend/storage/oas.db` (SQLite), next to its files
+in `backend/storage/jobs/<id>/`, so the **Your videos** gallery survives backend
+restarts. From the gallery you can:
+
+- **Queue** several videos: Generate works while another video renders, and
+  each queued card shows its place in line. `OAS_MAX_CONCURRENT_JOBS` sets how
+  many render at once.
+- **Cancel** a queued or rendering video. A render stops within a few seconds;
+  the Wav2Lip, SadTalker or GFPGAN process is killed rather than left to finish.
+- **Replay** (click a card), **download**, **render again** with the same
+  script, voice, photo and options, or **delete** a video and its files.
+
+When the backend restarts, queued videos pick up where they were. A video that
+was rendering is marked "interrupted" (use Render again). With `uvicorn --reload`
+that includes saving a backend source file. Finished videos keep only
+`video.mp4`, `audio.wav` and a poster frame; intermediate engine files are
+deleted. Set `OAS_RETENTION_DAYS` to delete old videos automatically.
+
 ## API
 
 | Method | Path | Description |
@@ -271,7 +296,11 @@ instead of every frame, which halves the CPU cost for the same result.
 | `GET` | `/api/voices` | Voices offered by the active provider |
 | `POST` | `/api/avatars/upload` | Multipart `file` (PNG/JPEG, checked by content). Returns `avatar_id` and `url` |
 | `POST` | `/api/generate` | `{script, voice_id, avatar_id, engine?, enhance?, head_motion?}` → `202` with a job; `409` if the engine or enhancer isn't installed |
-| `GET` | `/api/jobs/{job_id}` | `status`, `stage`, `progress` (0–100), `message`, `error`, `video_url`, `audio_url` |
+| `GET` | `/api/jobs?limit&offset` | The library, newest first, with `total`, `active` (queued + running) and `storage_bytes` |
+| `GET` | `/api/jobs/{job_id}` | `status` (queued/running/completed/failed/cancelled), `stage`, `progress`, `message`, `error`, `queue_position`, `video_url`, `poster_url`, `render_seconds`, … |
+| `POST` | `/api/jobs/{job_id}/cancel` | Cancel a queued or running job (`409` once finished) |
+| `POST` | `/api/jobs/{job_id}/retry` | Queue a new job with the same settings → `202` |
+| `DELETE` | `/api/jobs/{job_id}` | Delete a finished job and its files → `204` (`409` while active) |
 | `GET` | `/media/...` | Uploaded avatars and rendered audio/video (supports HTTP range requests) |
 
 ## Development
@@ -290,9 +319,11 @@ cd frontend && npm run lint && npx tsc --noEmit && npm run build
 
 ## Known limitations
 
-- Jobs live in memory, so restarting the backend forgets in-flight and past jobs
-  (their files stay in `backend/storage/jobs/`). Use Redis and a task queue before
-  running more than one backend process.
+- One backend process owns the queue (SQLite plus in-process workers). Running
+  several API processes against the same storage would need a shared task queue
+  (e.g. Redis with RQ or Celery).
+- A video that is mid-render when the backend restarts is not resumed; it is
+  marked interrupted, and Render again starts it over.
 - The placeholder engines produce no real speech and no mouth movement; run the
   setup scripts for real ones.
 - Wav2Lip animates the mouth only: the head, eyes and expression stay still.

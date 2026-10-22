@@ -34,3 +34,18 @@ export function formatEstimate(
   if (minutes < 60) return `~${minutes} min`;
   return `~${Math.floor(minutes / 60)} h ${minutes % 60} min`;
 }
+
+/** "just now", "5 min ago", "yesterday"… relative to `reference` (an ISO time). */
+export function formatRelative(iso: string, reference: string): string {
+  const seconds = (Date.parse(iso) - Date.parse(reference)) / 1000;
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+  ];
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto", style: "short" });
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) return rtf.format(Math.round(seconds / size), unit);
+  }
+  return "just now";
+}

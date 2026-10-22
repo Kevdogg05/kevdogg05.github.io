@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from services.pipeline import JobStatus, Stage
+from services.jobs import JobStatus, Stage
 
 
 class ComponentStatus(BaseModel):
@@ -72,6 +72,8 @@ class GenerateRequest(BaseModel):
 
 class JobResponse(BaseModel):
     job_id: str
+    script: str
+    voice_id: str
     engine: str
     enhance: bool
     head_motion: bool
@@ -80,8 +82,23 @@ class JobResponse(BaseModel):
     progress: int = Field(ge=0, le=100)
     message: str
     error: str | None
+    queue_position: int | None  # 1 = next to start; only for queued jobs
+    avatar_url: str | None
     audio_url: str | None
     video_url: str | None
+    poster_url: str | None
     duration_seconds: float | None
+    render_seconds: float | None  # time spent rendering so far, or in total
+    size_bytes: int
     created_at: datetime
     updated_at: datetime
+    started_at: datetime | None
+    finished_at: datetime | None
+
+
+class JobListResponse(BaseModel):
+    jobs: list[JobResponse]
+    total: int
+    active: int  # queued + running
+    storage_bytes: int
+    server_time: datetime  # for "5 min ago" labels without trusting the client clock

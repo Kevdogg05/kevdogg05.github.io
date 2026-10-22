@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 import uuid
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import UploadFile
@@ -69,3 +70,12 @@ class AvatarStore:
             if path.exists():
                 return path
         return None
+
+    def delete_unused(self, in_use: set[str], *, older_than: datetime) -> None:
+        """Remove uploads that no job references and that predate `older_than`."""
+        for path in self._dir.iterdir():
+            if path.stem in in_use or path.suffix not in _SIGNATURES:
+                continue
+            modified = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc)
+            if modified < older_than:
+                path.unlink(missing_ok=True)

@@ -13,6 +13,6 @@ than port 8000 on the same host.
 
 | Path | What it holds |
 | --- | --- |
-| `src/components/studio/` | Dashboard UI: script editor, voice selector, avatar uploader, preview player, pipeline steps, control bar |
-| `src/hooks/` | `useBackend` (health + voices), `useAvatarUpload`, `useGenerationJob` (polling) |
+| `src/components/studio/` | Dashboard UI: script editor, voice selector, avatar uploader, animation options, preview player, pipeline steps, video library, control bar |
+| `src/hooks/` | `useBackend` (health + voices), `useAvatarUpload`, `useLibrary` (the video library, polled while anything renders) |
 | `src/lib/api.ts` | Typed client for the FastAPI backend |

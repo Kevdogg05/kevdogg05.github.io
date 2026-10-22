@@ -63,6 +63,8 @@ class Settings:
     max_upload_mb: int = 10
     max_script_chars: int = 5000
     max_concurrent_jobs: int = 1
+    # Delete finished videos (and unused avatar uploads) older than this; 0 keeps everything.
+    retention_days: int = 0
 
     # Voice generation: placeholder | coqui | elevenlabs
     tts_provider: str = "placeholder"
@@ -117,6 +119,10 @@ class Settings:
     def jobs_dir(self) -> Path:
         return self.storage_dir / "jobs"
 
+    @property
+    def database_path(self) -> Path:
+        return self.storage_dir / "oas.db"
+
 
 def load_settings() -> Settings:
     defaults = Settings()
@@ -127,6 +133,7 @@ def load_settings() -> Settings:
         max_upload_mb=_env_int("OAS_MAX_UPLOAD_MB", defaults.max_upload_mb),
         max_script_chars=_env_int("OAS_MAX_SCRIPT_CHARS", defaults.max_script_chars),
         max_concurrent_jobs=max(1, _env_int("OAS_MAX_CONCURRENT_JOBS", defaults.max_concurrent_jobs)),
+        retention_days=max(0, _env_int("OAS_RETENTION_DAYS", defaults.retention_days)),
         tts_provider=_env("OAS_TTS_PROVIDER", defaults.tts_provider).lower(),
         coqui_model=_env("OAS_COQUI_MODEL", defaults.coqui_model),
         coqui_speakers=_env_list("OAS_COQUI_SPEAKERS", defaults.coqui_speakers),

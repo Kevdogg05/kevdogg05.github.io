@@ -1,4 +1,4 @@
-import { Clapperboard, Download, LoaderCircle, TriangleAlert, Video } from "lucide-react";
+import { Ban, Clapperboard, Download, LoaderCircle, RotateCcw, TriangleAlert, Video } from "lucide-react";
 import { Panel } from "./Panel";
 import { mediaUrl, type Job } from "@/lib/api";
 import { formatDuration } from "@/lib/format";
@@ -7,10 +7,13 @@ interface PreviewPlayerProps {
   job: Job | null;
   avatarPreviewUrl: string | null;
   connectionError: string | null;
+  onRetry: (job: Job) => void;
 }
 
-export function PreviewPlayer({ job, avatarPreviewUrl, connectionError }: PreviewPlayerProps) {
+export function PreviewPlayer({ job, avatarPreviewUrl, connectionError, onRetry }: PreviewPlayerProps) {
   const videoUrl = job?.status === "completed" && job.video_url ? mediaUrl(job.video_url) : null;
+  // A library video shows its own avatar; a fresh draft shows the one being uploaded.
+  const backdropUrl = job?.avatar_url ? mediaUrl(job.avatar_url) : avatarPreviewUrl;
 
   return (
     <Panel
@@ -45,13 +48,15 @@ export function PreviewPlayer({ job, avatarPreviewUrl, connectionError }: Previe
           />
         ) : (
           <>
-            {avatarPreviewUrl && <AvatarBackdrop url={avatarPreviewUrl} dimmed={Boolean(job)} />}
+            {backdropUrl && <AvatarBackdrop url={backdropUrl} dimmed={Boolean(job)} />}
             <div className="absolute inset-0 grid place-items-center p-6">
-              {job && (job.status === "queued" || job.status === "running") ? (
+              {job?.status === "queued" ? (
+                <Queued job={job} />
+              ) : job?.status === "running" ? (
                 <Processing job={job} connectionError={connectionError} />
-              ) : job?.status === "failed" ? (
-                <Failed error={job.error} />
-              ) : avatarPreviewUrl ? (
+              ) : job?.status === "failed" || job?.status === "cancelled" ? (
+                <Stopped job={job} onRetry={() => onRetry(job)} />
+              ) : backdropUrl ? (
                 <span className="absolute bottom-3 left-3 rounded-md bg-black/60 px-2 py-1 text-xs text-zinc-300 backdrop-blur">
                   Avatar preview · ready to generate
                 </span>
@@ -101,12 +106,38 @@ function Processing({ job, connectionError }: { job: Job; connectionError: strin
   );
 }
 
-function Failed({ error }: { error: string | null }) {
+function Queued({ job }: { job: Job }) {
+  const ahead = Math.max(0, (job.queue_position ?? 1) - 1);
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-xl bg-black/50 p-5 text-center backdrop-blur" role="status">
+      <LoaderCircle className="size-8 text-zinc-400" strokeWidth={1.5} aria-hidden />
+      <p className="text-sm font-semibold text-white">Waiting in the queue</p>
+      <p className="text-xs text-zinc-300">
+        {ahead === 0 ? "Starts as soon as the current video finishes." : `${ahead} ${ahead === 1 ? "video" : "videos"} ahead of this one.`}
+      </p>
+    </div>
+  );
+}
+
+function Stopped({ job, onRetry }: { job: Job; onRetry: () => void }) {
+  const cancelled = job.status === "cancelled";
   return (
     <div className="flex max-w-md flex-col items-center gap-2 rounded-xl bg-black/50 p-5 text-center backdrop-blur">
-      <TriangleAlert className="size-8 text-red-400" aria-hidden />
-      <p className="text-sm font-semibold text-white">Generation failed</p>
-      <p className="text-xs leading-relaxed text-red-200/90">{error ?? "Unknown error"}</p>
+      {cancelled ? (
+        <Ban className="size-8 text-zinc-400" aria-hidden />
+      ) : (
+        <TriangleAlert className="size-8 text-red-400" aria-hidden />
+      )}
+      <p className="text-sm font-semibold text-white">{cancelled ? "Cancelled" : "Generation failed"}</p>
+      {!cancelled && <p className="text-xs leading-relaxed text-red-200/90">{job.error ?? "Unknown error"}</p>}
+      <button
+        type="button"
+        onClick={onRetry}
+        className="mt-1 flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-1.5 text-xs font-medium text-zinc-100 transition hover:bg-white/10"
+      >
+        <RotateCcw className="size-3.5" aria-hidden />
+        Render again
+      </button>
     </div>
   );
 }

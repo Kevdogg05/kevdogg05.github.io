@@ -9,13 +9,60 @@ import shlex
 import shutil
 import subprocess
 import threading
+import time
 from collections import deque
 from collections.abc import Callable
 from pathlib import Path
 
-from services.common import PipelineError, ProviderUnavailableError
+from services.common import JobCancelled, PipelineError, ProviderUnavailableError, current_cancel
 
 logger = logging.getLogger(__name__)
+
+
+class Supervisor:
+    """Kills a subprocess when it times out or the current job is cancelled.
+
+    Use as a context manager around the code that waits for the process, then
+    call raise_if_stopped() once it has exited.
+    """
+
+    def __init__(self, name: str, proc: subprocess.Popen, timeout: float | None = None):
+        self._name = name
+        self._proc = proc
+        self._timeout = timeout
+        self._deadline = time.monotonic() + timeout if timeout else None
+        self._cancel = current_cancel.get()
+        self._done = threading.Event()
+        self.cancelled = self.timed_out = False
+        self._thread = threading.Thread(target=self._watch, name=f"oas-watch-{name}", daemon=True)
+
+    def __enter__(self) -> Supervisor:
+        self._thread.start()
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self._done.set()
+        self._thread.join()
+        if self._proc.poll() is None:
+            self._proc.kill()
+            self._proc.wait()
+
+    def _watch(self) -> None:
+        while not self._done.wait(0.2):
+            if self._cancel is not None and self._cancel.is_set():
+                self.cancelled = True
+            elif self._deadline is not None and time.monotonic() > self._deadline:
+                self.timed_out = True
+            else:
+                continue
+            self._proc.kill()
+            return
+
+    def raise_if_stopped(self) -> None:
+        if self.cancelled:
+            raise JobCancelled()
+        if self.timed_out:
+            raise PipelineError(f"{self._name} timed out after {self._timeout:.0f}s")
 
 
 def run_engine(
@@ -43,17 +90,9 @@ def run_engine(
     except FileNotFoundError as exc:
         raise ProviderUnavailableError(f"{name}: could not start {cmd[0]!r}") from exc
 
-    timed_out = threading.Event()
-
-    def kill() -> None:
-        timed_out.set()
-        proc.kill()
-
-    watchdog = threading.Timer(timeout, kill)
-    watchdog.start()
     tail: deque[str] = deque(maxlen=40)
     buffer = ""
-    try:
+    with Supervisor(name, proc, timeout) as supervisor:
         assert proc.stdout is not None
         while chunk := proc.stdout.read(256):
             buffer += chunk
@@ -65,13 +104,8 @@ def run_engine(
         if buffer.strip():
             tail.append(buffer.strip())
         returncode = proc.wait()
-    finally:
-        watchdog.cancel()
-        if proc.poll() is None:
-            proc.kill()
 
-    if timed_out.is_set():
-        raise PipelineError(f"{name} timed out after {timeout}s")
+    supervisor.raise_if_stopped()
     if returncode != 0:
         raise PipelineError(f"{name} failed (exit {returncode}): {explain_failure(tail)}")
     return list(tail)

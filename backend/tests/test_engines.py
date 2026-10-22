@@ -107,10 +107,12 @@ def test_face_enhancer_runs_after_the_engine(tmp_path: Path, monkeypatch):
     for name in ("GFPGANv1.4.pth", "detection_Resnet50_Final.pth", "parsing_parsenet.pth"):
         (weights / name).write_text("")
     fake = tmp_path / "fake_enhance.py"
+    marker = tmp_path / "enhancer-ran"
     fake.write_text(textwrap.dedent(
-        """
-        import shutil, sys
+        f"""
+        import pathlib, shutil, sys
         shutil.copyfile(sys.argv[1], sys.argv[2])
+        pathlib.Path({str(marker)!r}).write_text(sys.argv[1])
         print("progress 1/2"); print("progress 2/2")
         """
     ))
@@ -119,7 +121,10 @@ def test_face_enhancer_runs_after_the_engine(tmp_path: Path, monkeypatch):
     settings = Settings(storage_dir=tmp_path / "storage", face_weights_dir=weights)
     job = run_job(settings, monkeypatch, enhance=True)
     assert job["enhance"] is True
-    assert (settings.jobs_dir / job["job_id"] / "enhanced.mp4").exists()
+    assert marker.read_text().endswith("render.mp4")  # enhanced the engine's output
+    # Only the final outputs survive; intermediates like enhanced.mp4 are tidied away.
+    kept = {p.name for p in (settings.jobs_dir / job["job_id"]).iterdir()}
+    assert kept == {"video.mp4", "audio.wav", "poster.jpg"}
 
 
 def test_generate_rejects_unknown_or_unready_engines(tmp_path: Path):
