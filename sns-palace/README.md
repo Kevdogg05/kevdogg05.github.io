@@ -84,6 +84,24 @@ Wi-Fi and it opens the PIN pad. If you opened SnS Palace as `localhost`, the
 dialog explains that other devices need the computer's network address (such as
 `http://192.168.1.20:3000`) and the code follows whichever address you use.
 
+### Put it on the home screen
+
+SnS Palace can be installed like an app: it gets the castle icon and opens
+without the browser's address bar.
+
+- **iPhone and iPad (Safari):** open SnS Palace, tap **Share → Add to Home
+  Screen**. An app added this way keeps its own sign-in, so type the family PIN
+  once more the first time you open it from the home screen.
+- **Android (Chrome):** tap **⋮ → Add to Home screen** (or **Install app**).
+  Chrome only installs it as a full app over **https://**. On a plain
+  `http://192.168…` address you get a shortcut that opens in a Chrome tab
+  instead. To get HTTPS on your home network, put SnS Palace behind Tailscale
+  (`tailscale serve`) or a reverse proxy such as Caddy.
+
+`src/app/manifest.ts` describes the app (name, colours, icons), with the icons
+in `public/icons/` and `src/app/apple-icon.png`. Browsers fetch these without
+cookies, so they are the only files outside the PIN gate besides build assets.
+
 ## Production setup: Supabase + Cloudinary
 
 1. **Supabase**: create a project, open *SQL Editor*, paste
@@ -202,7 +220,7 @@ sns-palace/
 ├── .env.local.example         # every setting, documented
 ├── src/
 │   ├── proxy.ts               # the household PIN gate
-│   ├── app/                   # pages: / (kids), /unlock, /parent; api/* route handlers
+│   ├── app/                   # pages: / (kids), /unlock, /parent; api/* route handlers; manifest.ts
 │   ├── components/            # VideoPlayer, PinPad, kid/*, parent/*
 │   ├── hooks/usePolling.ts
 │   ├── lib/                   # shared types, API client, formatting (browser-safe)

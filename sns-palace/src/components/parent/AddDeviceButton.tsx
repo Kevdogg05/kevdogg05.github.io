@@ -114,6 +114,12 @@ export function AddDeviceButton() {
               {copied ? <Check aria-hidden className="size-4" /> : <Copy aria-hidden className="size-4" />}
               {copied === null ? "Copy link" : copied ? "Copied!" : "Couldn't copy: select the link above"}
             </button>
+            <p className="mt-4 text-xs leading-relaxed text-slate-400">
+              <span className="font-bold text-slate-300">Make it an app:</span> on the tablet, open the link, then tap{" "}
+              <span className="font-bold text-slate-300">Share → Add to Home Screen</span> (iPhone, iPad) or{" "}
+              <span className="font-bold text-slate-300">⋮ → Add to Home screen</span> (Android). It gets the castle icon
+              and opens without the browser bars (on Android, that needs an https:// address).
+            </p>
           </>
         ) : null}
       </dialog>

@@ -43,6 +43,17 @@ describe("proxy matcher", () => {
     // Only the exact upload route is excluded.
     expect(matches("/api/uploads")).toBe(true);
   });
+
+  it("lets browsers fetch the app manifest and home-screen icons without a session", () => {
+    // Browsers request these without cookies; gated, they would get the PIN pad instead.
+    for (const url of ["/manifest.webmanifest", "/apple-icon.png", "/icons/icon-192.png", "/icons/maskable-512.png"]) {
+      expect(matches(url), url).toBe(false);
+    }
+    // Videos, thumbnails and pages stay behind the gate.
+    for (const url of ["/api/media/x/thumbnail", "/parent", "/iconsole", "/manifest.json"]) {
+      expect(matches(url), url).toBe(true);
+    }
+  });
 });
 
 describe("proxy", () => {
