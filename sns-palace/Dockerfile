@@ -1,9 +1,11 @@
 # SnS Palace in one container: the web app and the editing worker, with
 # ffmpeg and on-device speech recognition (faster-whisper).
 #
+# At home with Tailscale, compose.yaml builds and runs it: docker compose up -d --build
+# On its own:
 #   docker build -t sns-palace .
 #   docker run -d --restart unless-stopped -p 3000:3000 -v sns-palace-data:/data \
-#     -e FAMILY_PIN=... -e PARENT_PIN=... -e SESSION_SECRET=... sns-palace
+#     -e FAMILY_PIN=... -e PARENT_PIN=... sns-palace
 #
 # Everything SnS Palace keeps (the database, the videos and the downloaded
 # speech model) lives in /data, so put a persistent disk there. See
@@ -49,6 +51,8 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/src ./src
 COPY --from=build /app/worker ./worker
 COPY docker ./docker
+# A copy checked out on Windows can have CRLF line endings, which break scripts.
+RUN sed -i 's/\r$//' docker/*.sh && chmod +x docker/*.sh
 
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \

@@ -8,6 +8,8 @@ import { addressReach, type AddressReach } from "@/lib/address";
 const WHO_CAN_SCAN: Record<AddressReach, string> = {
   "this-computer": "Scan with a tablet or phone on your home Wi-Fi.",
   "home-network": "Scan with a tablet or phone on your home Wi-Fi.",
+  tailnet:
+    "Scan with a phone or tablet that has the Tailscale app, signed in to your Tailscale account. Then it works at home or away, on any Wi-Fi or mobile data.",
   anywhere: "Scan with any phone or tablet, at home or away: any Wi-Fi or mobile data works.",
 };
 

@@ -20,8 +20,20 @@ describe("addressReach", () => {
     }
   });
 
+  it("knows Tailscale addresses", () => {
+    for (const url of ["https://sns-palace.tail1234.ts.net/", "http://100.64.0.1:3000/", "http://100.101.102.103:3000/"]) {
+      expect(addressReach(url), url).toBe("tailnet");
+    }
+  });
+
   it("treats everything else as reachable from anywhere", () => {
-    for (const url of ["https://sns-palace.onrender.com/", "https://palace.example.com/", "http://172.32.0.1/", "http://8.8.8.8/"]) {
+    for (const url of [
+      "https://sns-palace.onrender.com/",
+      "https://palace.example.com/",
+      "http://172.32.0.1/",
+      "http://8.8.8.8/",
+      "http://100.128.0.1/",
+    ]) {
       expect(addressReach(url), url).toBe("anywhere");
     }
   });
