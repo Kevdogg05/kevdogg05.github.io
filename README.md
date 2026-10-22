@@ -19,6 +19,7 @@ own machine. No HeyGen services or accounts are involved.
 | 3 | Real engines: Coqui TTS (VITS, 109 voices) and Wav2Lip lip-sync, one-command setup scripts, live per-batch render progress | Done |
 | 4 | Realistic avatars: SadTalker (blinks, expressions, head motion) and GFPGAN face enhancement, chosen per video in the dashboard with render-time estimates | Done |
 | 5 | Video library: SQLite-backed jobs that survive restarts, a gallery with replay/download/retry/delete, a queue you can add to while rendering, cancel (kills the engine), automatic cleanup | Done |
+| 6 | Self-host packaging: Docker Compose (CPU, or NVIDIA GPU with an override) with the engines baked in, one port behind Caddy, optional password, automatic HTTPS | Done |
 
 Out of the box the pipeline runs with **placeholder engines**, so the whole
 flow works end to end without GPUs or model downloads:
@@ -63,7 +64,10 @@ backend/scripts/setup_gfpgan.sh      # GFPGAN face enhancement (optional)
 
 ```
 .
-├── dev.sh                  # starts backend + frontend together
+├── dev.sh                  # starts backend + frontend together (development)
+├── docker-compose.yml      # the whole studio in Docker (+ docker-compose.gpu.yml)
+├── .env.example            # Docker settings: password, domain, engines, ports
+├── deploy/proxy/           # Caddy front door: routing, password, HTTPS
 ├── backend/
 │   ├── main.py             # FastAPI app factory and routes
 │   ├── config.py           # settings from env / backend/.env
@@ -79,9 +83,11 @@ backend/scripts/setup_gfpgan.sh      # GFPGAN face enhancement (optional)
 │   ├── scripts/            # setup_coqui.sh, setup_wav2lip.sh, setup_sadtalker.sh, setup_gfpgan.sh
 │   ├── engines/            # compatibility patches, gfpgan_enhance.py (+ checkouts and weights, gitignored)
 │   ├── tests/              # pytest suite (API, pipeline, engine adapters)
-│   ├── requirements*.txt   # core, coqui and wav2lip dependencies
+│   ├── requirements*.txt   # core and per-engine dependencies
+│   ├── Dockerfile          # API + engines image
 │   └── .env.example
 └── frontend/
+    ├── Dockerfile          # standalone Next.js image
     └── src/
         ├── app/            # Next.js App Router entry (layout, page, styles)
         ├── components/studio/  # dashboard UI components
@@ -90,6 +96,9 @@ backend/scripts/setup_gfpgan.sh      # GFPGAN face enhancement (optional)
 ```
 
 ## Quick start
+
+To run it on a server, or without installing Python and Node.js yourself, see
+[Deploy with Docker](#deploy-with-docker). For development:
 
 Requirements: **Node.js 20+** and **Python 3.10+**. ffmpeg is optional: the
 backend uses the one on your `PATH`, or the binary bundled with `imageio-ffmpeg`.
@@ -121,6 +130,62 @@ cd frontend
 npm install
 npm run dev
 ```
+
+## Deploy with Docker
+
+The easiest way to run the studio on a home server, a GPU workstation or a VPS.
+Docker Compose builds three containers, bakes the engines and their models into
+the backend image, and serves everything on one port with an optional password.
+
+```bash
+cp .env.example .env          # optional: set OAS_PASSWORD, choose engines, ports
+docker compose up -d --build  # the first build downloads several GB and takes a while
+```
+
+Then open http://localhost:8080 (or `http://<server-ip>:8080`).
+
+The backend image with all four engines is about 5 GB with the CPU build of
+PyTorch, and about 9.5 GB with CUDA (whose libraries account for over 5 GB).
+List fewer engines in `OAS_ENGINES` for a smaller image.
+
+With an NVIDIA GPU (install the NVIDIA driver and the
+[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+first), add the GPU override. It builds PyTorch with CUDA and passes the GPU
+through, which is what makes SadTalker and face enhancement fast:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+```
+
+| Container | What it runs |
+| --- | --- |
+| `proxy` | Caddy: the only published port. Routes `/api`, `/media` and `/docs` to the backend and everything else to the dashboard, asks for the password, and handles HTTPS. |
+| `frontend` | The Next.js dashboard as a standalone server. It calls the API on its own origin, so no CORS or extra ports are involved. |
+| `backend` | The API and engines (Python 3.13, ffmpeg, espeak-ng, PyTorch, model weights), running as an unprivileged user. |
+
+Videos, uploads and the job database live in the `studio-data` volume, so
+`docker compose down` and image rebuilds keep your library. `docker compose
+down -v` deletes it. To update: `git pull && docker compose up -d --build`. The
+engine layers are reused unless the engine list or the setup scripts change.
+
+Settings go in `.env` next to `docker-compose.yml`:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `OAS_PASSWORD` | empty | Ask for a login on every page and API call. **Set this before exposing the port beyond your own machine.** |
+| `OAS_USERNAME` | `admin` | Login name |
+| `OAS_DOMAIN` | empty | Public hostname, e.g. `studio.example.com`, for automatic HTTPS from Let's Encrypt. Point its DNS at the server and set the ports to 80 and 443. |
+| `OAS_HTTP_PORT` / `OAS_HTTPS_PORT` | `8080` / `8443` | Ports published on the host |
+| `OAS_ENGINES` | `coqui wav2lip sadtalker gfpgan` | Engines baked into the backend image. Leave it empty for a small image with only the placeholder engines. |
+| `OAS_TORCH` | `cpu` | PyTorch build: `cpu` or `cuda` (the GPU override sets `cuda`) |
+| `OAS_MAX_CONCURRENT_JOBS`, `OAS_RETENTION_DAYS`, `ELEVENLABS_API_KEY` | | Passed to the backend; see [Configuration](#configuration) |
+
+Any other backend setting from `backend/.env.example` can be added under
+`backend.environment` in `docker-compose.yml`.
+
+Without `OAS_DOMAIN`, the studio is served over plain HTTP. That's fine on your
+own machine or home network, but use a domain (or a VPN such as Tailscale) when
+reaching it over the internet, so the password isn't sent unencrypted.
 
 ## Configuration
 

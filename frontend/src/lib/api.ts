@@ -108,7 +108,8 @@ export interface GenerateRequest {
 }
 
 /**
- * Backend origin. Set NEXT_PUBLIC_API_URL to override; otherwise port 8000 on
+ * Backend origin. Set NEXT_PUBLIC_API_URL to override ("/" means the same
+ * origin as the page, as behind the Docker proxy); otherwise port 8000 on
  * whatever host served the page, so LAN and localhost access both work.
  */
 export function apiBase(): string {

@@ -1,0 +1,55 @@
+# OpenAvatarStudio: dashboard, API + render engines, and a reverse proxy that
+# serves both on one port.
+#
+#   docker compose up -d --build        # then open http://localhost:8080
+#
+# With an NVIDIA GPU, add the override:
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+#
+# Settings come from .env next to this file (see .env.example).
+name: openavatarstudio
+
+services:
+  backend:
+    image: openavatarstudio/backend:latest
+    build:
+      context: ./backend
+      args:
+        # No ":-" here: an empty OAS_ENGINES means "placeholder engines only".
+        OAS_ENGINES: ${OAS_ENGINES-coqui wav2lip sadtalker gfpgan}
+        OAS_TORCH: ${OAS_TORCH:-cpu}
+    environment:
+      OAS_MAX_CONCURRENT_JOBS: ${OAS_MAX_CONCURRENT_JOBS:-1}
+      OAS_RETENTION_DAYS: ${OAS_RETENTION_DAYS:-0}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+    volumes:
+      - studio-data:/data
+    restart: unless-stopped
+
+  frontend:
+    image: openavatarstudio/frontend:latest
+    build: ./frontend
+    restart: unless-stopped
+
+  proxy:
+    image: openavatarstudio/proxy:latest
+    build: ./deploy/proxy
+    environment:
+      OAS_DOMAIN: ${OAS_DOMAIN:-}
+      OAS_USERNAME: ${OAS_USERNAME:-admin}
+      OAS_PASSWORD: ${OAS_PASSWORD:-}
+    ports:
+      - "${OAS_HTTP_PORT:-8080}:80"
+      - "${OAS_HTTPS_PORT:-8443}:443"
+    volumes:
+      - proxy-data:/data
+      - proxy-config:/config
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  studio-data:    # videos, uploads and the job database
+  proxy-data:     # HTTPS certificates
+  proxy-config:

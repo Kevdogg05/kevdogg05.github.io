@@ -103,6 +103,7 @@
     pre { background: #0d0d12; border: 1px solid var(--line); border-radius: 14px; padding: 16px; overflow-x: auto; font-size: 13.5px; line-height: 1.7; margin: 0; }
     pre .c { color: var(--faint); }
     .reqs { color: var(--muted); font-size: 14px; margin: 14px 0 0; }
+    h3.alt { font-size: 18px; margin: 32px 0 12px; }
 
     .share { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
     .share img { background: #fff; border-radius: 12px; padding: 8px; width: 220px; height: 220px; }
@@ -228,6 +229,14 @@ backend/scripts/setup_wav2lip.sh      <span class="c"># fast lip-sync</span>
 backend/scripts/setup_sadtalker.sh    <span class="c"># whole-face animation (GPU recommended)</span>
 backend/scripts/setup_gfpgan.sh       <span class="c"># face enhancement</span></pre>
         <p class="reqs">Needs Node.js 20+ and Python 3.10+, on Linux, macOS or WSL. The full setup, configuration and API reference are in the <a href="https://github.com/Kevdogg05/kevdogg05.github.io#readme">README</a>.</p>
+        <h3 class="alt">Or run everything in Docker</h3>
+<pre><span class="c"># every engine included; open http://localhost:8080</span>
+cp .env.example .env                  <span class="c"># optional: set OAS_PASSWORD, engines, domain</span>
+docker compose up -d --build
+
+<span class="c"># with an NVIDIA GPU (much faster SadTalker and face enhancement)</span>
+docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build</pre>
+        <p class="reqs">One port behind a Caddy proxy, with an optional password and automatic HTTPS when you set a domain. Your videos persist in a Docker volume.</p>
       </div>
     </section>
 

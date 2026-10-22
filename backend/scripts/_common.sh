@@ -12,9 +12,11 @@ ensure_venv() {
   fi
 }
 
-# PyTorch (+ torchaudio, torchvision): the default CUDA build when an NVIDIA GPU
-# is present, otherwise the much smaller CPU-only build. macOS wheels on PyPI
-# already are CPU/MPS builds.
+# PyTorch (+ torchaudio, torchvision). OAS_TORCH picks the build:
+#   cuda  the default PyPI wheels, which bundle CUDA (large)
+#   cpu   the much smaller CPU-only wheels
+#   auto  (default) cpu on Linux without an NVIDIA GPU, otherwise PyPI.
+#         macOS wheels on PyPI already are CPU/MPS builds.
 install_torch() {
   local torch_spec="torch"
   if "$PY" -c "import torch" 2>/dev/null; then
@@ -25,7 +27,14 @@ install_torch() {
     # Match the companion packages to the installed torch instead of upgrading it.
     torch_spec="torch==$("$PY" -c 'import torch; print(torch.__version__.split("+")[0])')"
   fi
-  if [ "$(uname -s)" = "Linux" ] && ! command -v nvidia-smi >/dev/null 2>&1; then
+  local variant="${OAS_TORCH:-auto}"
+  if [ "$variant" = "auto" ]; then
+    variant=cuda
+    if [ "$(uname -s)" = "Linux" ] && ! command -v nvidia-smi >/dev/null 2>&1; then
+      variant=cpu
+    fi
+  fi
+  if [ "$variant" = "cpu" ]; then
     echo "==> Installing CPU-only PyTorch"
     if "$PY" -m pip install "$torch_spec" torchaudio torchvision --index-url https://download.pytorch.org/whl/cpu; then
       return
@@ -53,7 +62,9 @@ download() {
   fi
   echo "==> Downloading $(basename "$dest")"
   mkdir -p "$(dirname "$dest")"
-  curl -fL --retry 3 --progress-bar -o "$dest.part" "$url"
+  # Resume (-C -) and retry on any error: these files are hundreds of MB, and a
+  # dropped connection mid-transfer is not one of curl's default retry cases.
+  curl -fL --retry 5 --retry-all-errors --retry-delay 3 -C - --progress-bar -o "$dest.part" "$url"
   if [ "$(sha256_of "$dest.part")" != "$sha" ]; then
     rm -f "$dest.part"
     echo "Checksum mismatch for $url" >&2
