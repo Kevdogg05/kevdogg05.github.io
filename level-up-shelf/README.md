@@ -6,7 +6,10 @@ front, coin cut-outs under the shelf and stair-block brackets.
 
 ![The assembled shelf](preview.png)
 
-**Print file: [`level-up-shelf.svg`](level-up-shelf.svg).** It holds 5 flat parts, each exactly 3 mm thick.
+**Print file: [`level-up-shelf.stl`](level-up-shelf.stl).** It holds all 5 parts, already
+3 mm thick and laid flat, ready to slice. The same layout is also in
+[`level-up-shelf.svg`](level-up-shelf.svg), for laser cutters or for
+extruding yourself.
 
 | | |
 | --- | --- |
@@ -24,20 +27,19 @@ front, coin cut-outs under the shelf and stair-block brackets.
 
 ## Print it
 
-1. Import `level-up-shelf.svg` into Bambu Studio, OrcaSlicer or PrusaSlicer
-   (drag it onto the plate, or use File › Import).
-2. Set the depth (height) to **exactly 3 mm**. The slots are made for 3 mm
-   parts. The back panel should come in 180 mm wide; if it doesn't, scale it
-   until it does.
-3. Split it into separate objects and let the slicer arrange them.
-4. Settings: 0.28 mm "draft" layers (0.2 mm works too), 2 walls, 15 % infill,
+1. Open `level-up-shelf.stl` in your slicer (Bambu Studio, OrcaSlicer,
+   PrusaSlicer, Cura). Don't scale it: the slots only fit at 100 %.
+2. On a bed smaller than 256 mm, split it into separate objects and spread
+   them over two plates.
+3. Settings: 0.28 mm "draft" layers (0.2 mm works too), 2 walls, 15 % infill,
    no supports, no brim.
 
 Fun colour idea: a blue panel, an orange shelf, a green rail and pink
 brackets. Or print the whole thing in one colour.
 
-**Laser cutter:** you can also cut the same file from 3 mm (1/8") plywood or
-acrylic. Set every shape to "cut".
+**Using the SVG instead:** import it, set the depth (height) to **exactly 3 mm**
+and check that the back panel is 180 mm wide. On a laser cutter, cut it from
+3 mm (1/8") plywood or acrylic with every shape set to "cut".
 
 ## Build it
 
@@ -66,11 +68,11 @@ step or a handle.
 
 ## Change it
 
-`make_shelf.py` draws the SVG and checks that every tab lands in its slot.
+`make_shelf.py` draws the STL and SVG and checks that every tab lands in its slot.
 Edit the numbers at the top and run it again:
 
 ```bash
-pip install shapely
+pip install "shapely>=2.1"
 python3 make_shelf.py
 ```
 

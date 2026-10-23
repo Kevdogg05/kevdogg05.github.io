@@ -1,16 +1,20 @@
-"""Generates level-up-shelf.svg: a flat-pack, pixel-art wall shelf for toys.
+"""Generates level-up-shelf.stl and .svg: a flat-pack, pixel-art wall shelf for toys.
 
-Every part is a flat 3 mm plate, so the SVG can be extruded to 3 mm in a
-slicer (or cut from 3 mm sheet on a laser) and the parts slot together.
+Every part is a flat 3 mm plate that slots into the others. The STL has all
+five parts laid out flat and ready to slice; the SVG is the same layout for
+extruding to 3 mm in a slicer or cutting from 3 mm sheet on a laser.
 
-    pip install shapely
-    python3 make_shelf.py            # checks the fit, then writes the SVG
+    pip install "shapely>=2.1"
+    python3 make_shelf.py            # checks the fit, then writes both files
 
 Assembled coordinates: x runs along the wall, y is up (0 = top of the shelf)
 and z' is the distance out from the front face of the back panel.
 """
+import struct
+from collections import Counter
 from pathlib import Path
 
+import shapely
 from shapely import affinity
 from shapely.geometry import Point, box
 from shapely.geometry.polygon import orient
@@ -211,6 +215,48 @@ def place(geom, x, y, flip=True):
     return affinity.translate(geom, x - minx, y - miny)
 
 
+def solid(geom):
+    """Triangles of a part extruded from z = 0 to z = T, wound so normals face out."""
+    geom = orient(geom.simplify(0.001), sign=1.0)
+    tris = []
+    for tri in shapely.constrained_delaunay_triangles(geom).geoms:
+        a, b, c = orient(tri, sign=1.0).exterior.coords[:3]
+        tris.append(((*a, 0.0), (*c, 0.0), (*b, 0.0)))
+        tris.append(((*a, T), (*b, T), (*c, T)))
+    for ring in [geom.exterior, *geom.interiors]:
+        pts = list(ring.coords)
+        for p, q in zip(pts, pts[1:]):
+            tris.append(((*p, 0.0), (*q, 0.0), (*q, T)))
+            tris.append(((*p, 0.0), (*q, T), (*p, T)))
+    return tris
+
+
+def check_mesh(tris, area):
+    """Watertight: every edge is shared by exactly two faces, running opposite ways."""
+    edges = Counter()
+    for t in tris:
+        for i in range(3):
+            edges[(t[i], t[(i + 1) % 3])] += 1
+    assert all(n == 1 and edges[(b, a)] == 1 for (a, b), n in edges.items()), "mesh has holes"
+    volume = sum(
+        a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])
+        for a, b, c in tris
+    ) / 6
+    assert abs(volume - area * T) < 0.01, "mesh is inside out"
+
+
+def write_stl(path, tris):
+    with open(path, "wb") as f:
+        f.write(b"Level-Up Toy Shelf: 5 parts, 3 mm thick, units mm".ljust(80, b" "))
+        f.write(struct.pack("<I", len(tris)))
+        for a, b, c in tris:
+            u = [b[i] - a[i] for i in range(3)]
+            v = [c[i] - a[i] for i in range(3)]
+            n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]]
+            length = sum(x * x for x in n) ** 0.5 or 1.0
+            f.write(struct.pack("<12fH", *(x / length for x in n), *a, *b, *c, 0))
+
+
 def main():
     panel, plate, grass, stairs = back_panel(), shelf(), rail(), bracket()
     check_fit(panel, plate, grass, stairs)
@@ -245,12 +291,20 @@ def main():
     out = Path(__file__).with_name("level-up-shelf.svg")
     out.write_text("\n".join(lines) + "\n")
 
+    # same layout for the STL, flipped so it reads the right way round from above
+    tris = []
+    for g in shapes:
+        tris += solid(affinity.scale(g, 1, -1, origin=(0, float(height) / 2)))
     area = sum(g.area for g in shapes)
+    check_mesh(tris, area)
+    stl = out.with_suffix(".stl")
+    write_stl(stl, tris)
+
     edge = sum(g.exterior.length + sum(r.length for r in g.interiors) for g in shapes)
     # 2 walls of 0.45 mm, 1.6 mm of top + bottom skin, 15 % infill in between
     walls = edge * 0.9
     volume = walls * T + (area - walls) * (1.6 + (T - 1.6) * 0.15)
-    print(f"wrote {out.name}: {width} x {height} mm sheet")
+    print(f"wrote {stl.name} ({len(tris)} triangles) and {out.name}: {width} x {height} x {fmt(T)} mm")
     print(f"parts cover {area / 100:.0f} cm2, about {volume / 1000 * 1.24:.0f} g of PLA")
 
 
