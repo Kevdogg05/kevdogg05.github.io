@@ -1,4 +1,7 @@
-// Where an address SnS Palace is open at can be reached from.
+// Where an address SnS Palace is open at can be reached from, and which
+// address "Add a device" should hand to a phone or tablet.
+
+import type { TailscaleStatus } from "@/lib/types";
 
 export type AddressReach = "this-computer" | "home-network" | "tailnet" | "anywhere";
 
@@ -14,4 +17,25 @@ export function addressReach(url: string): AddressReach {
   // mDNS names (my-computer.local) and IPv6 link-local / unique local addresses.
   if (host.endsWith(".local") || /^\[(fe80|f[cd][0-9a-f]{2}):/.test(host)) return "home-network";
   return "anywhere";
+}
+
+export interface DeviceAddress {
+  /** The address for the QR code. */
+  url: string;
+  reach: AddressReach;
+  /** A home-network address that also works there without the Tailscale app. */
+  homeUrl: string | null;
+}
+
+/**
+ * The page's own address when other devices can use it, otherwise this
+ * device's Tailscale address. Opened as http://localhost:3000 on the computer
+ * running SnS Palace, the QR code would only work on that same computer.
+ */
+export function deviceAddress(origin: string, tailscale: TailscaleStatus): DeviceAddress {
+  const reach = addressReach(origin);
+  if ((reach === "this-computer" || reach === "home-network") && tailscale.state === "ready") {
+    return { url: tailscale.url, reach: "tailnet", homeUrl: reach === "home-network" ? origin : null };
+  }
+  return { url: origin, reach, homeUrl: null };
 }

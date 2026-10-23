@@ -148,6 +148,16 @@ export const getUploadConfig = memo(() => parse("upload", uploadSchema));
 
 // ---------------------------------------------------------------------------
 
+// compose.yaml shares the Tailscale container's LocalAPI socket, so "Add a
+// device" can show this device's https://<name>.<tailnet>.ts.net address.
+const tailscaleSchema = z
+  .object({ TAILSCALE_SOCKET: z.string().optional() })
+  .transform((env) => ({ socket: env.TAILSCALE_SOCKET ?? null }));
+
+export const getTailscaleConfig = memo(() => parse("tailscale", tailscaleSchema));
+
+// ---------------------------------------------------------------------------
+
 const pipelineSchema = z
   .object({
     TRANSCRIBER: z.enum(["local", "openai", "none"]).default("local"),

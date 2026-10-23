@@ -1,9 +1,11 @@
 "use client";
 
-import { Check, Copy, QrCode as QrIcon, TriangleAlert, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { Check, Copy, LoaderCircle, QrCode as QrIcon, TriangleAlert, X } from "lucide-react";
+import { useRef, useState, type ReactNode } from "react";
 import { QrCode } from "@/components/QrCode";
-import { addressReach, type AddressReach } from "@/lib/address";
+import { deviceAddress, type AddressReach, type DeviceAddress } from "@/lib/address";
+import { api } from "@/lib/api";
+import type { TailscaleStatus } from "@/lib/types";
 
 const WHO_CAN_SCAN: Record<AddressReach, string> = {
   "this-computer": "Scan with a tablet or phone on your home Wi-Fi.",
@@ -39,21 +41,69 @@ async function copyText(text: string, container: HTMLElement): Promise<boolean> 
   return copied;
 }
 
+/** Why the QR code only works on this computer, and what fixes it. */
+function ThisComputerOnly({ tailscale }: { tailscale: TailscaleStatus }) {
+  let fix: ReactNode;
+  if (tailscale.state === "not-connected") {
+    fix = tailscale.loginUrl ? (
+      <>
+        SnS Palace isn&apos;t signed in to Tailscale yet.{" "}
+        <a href={tailscale.loginUrl} target="_blank" rel="noreferrer" className="font-bold underline">
+          Sign it in
+        </a>
+        , then open this again.
+      </>
+    ) : (
+      <>
+        SnS Palace isn&apos;t signed in to Tailscale yet. Check <span className="font-mono">TS_AUTHKEY</span> in{" "}
+        <span className="font-mono">.env</span> and run <span className="font-mono">docker compose up -d</span>;{" "}
+        <span className="font-mono">docker compose logs tailscale</span> shows what went wrong.
+      </>
+    );
+  } else if (tailscale.state === "https-off") {
+    fix = (
+      <>
+        Tailscale is connected, but HTTPS is off. In the Tailscale admin console, open <b>DNS</b> and press{" "}
+        <b>Enable HTTPS</b>, then open this again.
+      </>
+    );
+  } else {
+    fix = (
+      <>
+        Open SnS Palace with the computer&apos;s network address (like{" "}
+        <span className="font-mono">http://192.168.1.20:3000</span>) and this code will use that instead.
+      </>
+    );
+  }
+  return (
+    <p className="mt-3 flex gap-2 rounded-xl bg-amber-400/10 p-3 text-sm text-amber-200 ring-1 ring-amber-300/20">
+      <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+      <span>This address only works on this computer. {fix}</span>
+    </p>
+  );
+}
+
 /**
- * Shows a QR code of the address this app is running at, so a parent can
- * open SnS Palace on a kid's tablet in one scan. The new device still has to
- * pass the family PIN.
+ * Shows a QR code that opens SnS Palace on a kid's tablet in one scan: the
+ * page's own address, or this device's Tailscale address when the page was
+ * opened in a way other devices can't use (such as http://localhost:3000).
+ * The new device still has to pass the family PIN.
  */
 export function AddDeviceButton() {
   const dialog = useRef<HTMLDialogElement>(null);
-  const [url, setUrl] = useState<string | null>(null);
-  const reach = url ? addressReach(url) : "home-network";
+  const [address, setAddress] = useState<DeviceAddress | null>(null);
+  const [tailscale, setTailscale] = useState<TailscaleStatus>({ state: "off" });
   const [copied, setCopied] = useState<boolean | null>(null);
+  const url = address?.url ?? null;
+  const reach = address?.reach ?? "home-network";
 
-  const open = () => {
-    setUrl(`${window.location.origin}/`);
+  const open = async () => {
+    setAddress(null);
     setCopied(null);
     dialog.current?.showModal();
+    const status = await api<TailscaleStatus>("/api/tailscale").catch((): TailscaleStatus => ({ state: "off" }));
+    setTailscale(status);
+    setAddress(deviceAddress(`${window.location.origin}/`, status));
   };
 
   const copy = async () => {
@@ -66,7 +116,7 @@ export function AddDeviceButton() {
     <>
       <button
         type="button"
-        onClick={open}
+        onClick={() => void open()}
         aria-haspopup="dialog"
         className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-300 hover:bg-white/10 focus-visible:outline-3 focus-visible:outline-violet-400"
       >
@@ -95,19 +145,17 @@ export function AddDeviceButton() {
         </div>
         <p className="mt-1 text-sm text-slate-400">{WHO_CAN_SCAN[reach]} It still asks for the family PIN.</p>
 
-        {url ? (
+        {url && address ? (
           <>
             <QrCode value={url} label={`QR code for ${url}`} className="mx-auto mt-5 w-full max-w-64 rounded-2xl" />
             <p className="mt-3 text-center font-mono text-sm break-all text-violet-200">{url}</p>
-            {reach === "this-computer" ? (
-              <p className="mt-3 flex gap-2 rounded-xl bg-amber-400/10 p-3 text-sm text-amber-200 ring-1 ring-amber-300/20">
-                <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-                <span>
-                  This address only works on this computer. Open SnS Palace with the computer&apos;s network address
-                  (like <span className="font-mono">http://192.168.1.20:3000</span>) and this code will use that instead.
-                </span>
+            {address.homeUrl ? (
+              <p className="mt-2 text-center text-xs text-slate-400">
+                On the home Wi-Fi, devices without Tailscale can also use
+                <span className="block font-mono break-all text-slate-300">{address.homeUrl}</span>
               </p>
             ) : null}
+            {reach === "this-computer" ? <ThisComputerOnly tailscale={tailscale} /> : null}
             <button
               type="button"
               onClick={() => void copy()}
@@ -123,7 +171,13 @@ export function AddDeviceButton() {
               and opens without the browser bars{url.startsWith("https:") ? "." : " (on Android, that needs an https:// address)."}
             </p>
           </>
-        ) : null}
+        ) : (
+          <p className="mx-auto mt-5 grid aspect-square w-full max-w-64 place-items-center rounded-2xl bg-white/5 text-sm text-slate-400">
+            <span className="flex items-center gap-2">
+              <LoaderCircle aria-hidden className="size-4 animate-spin" /> Finding the best address…
+            </span>
+          </p>
+        )}
       </dialog>
     </>
   );

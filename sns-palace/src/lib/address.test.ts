@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addressReach } from "@/lib/address";
+import { addressReach, deviceAddress } from "@/lib/address";
 
 describe("addressReach", () => {
   it("knows addresses that only work on the computer running SnS Palace", () => {
@@ -35,6 +35,45 @@ describe("addressReach", () => {
       "http://100.128.0.1/",
     ]) {
       expect(addressReach(url), url).toBe("anywhere");
+    }
+  });
+});
+
+describe("deviceAddress", () => {
+  const ready = { state: "ready", url: "https://sns-palace.tail1234.ts.net/" } as const;
+
+  it("swaps a this-computer address for the Tailscale one", () => {
+    expect(deviceAddress("http://localhost:3000/", ready)).toEqual({
+      url: "https://sns-palace.tail1234.ts.net/",
+      reach: "tailnet",
+      homeUrl: null,
+    });
+  });
+
+  it("prefers Tailscale over a home address, and still mentions the home one", () => {
+    expect(deviceAddress("http://192.168.1.20:3000/", ready)).toEqual({
+      url: "https://sns-palace.tail1234.ts.net/",
+      reach: "tailnet",
+      homeUrl: "http://192.168.1.20:3000/",
+    });
+  });
+
+  it("keeps addresses that already work elsewhere", () => {
+    expect(deviceAddress("https://sns-palace.tail1234.ts.net/", ready)).toMatchObject({ reach: "tailnet", homeUrl: null });
+    expect(deviceAddress("https://palace.example.com/", ready)).toMatchObject({ url: "https://palace.example.com/" });
+  });
+
+  it("falls back to the page's address when Tailscale isn't ready", () => {
+    for (const tailscale of [
+      { state: "off" },
+      { state: "not-connected", loginUrl: null },
+      { state: "https-off", name: "sns-palace.tail1234.ts.net" },
+    ] as const) {
+      expect(deviceAddress("http://localhost:3000/", tailscale)).toEqual({
+        url: "http://localhost:3000/",
+        reach: "this-computer",
+        homeUrl: null,
+      });
     }
   });
 });

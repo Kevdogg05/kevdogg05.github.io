@@ -162,3 +162,13 @@ export type VideoAction =
   | { action: "unapprove" }
   | { action: "reprocess" }
   | { action: "rename"; title: string };
+
+/** What the Tailscale container (compose.yaml) reports, for "Add a device". */
+export type TailscaleStatus =
+  /** No Tailscale container to ask (not set up, or not running). */
+  | { state: "off" }
+  /** Not signed in yet; loginUrl signs it in when Tailscale offers one. */
+  | { state: "not-connected"; loginUrl: string | null }
+  /** Signed in, but HTTPS certificates are turned off for the tailnet. */
+  | { state: "https-off"; name: string }
+  | { state: "ready"; url: string };

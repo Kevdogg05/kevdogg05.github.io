@@ -84,6 +84,9 @@ address SnS Palace is running at; scan it with a tablet or phone on your home
 Wi-Fi and it opens the PIN pad. If you opened SnS Palace as `localhost`, the
 dialog explains that other devices need the computer's network address (such as
 `http://192.168.1.20:3000`) and the code follows whichever address you use.
+With the [Tailscale setup](#free-a-computer-at-home--tailscale), the code uses
+the `https://sns-palace.<your-tailnet>.ts.net` address instead, which works
+anywhere.
 
 ### Put it on the home screen
 
@@ -178,10 +181,11 @@ fine; 4 GB of memory or more) and about half an hour.
      for when it's on the power adapter): turn on **Prevent automatic sleeping
      when the display is off**.
 
-In the parent room, **Add a device** shows a QR code of whichever address you
-opened SnS Palace at, and says when a device needs the Tailscale app. On the
-home Wi-Fi, devices without Tailscale can still use
-`http://<the computer's address>:3000`. Away from home, videos stream from
+In the parent room, **Add a device** shows a QR code of the Tailscale address,
+even when you opened SnS Palace as `http://localhost:3000` on the computer (it
+asks the Tailscale container). If Tailscale isn't signed in yet or HTTPS is
+off, the dialog says what to fix. On the home Wi-Fi, devices without Tailscale
+can still use `http://<the computer's address>:3000`. Away from home, videos stream from
 your home internet connection; an upload speed of 10 Mbit/s or more is plenty
 for these clips.
 
@@ -419,6 +423,7 @@ the parent session.
 | `PATCH` | `/api/videos/:id` | parent | `{action: "approve" \| "unapprove" \| "reprocess"}` or `{action: "rename", title}` |
 | `DELETE` | `/api/videos/:id` | parent | Deletes every stored file, then the row |
 | `GET` | `/api/media/:id/:variant` | family / parent | `raw`, `preview`, `edited`, `webm`, `thumbnail`; supports `Range` |
+| `GET` | `/api/tailscale` | parent | `{state: "ready", url}`, `"not-connected"` (with `loginUrl`), `"https-off"` or `"off"`: this device's Tailscale address, for **Add a device** |
 
 ## Project structure
 

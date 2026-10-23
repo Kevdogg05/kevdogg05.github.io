@@ -16,10 +16,13 @@ services:
       PARENT_PIN: ${PARENT_PIN:?Set PARENT_PIN in .env}
       # Optional: when empty, one is generated and kept with the videos.
       SESSION_SECRET: ${SESSION_SECRET:-}
+      # Lets "Add a device" show the https://sns-palace.<tailnet>.ts.net address.
+      TAILSCALE_SOCKET: /var/run/tailscale/tailscaled.sock
       # Any other setting from .env.local.example can be added here, except
       # LOCAL_DATA_DIR and WHISPER_PYTHON, which the image sets.
     volumes:
       - data:/data
+      - tailscale-socket:/var/run/tailscale
     # Shares the Tailscale container's network, so Tailscale can pass it
     # requests (and port 3000 below reaches it).
     network_mode: service:tailscale
@@ -40,8 +43,11 @@ services:
       TS_STATE_DIR: /var/lib/tailscale
       TS_SERVE_CONFIG: /config/serve.json
       TS_USERSPACE: "true"
+      # Shared with the app, which asks Tailscale for this device's address.
+      TS_SOCKET: /var/run/tailscale/tailscaled.sock
     volumes:
       - tailscale:/var/lib/tailscale
+      - tailscale-socket:/var/run/tailscale
       - ./docker/tailscale-serve.json:/config/serve.json:ro
     ports:
       # Devices on the home Wi-Fi without Tailscale can still use
@@ -53,3 +59,5 @@ volumes:
     name: sns-palace-data
   tailscale:
     name: sns-palace-tailscale
+  tailscale-socket:
+    name: sns-palace-tailscale-socket
