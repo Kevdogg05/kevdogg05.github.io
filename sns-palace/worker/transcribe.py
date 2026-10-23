@@ -20,8 +20,27 @@ The model downloads from Hugging Face on first use and is cached afterwards.
 import argparse
 import json
 import sys
+import wave
 
 EXIT_NOT_INSTALLED = 3
+
+
+def load_wav(path):
+    """The worker's 16 kHz mono 16-bit WAV as float32 samples in [-1, 1).
+
+    Read here instead of by faster-whisper: its own decoder calls PyAV with an
+    option (metadata_errors) that newer PyAV releases removed, so every file
+    failed with "open() got an unexpected keyword argument". Given samples,
+    faster-whisper skips PyAV, and the scaling matches its decoder exactly.
+    """
+    import numpy as np
+
+    with wave.open(path, "rb") as wav:
+        layout = (wav.getnchannels(), wav.getsampwidth(), wav.getframerate())
+        if layout != (1, 2, 16000):
+            raise ValueError(f"expected a 16 kHz mono 16-bit WAV, got channels/bytes/rate {layout}")
+        frames = wav.readframes(wav.getnframes())
+    return np.frombuffer(frames, dtype="<i2").astype(np.float32) / 32768.0
 
 
 def main() -> int:
@@ -43,9 +62,10 @@ def main() -> int:
         )
         return EXIT_NOT_INSTALLED
 
+    audio = load_wav(args.audio)
     model = WhisperModel(args.model, device=args.device, compute_type=args.compute_type)
     segments, info = model.transcribe(
-        args.audio,
+        audio,
         language=args.language,
         word_timestamps=True,
         # Voice activity detection keeps Whisper from inventing words in silence.
