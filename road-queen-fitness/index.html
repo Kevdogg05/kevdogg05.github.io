@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Road Queen Fitness · Soca Dance &amp; Conditioning</title>
+  <meta name="description" content="Road Queen Fitness — Soca-powered workouts, Caribbean dance choreography, live Zoom and Instagram classes, on-demand videos and carnival-ready gear.">
+  <meta name="theme-color" content="#020514">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Road Queen Fitness">
+  <meta property="og:description" content="Train like it's Carnival Monday. Soca workouts, choreography and live classes for queens who own the road.">
+  <meta property="og:url" content="https://kevdogg05.github.io/road-queen-fitness/">
+  <meta property="og:image" content="https://kevdogg05.github.io/road-queen-fitness/img/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="img/palms-crimson.jpg" media="(min-width: 701px)">
+  <link rel="preload" as="image" href="img/palms-night.jpg" media="(max-width: 700px)">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <!-- Icon sprite: every icon on the page is a <use> of one of these symbols. -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="pg-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a55ff"/><stop offset="1" stop-color="#0a127a"/></linearGradient>
+      <linearGradient id="pg-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff2a55"/><stop offset="1" stop-color="#8a0020"/></linearGradient>
+      <linearGradient id="pg-ink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2150"/><stop offset="1" stop-color="#070a22"/></linearGradient>
+      <linearGradient id="pg-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".45" stop-color="#ffc94d"/><stop offset=".75" stop-color="#ff8fc0"/><stop offset="1" stop-color="#8fd8ff"/></linearGradient>
+      <linearGradient id="pg-glass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3a63ff" stop-opacity=".85"/><stop offset=".5" stop-color="#7f9cff" stop-opacity=".55"/><stop offset="1" stop-color="#1630c9" stop-opacity=".9"/></linearGradient>
+      <filter id="pg-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 18 2 7l5.5 4.5L12 4l4.5 7.5L22 7l-1 11z" fill="currentColor"/><path d="M3.5 20.5h17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2.2l2.1 10.2a1.6 1.6 0 0 0 1.6 1.3h8.4a1.6 1.6 0 0 0 1.6-1.2L20.5 8H6.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="19.5" r="1.4" fill="currentColor"/><circle cx="17" cy="19.5" r="1.4" fill="currentColor"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></symbol>
+    <symbol id="i-live" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-zoom" viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="13" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m15.5 10.5 6-3.5v10l-6-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5.2" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.3" cy="6.7" r="1.25" fill="currentColor"/></symbol>
+    <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M16.6 3h-3.3v12.1a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V8.9a6.3 6.3 0 1 0 5.3 6.2V9.2a7.6 7.6 0 0 0 4.4 1.4V7.3a4.4 4.4 0 0 1-4.4-4.3z" fill="currentColor"/></symbol>
+    <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M13.6 21v-7.4h2.6l.4-3.1h-3V8.6c0-.9.3-1.5 1.6-1.5h1.6V4.3a21 21 0 0 0-2.4-.1c-2.4 0-4 1.4-4 4.1v2.2H7.7v3.1h2.7V21z" fill="currentColor"/></symbol>
+    <symbol id="i-youtube" viewBox="0 0 24 24"><rect x="2" y="5.2" width="20" height="13.6" rx="4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M10 9v6l5.2-3z" fill="currentColor"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 12.5v5M9.5 15h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-9.2-9.4C1.6 7.8 3.8 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.4 0 5.6 3.3 4.4 6.6-1.7 4.8-9.2 9.4-9.2 9.4z" fill="var(--heart-fill, none)" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15.5V4M7 8.5 12 3.5l5 5M4 15v3.5A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="18.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m3.8 6.5 8.2 6.3 8.2-6.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13.5 6.5 19 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-flip" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM16 16h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6.5 6.5h1v1h-1zM16.5 6.5h1v1h-1zM6.5 16.5h1v1h-1z" fill="currentColor"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11H12z" fill="currentColor"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 5.2a3.4 3.4 0 0 1 0 6.6M18 14.8c2 .7 3.2 2.4 3.5 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 4v16M16.5 4v16M3 9h4.5M3 15h4.5M16.5 9H21M16.5 15H21" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-6.5 18-4.5-7-7-4.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.1 8 7.5 9.5 4.4-1.5 7.5-4.9 7.5-9.5V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m8.8 12 2.3 2.3 4.3-4.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2.5 6.5h11v9.5h-11zM13.5 10h4l3 3v3h-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="6.5" cy="17.5" r="1.8" fill="var(--bg)" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="17.5" r="1.8" fill="var(--bg)" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 2.5c.7 4.6 2.9 6.8 7.5 7.5-4.6.7-6.8 2.9-7.5 7.5-.7-4.6-2.9-6.8-7.5-7.5 4.6-.7 6.8-2.9 7.5-7.5zM19 15.5c.3 2 1.2 2.9 3 3.2-1.8.3-2.7 1.2-3 3-.3-1.8-1.2-2.7-3-3 1.8-.3 2.7-1.2 3-3.2z" fill="currentColor"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#home" aria-label="Road Queen Fitness — home">
+        <img class="brand-mark" src="icon.svg" alt="" width="40" height="40">
+        <span class="brand-text"><strong>Road Queen</strong><small>Fitness</small></span>
+      </a>
+
+      <nav class="primary-nav" id="primary-nav" aria-label="Primary">
+        <ul>
+          <li><a href="#home" data-nav="home">Home</a></li>
+          <li><a href="#about" data-nav="about">About Us</a></li>
+          <li><a href="#live" data-nav="live"><span class="nav-live-dot" aria-hidden="true"></span>Live</a></li>
+          <li><a href="#active" data-nav="active">Active</a></li>
+          <li><a href="#gear" data-nav="gear">Gear Up</a></li>
+          <li class="nav-join-mobile"><a href="#join" data-nav="join">Join Us</a></li>
+        </ul>
+        <span class="nav-indicator" aria-hidden="true"></span>
+      </nav>
+
+      <div class="header-actions">
+        <a class="btn btn-gem btn-sm header-join" href="#join" data-nav="join">Join Us</a>
+        <button type="button" class="icon-btn cart-btn" id="cart-open" aria-label="Open cart, 0 items" aria-haspopup="dialog">
+          <svg class="icon" aria-hidden="true"><use href="#i-cart"/></svg>
+          <span class="cart-count" id="cart-count" aria-hidden="true">0</span>
+        </button>
+        <button type="button" class="icon-btn menu-btn" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+          <svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"/></svg>
+          <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ============ HOME ============ -->
+    <section class="hero" id="home" data-section aria-labelledby="hero-title">
+      <div class="parallax-layer" data-parallax="0.25" aria-hidden="true">
+        <picture>
+          <source media="(max-width: 700px)" srcset="img/palms-night.jpg">
+          <img src="img/palms-crimson.jpg" alt="" width="1199" height="899" fetchpriority="high">
+        </picture>
+      </div>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-inner container">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>Soca · Dance · Conditioning</p>
+          <h1 class="hero-title" id="hero-title">
+            <span class="hero-title-line" data-text="Road Queen">Road Queen</span>
+            <span class="hero-title-line hero-title-outline">Fitness</span>
+          </h1>
+          <p class="hero-lead">Train like it's Carnival Monday. High-energy Soca workouts, choreography and live classes for every queen ready to own the road.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-gem btn-lg" href="#join">Join the Movement <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost btn-lg" href="#live"><svg class="icon" aria-hidden="true"><use href="#i-live"/></svg> Live Classes</a>
+          </div>
+          <a class="next-chip" href="#live" id="hero-next" hidden>
+            <span class="pulse-dot" aria-hidden="true"></span>
+            <span><strong id="hero-next-title">Next class</strong> <span id="hero-next-when"></span></span>
+          </a>
+        </div>
+        <figure class="hero-card" aria-hidden="true">
+          <img src="img/dancer-feathers.jpg" alt="" width="768" height="960">
+          <figcaption><svg class="icon" aria-hidden="true"><use href="#i-crown"/></svg> Own the road</figcaption>
+        </figure>
+      </div>
+      <a class="scroll-cue" href="#vibe" aria-label="Scroll to the gallery"><span></span></a>
+    </section>
+
+    <div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee">
+      <div class="marquee-track">
+        <span>Soca Sweat</span><i></i><span>Road March Cardio</span><i></i><span>Wine &amp; Sculpt</span><i></i><span>Feather Flow</span><i></i><span>J'ouvert Energy</span><i></i><span>Queen Stretch</span><i></i>
+        <span>Soca Sweat</span><i></i><span>Road March Cardio</span><i></i><span>Wine &amp; Sculpt</span><i></i><span>Feather Flow</span><i></i><span>J'ouvert Energy</span><i></i><span>Queen Stretch</span><i></i>
+      </div>
+    </div>
+    </div>
+
+    <section class="section vibe" id="vibe" data-section="home" aria-labelledby="vibe-title">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>Home of the Road Queens</p>
+          <h2 class="section-title" id="vibe-title">Feel the <span class="outline">Fete</span></h2>
+          <p class="section-lead">Feathers, paint and pure rhythm. This is the energy we bring to every single class.</p>
+        </div>
+        <div class="media-grid" id="media-grid"></div>
+      </div>
+    </section>
+
+    <div class="slash" aria-hidden="true"></div>
+
+    <!-- ============ ABOUT US ============ -->
+    <section class="section about" id="about" data-section aria-labelledby="about-title">
+      <div class="container about-grid">
+        <div class="about-collage" data-reveal>
+          <figure class="collage-a"><img src="img/eye.jpg" alt="Painted eye in electric blue with crimson lashes and a red tear" loading="lazy" width="880" height="1100"></figure>
+          <figure class="collage-b"><img src="img/blue-devil.jpg" alt="Masquerader in blue body paint and horns blowing a red kiss" loading="lazy" width="880" height="1100"></figure>
+          <div class="collage-badge"><svg class="icon" aria-hidden="true"><use href="#i-crown"/></svg><span>Est. on the road</span></div>
+        </div>
+        <div class="about-copy" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>About Us</p>
+          <h2 class="section-title" id="about-title">Born on <span class="outline">the Road</span></h2>
+          <p class="section-lead">Road Queen Fitness started where every soca lover comes alive — on the road. Hours of chipping, wining and jumping behind the music truck take real stamina, real strength and real joy. We built a training experience that gives you all three.</p>
+          <p>Every class fuses authentic Soca and Caribbean rhythm with proven conditioning: HIIT intervals timed to the drop, lower-body sculpting that builds the hips and core you wine with, and choreography that turns sweat into celebration.</p>
+          <p>Training for your first mas band or your fifteenth Carnival Monday? You'll find a community of queens who hype each other up — on Zoom, on Instagram Live and on the road.</p>
+          <ul class="pillars">
+            <li><span class="pillar-icon red"><svg class="icon" aria-hidden="true"><use href="#i-bolt"/></svg></span><div><strong>Rhythm</strong><span>Every rep on the beat — soca, dancehall and afrobeats.</span></div></li>
+            <li><span class="pillar-icon blue"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></span><div><strong>Conditioning</strong><span>Real strength and cardio built for eight-hour road marches.</span></div></li>
+            <li><span class="pillar-icon gold"><svg class="icon" aria-hidden="true"><use href="#i-crown"/></svg></span><div><strong>Royalty</strong><span>Confidence, community and zero judgment, every class.</span></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="container goals" aria-labelledby="goals-title">
+        <div class="section-head compact" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>Our Goals</p>
+          <h3 class="section-subtitle" id="goals-title">What every queen trains for</h3>
+        </div>
+        <ol class="goal-grid">
+          <li class="goal-card" data-reveal><span class="goal-num">01</span><h4>Road-ready stamina</h4><p>Build the endurance to chip, jump and wine from J'ouvert morning to the last lap.</p></li>
+          <li class="goal-card" data-reveal><span class="goal-num">02</span><h4>Strength that moves</h4><p>Sculpt glutes, legs and core with conditioning that serves the dance floor and the road.</p></li>
+          <li class="goal-card" data-reveal><span class="goal-num">03</span><h4>Master the moves</h4><p>Break choreography down step by step until every wine, roll and jump feels natural.</p></li>
+          <li class="goal-card" data-reveal><span class="goal-num">04</span><h4>A queendom, not a class</h4><p>Grow a worldwide community that trains together, travels together and celebrates each other.</p></li>
+        </ol>
+      </div>
+
+      <div class="gallery-strip-wrap" aria-labelledby="motion-title">
+        <div class="container strip-head">
+          <h3 class="section-subtitle" id="motion-title">In Motion</h3>
+          <div class="strip-nav">
+            <button type="button" class="icon-btn" data-strip="-1" aria-label="Scroll gallery left"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
+            <button type="button" class="icon-btn" data-strip="1" aria-label="Scroll gallery right"><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></button>
+          </div>
+        </div>
+        <div class="gallery-strip" id="gallery-strip" tabindex="0" aria-label="In Motion photo gallery"></div>
+      </div>
+    </section>
+
+    <div class="slash slash-flip" aria-hidden="true"></div>
+
+    <!-- ============ LIVE ============ -->
+    <section class="section live" id="live" data-section aria-labelledby="live-title">
+      <div class="section-bg" aria-hidden="true"><div class="parallax-layer" data-parallax="0.18"><img src="img/crimson-tide.jpg" alt="" loading="lazy" width="787" height="1400"></div></div>
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span>Train together, in real time</p>
+          <h2 class="section-title" id="live-title">Go <span class="outline">Live</span></h2>
+          <p class="section-lead">Live classes on Zoom and Instagram Live. RSVP for reminders and add any class to your calendar — times are shown in <strong id="viewer-tz">your time zone</strong>.</p>
+        </div>
+
+        <div class="live-grid">
+          <div class="stage-wrap" data-reveal>
+            <div class="stage" id="stage" data-state="offline">
+              <div class="stage-media" id="stage-media" aria-hidden="true"></div>
+              <div class="stage-hud">
+                <span class="stage-badge" id="stage-badge">Offline</span>
+                <span class="stage-viewers" id="stage-platform"></span>
+              </div>
+              <div class="stage-center">
+                <p class="stage-kicker" id="stage-kicker">Next class</p>
+                <h3 class="stage-title" id="stage-title">Loading schedule…</h3>
+                <p class="stage-meta" id="stage-meta"></p>
+                <div class="countdown" id="countdown" role="timer" aria-live="off">
+                  <span><b data-unit="d">0</b><small>days</small></span>
+                  <span><b data-unit="h">00</b><small>hrs</small></span>
+                  <span><b data-unit="m">00</b><small>min</small></span>
+                  <span><b data-unit="s">00</b><small>sec</small></span>
+                </div>
+                <div class="stage-actions" id="stage-actions"></div>
+              </div>
+              <div class="reactions" id="reactions" aria-hidden="true"></div>
+            </div>
+
+            <aside class="chat" id="chat" aria-label="Live chat">
+              <header class="chat-head">
+                <span><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg> Live chat</span>
+                <button type="button" class="chat-toggle" id="chat-toggle" aria-expanded="true" aria-controls="chat-body">Hide</button>
+              </header>
+              <div class="chat-body" id="chat-body">
+                <p class="chat-note">Preview — chat connects when the stream starts.</p>
+                <ol class="chat-log" id="chat-log" aria-live="polite"></ol>
+                <div class="chat-reacts" role="group" aria-label="Send a reaction">
+                  <button type="button" data-react="🔥" aria-label="Fire">🔥</button>
+                  <button type="button" data-react="👑" aria-label="Crown">👑</button>
+                  <button type="button" data-react="💃🏾" aria-label="Dancer">💃🏾</button>
+                  <button type="button" data-react="🪶" aria-label="Feather">🪶</button>
+                  <button type="button" data-react="❤️" aria-label="Heart">❤️</button>
+                </div>
+                <form class="chat-form" id="chat-form" autocomplete="off">
+                  <label class="sr-only" for="chat-input">Message</label>
+                  <input id="chat-input" name="message" maxlength="140" placeholder="Hype the class…" required>
+                  <button type="submit" class="icon-btn" aria-label="Send message"><svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button>
+                </form>
+              </div>
+            </aside>
+          </div>
+
+          <div class="schedule panel" data-reveal>
+            <div class="panel-head">
+              <h3><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg> Class schedule</h3>
+              <p class="muted small" id="schedule-range"></p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Filter classes" id="schedule-tabs">
+              <button role="tab" type="button" data-filter="all" aria-selected="true">All</button>
+              <button role="tab" type="button" data-filter="zoom" aria-selected="false">Zoom</button>
+              <button role="tab" type="button" data-filter="ig" aria-selected="false">IG Live</button>
+              <button role="tab" type="button" data-filter="rsvp" aria-selected="false">My RSVPs <span class="tab-count" id="rsvp-count">0</span></button>
+            </div>
+            <ol class="session-list" id="session-list" role="tabpanel" aria-label="Upcoming classes"></ol>
+          </div>
+        </div>
+
+        <div class="engage-grid">
+          <article class="panel engage" data-reveal>
+            <div class="engage-icon ig"><svg class="icon" aria-hidden="true"><use href="#i-instagram"/></svg></div>
+            <div>
+              <h3>Instagram Lives</h3>
+              <p class="muted">Quick-hit sessions, choreo teasers and Q&amp;As straight from the road. Follow so you get the notification the second we go live.</p>
+              <ul class="ig-list" id="ig-list"></ul>
+              <a class="btn btn-ghost btn-sm" data-social="instagram" target="_blank" rel="noopener">Follow <span data-handle></span></a>
+            </div>
+          </article>
+          <article class="panel engage" data-reveal>
+            <div class="engage-icon zoom"><svg class="icon" aria-hidden="true"><use href="#i-zoom"/></svg></div>
+            <div>
+              <h3>Zoom Meetings</h3>
+              <p class="muted">Full-length classes with cameras on, real coaching and shout-outs. RSVP and the class link is sent before every session.</p>
+              <h4 class="mini-title">Interactive remote events</h4>
+              <ul class="event-list" id="event-list"></ul>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="slash" aria-hidden="true"></div>
+
+    <!-- ============ ACTIVE (VIDEOS) ============ -->
+    <section class="section active" id="active" data-section aria-labelledby="active-title">
+      <div class="section-bg" aria-hidden="true"><div class="parallax-layer" data-parallax="0.15"><img src="img/light-trails.jpg" alt="" loading="lazy" width="791" height="1400"></div></div>
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>Video on demand</p>
+          <h2 class="section-title" id="active-title">Stay <span class="outline">Active</span></h2>
+          <p class="section-lead">Workouts, choreography breakdowns and road march recaps from our meetups and events — press play whenever the music hits you.</p>
+        </div>
+
+        <div class="vod-toolbar">
+          <div class="tabs" role="tablist" aria-label="Video categories" id="vod-tabs">
+            <button role="tab" type="button" data-cat="all" aria-selected="true">All</button>
+            <button role="tab" type="button" data-cat="workout" aria-selected="false">Workouts</button>
+            <button role="tab" type="button" data-cat="choreo" aria-selected="false">Choreo Breakdowns</button>
+            <button role="tab" type="button" data-cat="recap" aria-selected="false">Road March Recaps</button>
+            <button role="tab" type="button" data-cat="saved" aria-selected="false">Saved <span class="tab-count" id="saved-count">0</span></button>
+          </div>
+          <label class="search">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <span class="sr-only">Search videos</span>
+            <input type="search" id="vod-search" placeholder="Search videos">
+          </label>
+        </div>
+        <div class="vod-grid" id="vod-grid" role="tabpanel" aria-label="Videos"></div>
+        <p class="empty" id="vod-empty" hidden>No videos match — try another category or search.</p>
+
+        <div class="upload panel" id="upload" data-reveal>
+          <div class="upload-copy">
+            <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>Community uploads</p>
+            <h3 class="section-subtitle">Show us your moves</h3>
+            <p class="muted">Submit dance clips and transformation videos. Every clip is reviewed by our team before anything is shared, and selected queens get featured here and on our socials.</p>
+            <ul class="rules">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-film"/></svg> MP4, MOV or WebM</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg> Up to 3 minutes, 250 MB</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg> 18+ only, with everyone's consent</li>
+            </ul>
+          </div>
+          <form class="upload-form" id="upload-form" novalidate>
+            <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-describedby="drop-help">
+              <input type="file" id="file-input" accept="video/mp4,video/quicktime,video/webm,video/x-m4v,.mp4,.mov,.webm,.m4v" multiple hidden>
+              <svg class="icon drop-icon" aria-hidden="true"><use href="#i-upload"/></svg>
+              <strong>Drag &amp; drop your clips</strong>
+              <span id="drop-help">or <u>browse your files</u> — up to 3 clips at a time</span>
+            </div>
+            <ul class="file-queue" id="file-queue" aria-live="polite"></ul>
+            <div class="field-row">
+              <div class="field">
+                <label for="up-name">Name or IG handle</label>
+                <input id="up-name" name="name" required maxlength="60" autocomplete="name">
+                <p class="field-error" data-error-for="up-name"></p>
+              </div>
+              <div class="field">
+                <label for="up-email">Email</label>
+                <input id="up-email" name="email" type="email" required maxlength="120" autocomplete="email">
+                <p class="field-error" data-error-for="up-email"></p>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="up-type">Clip type</label>
+                <select id="up-type" name="type">
+                  <option>Dance clip</option>
+                  <option>Transformation</option>
+                  <option>Event / meetup moment</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="up-caption">Caption <span class="muted" id="caption-count">0/200</span></label>
+                <input id="up-caption" name="caption" maxlength="200" placeholder="Tell us about it">
+              </div>
+            </div>
+            <label class="check">
+              <input type="checkbox" id="up-consent" name="consent" required>
+              <span>I own this clip, everyone in it is 18+ and agrees to be featured by Road Queen Fitness.</span>
+            </label>
+            <p class="field-error" data-error-for="up-consent"></p>
+            <div class="upload-progress" id="upload-progress" hidden><span></span></div>
+            <button type="submit" class="btn btn-gem" id="upload-submit"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg> Submit clips</button>
+            <div class="form-result" id="upload-result" hidden></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div class="slash slash-flip" aria-hidden="true"></div>
+
+    <!-- ============ GEAR UP ============ -->
+    <section class="section gear" id="gear" data-section aria-labelledby="gear-title">
+      <div class="container">
+        <div class="section-head with-aside" data-reveal>
+          <div>
+            <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>Merch &amp; carnival wear</p>
+            <h2 class="section-title" id="gear-title">Gear <span class="outline">Up</span></h2>
+            <p class="section-lead">Train in it, fete in it, own the road in it. Hover a piece — or tap Flip — to see every angle.</p>
+          </div>
+          <p class="ship-note"><svg class="icon" aria-hidden="true"><use href="#i-truck"/></svg> <span>Free shipping over <strong data-free-ship></strong></span></p>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Product categories" id="shop-tabs">
+          <button role="tab" type="button" data-cat="all" aria-selected="true">All</button>
+          <button role="tab" type="button" data-cat="apparel" aria-selected="false">Apparel</button>
+          <button role="tab" type="button" data-cat="trainers" aria-selected="false">Waist Trainers</button>
+          <button role="tab" type="button" data-cat="carnival" aria-selected="false">Carnival Wear</button>
+          <button role="tab" type="button" data-cat="gear" aria-selected="false">Fitness Gear</button>
+        </div>
+        <div class="product-grid" id="product-grid" role="tabpanel" aria-label="Products"></div>
+      </div>
+    </section>
+
+    <!-- ============ JOIN US ============ -->
+    <section class="section join" id="join" data-section aria-labelledby="join-title">
+      <div class="section-bg" aria-hidden="true"><div class="parallax-layer" data-parallax="0.22"><img src="img/palms-night.jpg" alt="" loading="lazy" width="675" height="1200"></div></div>
+      <div class="container join-grid">
+        <div class="join-main" data-reveal>
+          <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>Join Us</p>
+          <h2 class="section-title" id="join-title">Join the <span class="outline">Movement</span></h2>
+          <ol class="join-steps">
+            <li><span>1</span><div><strong>Sign up below</strong><small>Get class links, drops and road invites by email.</small></div></li>
+            <li><span>2</span><div><strong>Pick your class</strong><small>RSVP to a live session or press play on demand.</small></div></li>
+            <li><span>3</span><div><strong>Share the vibe</strong><small>Tag <b data-handle></b> and bring your crew.</small></div></li>
+          </ol>
+
+          <form class="join-form panel" id="join-form" novalidate>
+            <div class="field-row">
+              <div class="field">
+                <label for="join-name">Name</label>
+                <input id="join-name" name="name" required maxlength="60" autocomplete="name" placeholder="Your name">
+                <p class="field-error" data-error-for="join-name"></p>
+              </div>
+              <div class="field">
+                <label for="join-email">Email</label>
+                <input id="join-email" name="email" type="email" required maxlength="120" autocomplete="email" placeholder="you@email.com">
+                <p class="field-error" data-error-for="join-email"></p>
+              </div>
+            </div>
+            <fieldset class="interests">
+              <legend>I'm in for… <span class="muted">(optional)</span></legend>
+              <label class="chip-check"><input type="checkbox" name="interests" value="Live classes" checked><span>Live classes</span></label>
+              <label class="chip-check"><input type="checkbox" name="interests" value="On-demand videos"><span>On-demand videos</span></label>
+              <label class="chip-check"><input type="checkbox" name="interests" value="Merch drops"><span>Merch drops</span></label>
+              <label class="chip-check"><input type="checkbox" name="interests" value="Ambassador"><span>Help promote 👑</span></label>
+            </fieldset>
+            <button type="submit" class="btn btn-gem btn-lg btn-block">Join the Movement <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            <p class="fine-print">No spam — just classes, drops and road invites. Unsubscribe anytime.</p>
+            <div class="form-result" id="join-result" hidden></div>
+          </form>
+        </div>
+
+        <aside class="connect panel" data-reveal aria-labelledby="connect-title">
+          <h3 id="connect-title">Spread the word</h3>
+          <p class="muted">Help grow the queendom — follow, share and tag <b data-handle></b> on your favorite platform.</p>
+          <ul class="social-list">
+            <li><a class="social tiktok" data-social="tiktok" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-tiktok"/></svg><span><strong>TikTok</strong><small>Dance challenges</small></span></a></li>
+            <li><a class="social instagram" data-social="instagram" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-instagram"/></svg><span><strong>Instagram</strong><small>Lives &amp; reels</small></span></a></li>
+            <li><a class="social facebook" data-social="facebook" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-facebook"/></svg><span><strong>Facebook</strong><small>Events &amp; community</small></span></a></li>
+            <li><a class="social youtube" data-social="youtube" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-youtube"/></svg><span><strong>YouTube</strong><small>Full workouts</small></span></a></li>
+          </ul>
+          <div class="connect-actions">
+            <button type="button" class="btn btn-ghost" id="share-btn"><svg class="icon" aria-hidden="true"><use href="#i-share"/></svg> Share Road Queen</button>
+            <button type="button" class="btn btn-ghost" id="qr-btn" aria-haspopup="dialog"><svg class="icon" aria-hidden="true"><use href="#i-qr"/></svg> QR code</button>
+          </div>
+          <a class="mail-link" data-email-link><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg> <span data-email></span></a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#home" aria-label="Back to top">
+        <img class="brand-mark" src="icon.svg" alt="" width="40" height="40">
+        <span class="brand-text"><strong>Road Queen</strong><small>Fitness</small></span>
+      </a>
+      <nav aria-label="Footer">
+        <ul class="footer-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#live">Live</a></li>
+          <li><a href="#active">Active</a></li>
+          <li><a href="#gear">Gear Up</a></li>
+          <li><a href="#join">Join Us</a></li>
+        </ul>
+      </nav>
+      <ul class="footer-social" aria-label="Social media">
+        <li><a data-social="tiktok" target="_blank" rel="noopener" aria-label="TikTok"><svg class="icon" aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+        <li><a data-social="instagram" target="_blank" rel="noopener" aria-label="Instagram"><svg class="icon" aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+        <li><a data-social="facebook" target="_blank" rel="noopener" aria-label="Facebook"><svg class="icon" aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        <li><a data-social="youtube" target="_blank" rel="noopener" aria-label="YouTube"><svg class="icon" aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+      </ul>
+      <p class="footer-copy">© <span id="year">2026</span> Road Queen Fitness · roadqueenfitness.com</p>
+    </div>
+  </footer>
+
+  <!-- ============ DIALOGS ============ -->
+  <dialog class="lightbox" id="lightbox" aria-label="Photo viewer">
+    <button type="button" class="icon-btn dialog-close" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <figure>
+      <img id="lightbox-img" alt="">
+      <figcaption id="lightbox-cap"></figcaption>
+    </figure>
+    <button type="button" class="icon-btn lb-prev" id="lb-prev" aria-label="Previous photo"><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
+    <button type="button" class="icon-btn lb-next" id="lb-next" aria-label="Next photo"><svg class="icon" aria-hidden="true"><use href="#i-right"/></svg></button>
+  </dialog>
+
+  <dialog class="video-dialog" id="video-dialog" aria-labelledby="video-dialog-title">
+    <button type="button" class="icon-btn dialog-close" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <div class="video-frame" id="video-frame"></div>
+    <div class="video-info">
+      <h3 id="video-dialog-title"></h3>
+      <p class="muted" id="video-dialog-meta"></p>
+    </div>
+  </dialog>
+
+  <dialog class="cart-drawer" id="cart" aria-labelledby="cart-title">
+    <header class="cart-head">
+      <h2 id="cart-title"><svg class="icon" aria-hidden="true"><use href="#i-cart"/></svg> Your bag</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close cart"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </header>
+    <div class="ship-meter" id="ship-meter"><p id="ship-text"></p><div class="meter"><span id="ship-bar"></span></div></div>
+    <ul class="cart-items" id="cart-items"></ul>
+    <div class="cart-empty" id="cart-empty">
+      <svg class="icon" aria-hidden="true"><use href="#i-crown"/></svg>
+      <p>Your bag is empty.</p>
+      <button type="button" class="btn btn-ghost btn-sm" data-close data-goto="#gear">Shop Gear Up</button>
+    </div>
+    <footer class="cart-foot" id="cart-foot">
+      <div class="cart-total"><span>Subtotal</span><strong id="cart-subtotal">$0.00</strong></div>
+      <p class="fine-print">Shipping and taxes are worked out at checkout.</p>
+      <button type="button" class="btn btn-gem btn-block" id="checkout-btn">Checkout <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <div class="form-result" id="checkout-result" hidden></div>
+    </footer>
+  </dialog>
+
+  <dialog class="qr-dialog" id="qr-dialog" aria-labelledby="qr-title">
+    <button type="button" class="icon-btn dialog-close" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <h2 id="qr-title">Open on your phone</h2>
+    <p class="muted">Scan to take Road Queen Fitness with you — or print it for your next meetup.</p>
+    <img src="qr-code.svg" width="240" height="240" alt="QR code linking to https://kevdogg05.github.io/road-queen-fitness/">
+    <p class="qr-url">kevdogg05.github.io/road-queen-fitness</p>
+    <div class="qr-actions">
+      <button type="button" class="btn btn-ghost btn-sm" id="qr-copy"><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg> Copy link</button>
+      <a class="btn btn-ghost btn-sm" href="qr-code.png" download="road-queen-fitness-qr.png">Download QR card</a>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite" popover="manual"></div>
+
+  <noscript><p class="noscript">Road Queen Fitness works best with JavaScript turned on — schedules, videos and the shop need it.</p></noscript>
+</body>
+</html>
