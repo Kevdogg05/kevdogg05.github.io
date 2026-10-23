@@ -18,12 +18,10 @@ own machine. No HeyGen services or accounts are involved.
 > with screenshots, setup steps and a QR code, is `sns-palace/index.html`:
 > https://kevdogg05.github.io/sns-palace/
 >
-> **Road Queen Fitness**, a Soca dance and fitness site (live class schedule,
-> on-demand videos, community clip uploads, a merch store and sign-up), lives in
-> `road-queen-fitness/`. It is plain HTML, CSS and JavaScript with no build
-> step. Class times, events, videos, products, social links and form endpoints
-> are edited in `road-queen-fitness/js/config.js` and `road-queen-fitness/js/data.js`:
-> https://kevdogg05.github.io/road-queen-fitness/
+> **Road Queen Fitness**, a Soca dance and fitness site, moved to its own
+> repository, [Kevdogg05/Road-Queen-Fitness](https://github.com/Kevdogg05/Road-Queen-Fitness),
+> and is served at https://roadqueenfitness.com. `road-queen-fitness/` here only
+> redirects old links and QR codes there.
 
 ## Status
 
