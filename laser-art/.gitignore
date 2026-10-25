@@ -1,0 +1,6 @@
+# downloaded on first run
+models/
+# per-photo outputs (personal photos stay out of the repo)
+out*/
+*.jpg
+*.png
