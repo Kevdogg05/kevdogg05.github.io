@@ -1,6 +1,10 @@
-opencv-python-headless>=4.9
-numpy
 Pillow
+mapbox_earcut
+numpy
+onnxruntime
+opencv-python-headless>=4.9
 potracer
 rembg
-onnxruntime
+shapely
+triangle
+trimesh

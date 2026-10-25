@@ -243,8 +243,143 @@ def render_preview(cut, score, px_per_mm, frame_mm, panel_h_px, panel_w_px, off)
     return out
 
 
+# ------------------------------------------------------------------ STL export
+def _polys_of(geom):
+    """Flatten any shapely geometry to a list of Polygons (drops lines/points)."""
+    if geom.is_empty:
+        return []
+    if geom.geom_type == "Polygon":
+        return [geom]
+    if hasattr(geom, "geoms"):
+        return [p for g in geom.geoms for p in _polys_of(g)]
+    return []
+
+
+def mask_to_polygons(mask, px_per_mm, tol_mm=0.06):
+    """0/1 mask -> list of shapely Polygons (with holes), in millimetres."""
+    from shapely.geometry import Polygon
+    from shapely.validation import make_valid
+    from shapely.ops import unary_union
+    m = (mask > 0).astype(np.uint8)
+    contours, hier = cv2.findContours(m, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+    if hier is None:
+        return []
+    hier = hier[0]
+    eps = tol_mm * px_per_mm
+    rings = [cv2.approxPolyDP(c, eps, True).reshape(-1, 2) / px_per_mm for c in contours]
+    polys = []
+    for i, (nxt, prv, child, parent) in enumerate(hier):
+        if parent != -1 or len(rings[i]) < 3:
+            continue
+        holes = []
+        c = child
+        while c != -1:
+            if len(rings[c]) >= 3:
+                holes.append(rings[c])
+            c = hier[c][0]
+        p = Polygon(rings[i], holes)
+        if not p.is_valid:
+            p = make_valid(p)          # may return a GeometryCollection with line slivers
+        polys += _polys_of(p)
+    return _polys_of(unary_union(polys))
+
+
+_TRI_WORKER = r"""
+import sys, pickle, trimesh
+g, h = pickle.load(sys.stdin.buffer)
+m = trimesh.creation.extrude_polygon(g, h, engine="triangle")
+pickle.dump((m.vertices, m.faces), sys.stdout.buffer)
+"""
+
+
+def _extrude_triangle_subprocess(g, height, timeout=60):
+    """The 'triangle' C library gives the best (watertight) results on polygons with many
+    holes, but segfaults on some inputs.  Run it in a child process so a crash just means
+    'no result' instead of taking the whole run down."""
+    import pickle, subprocess, sys, trimesh
+    try:
+        r = subprocess.run([sys.executable, "-c", _TRI_WORKER], input=pickle.dumps((g, height)),
+                           capture_output=True, timeout=timeout)
+        if r.returncode != 0 or not r.stdout:
+            return None
+        v, f = pickle.loads(r.stdout)
+        return trimesh.Trimesh(v, f, process=True)
+    except Exception:
+        return None
+
+
+def extrude(polys, height, z0, min_area=1e-3):
+    import trimesh
+    out = []
+    for p in polys:
+        geoms = p.geoms if p.geom_type == "MultiPolygon" else [p]
+        for g in geoms:
+            if g.geom_type != "Polygon" or g.area < min_area:
+                continue
+            # snap to a 0.01 mm grid and re-validate: the triangle library segfaults on
+            # duplicate / collinear vertices, and earcut leaves gaps on polygons with many holes.
+            from shapely import set_precision
+            g = set_precision(g, 0.01).buffer(0)
+            if g.is_empty or g.geom_type != "Polygon":
+                parts = _polys_of(g)
+                if not parts:
+                    continue
+                g = max(parts, key=lambda q: q.area)
+            m = trimesh.creation.extrude_polygon(g, height)              # earcut
+            if not m.is_watertight:
+                m2 = _extrude_triangle_subprocess(g, height)
+                if m2 is not None and m2.is_watertight:
+                    m = m2
+                else:
+                    trimesh.repair.fill_holes(m)
+            m.apply_translation((0, 0, z0))
+            out.append(m)
+    return out
+
+
+def write_stl(path, cut, score, px_per_mm, frame_mm, W, H, off,
+              base_mm=3.0, light_mm=1.5, groove_mm=0.6, split=False):
+    """Two-tone relief as STL.
+    z 0..base_mm            dark base plate (whole panel)
+    z base..base+light_mm   light layer: panel minus the dark (cut) regions inside the window
+    score lines             grooves groove_mm deep in the light layer
+    With split=True also writes <path>_base.stl and <path>_top.stl for two-colour printing.
+    """
+    import trimesh
+    from shapely.geometry import box
+    panel_w, panel_h = W / px_per_mm, H / px_per_mm
+    # full-panel masks
+    dark_full = np.zeros((H, W), np.uint8); score_full = np.zeros((H, W), np.uint8)
+    y, x = off
+    dark_full[y:y + cut.shape[0], x:x + cut.shape[1]] = cut
+    score_full[y:y + score.shape[0], x:x + score.shape[1]] = score
+    f = int(frame_mm * px_per_mm)
+    window = np.zeros((H, W), np.uint8); window[f:H - f, f:W - f] = 1
+    dark_full &= window
+    light_full = 1 - dark_full
+    score_full &= light_full
+    light_solid = light_full & (1 - score_full)        # full height
+    light_grooved = light_full & score_full             # reduced height
+    # STL y axis points up; image rows point down -> flip rows so the print isn't mirrored
+    light_solid, light_grooved = light_solid[::-1], light_grooved[::-1]
+
+    base = trimesh.creation.box((panel_w, panel_h, base_mm))
+    base.apply_translation((panel_w / 2, panel_h / 2, base_mm / 2))
+    top = extrude(mask_to_polygons(light_solid, px_per_mm), light_mm, base_mm)
+    top += extrude(mask_to_polygons(light_grooved, px_per_mm), light_mm - groove_mm, base_mm)
+    top_mesh = trimesh.util.concatenate(top)
+    whole = trimesh.util.concatenate([base, top_mesh])
+    whole.export(path)
+    if split:
+        root = path[:-4] if path.lower().endswith(".stl") else path
+        base.export(root + "_base.stl")
+        top_mesh.export(root + "_top.stl")
+    return dict(stl=path, triangles=len(whole.faces), size_mm=(round(panel_w, 1), round(panel_h, 1), base_mm + light_mm),
+                top_bodies=len(top), top_watertight=all(m.is_watertight for m in top))
+
+
 # ------------------------------------------------------------------ main
-def run(photo, out, height_mm=300, frame_mm=12, level=2, px_per_mm=8.0, cache=None, bust=None, tag="", face_aware=True):
+def run(photo, out, height_mm=300, frame_mm=12, level=2, px_per_mm=8.0, cache=None, bust=None, tag="", face_aware=True, stl=False):
     os.makedirs(out, exist_ok=True)
     P = LEVELS[level]
     rgb, alpha = load_subject(photo, cache)
@@ -337,6 +472,11 @@ def run(photo, out, height_mm=300, frame_mm=12, level=2, px_per_mm=8.0, cache=No
     if score.any():
         Image.fromarray((1 - score) * 255).save(os.path.join(out, f"mask{tag}_score_L{level}.png"))
 
+    if stl:
+        st = write_stl(os.path.join(out, f"relief{tag}_L{level}_{P['name']}.stl"), cut, score, px_per_mm,
+                       frame_mm, W, H, off, split=True)
+        print(st)
+
     n_cut = len(cut_d); n_score = len(score_d)
     stats = dict(level=level, name=P["name"], panel_mm=(round(width_mm, 1), height_mm),
                  cut_paths=n_cut, score_paths=n_score,
@@ -376,7 +516,8 @@ if __name__ == "__main__":
     ap.add_argument("--bust", type=int, default=None, help="head-and-shoulders crop of face N (0 = leftmost)")
     ap.add_argument("--tag", default="", help="suffix for output file names")
     ap.add_argument("--no-face-aware", action="store_true", help="same detail everywhere (no face detection)")
+    ap.add_argument("--stl", action="store_true", help="also export a 3D-printable two-tone relief (STL)")
     a = ap.parse_args()
     levels = [a.level] if a.level else [1, 2, 3, 4]
     for L in levels:
-        run(a.photo, a.out, a.height_mm, a.frame_mm, L, a.px_per_mm, a.cache, a.bust, a.tag, not a.no_face_aware)
+        run(a.photo, a.out, a.height_mm, a.frame_mm, L, a.px_per_mm, a.cache, a.bust, a.tag, not a.no_face_aware, a.stl)

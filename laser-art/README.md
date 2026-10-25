@@ -101,6 +101,35 @@ Pipeline (sizes are in millimetres so presets stay valid at any panel size):
 
 Outputs per level: `design_*.svg`, `preview_*.png`, `mask_*_cut.png`, `mask_*_score.png`, plus a one-line stats dict (paths and island count) on stdout.
 
+### STL export (3D-printable relief)
+
+```
+python3 photo2laser.py photo.jpg --out out --bust 0 --level 2 --height-mm 200 --frame-mm 8 --stl
+```
+
+`--stl` writes the same design as a two-tone relief:
+
+| z range | body | meaning |
+|---|---|---|
+| 0 – 3.0 mm | `*_base.stl` | the dark "walnut" plate, whole panel |
+| 3.0 – 4.5 mm | `*_top.stl` | the light layer: panel minus the cut regions inside the window |
+| 3.9 mm top | grooves in the top layer | score lines, 0.6 mm deep |
+
+`relief_*.stl` is both bodies in one file. Print it in one colour and add a
+**filament change at z = 3.0 mm** (dark below, light above) and you get the
+two-tone look from a single-extruder printer; with a multi-material printer
+load `_base` and `_top` as two objects. Heights are arguments of `write_stl`
+(`base_mm`, `light_mm`, `groove_mm`). At 200 mm tall the panels are 150–160 mm
+wide and fit a 220 mm bed; use `--height-mm 300` for the laser-size version.
+
+Meshes are built by extruding the traced polygons (shapely + trimesh). Each
+body is checked for watertightness; the `triangle` triangulator gives the
+cleanest result on shapes with many holes but can crash on some inputs, so it
+runs in a child process with earcut as the fallback. On the test photo every
+design slices cleanly; two of them report one large body with a non-manifold
+edge where a hole touches the outline, plus a couple of 3 mm² islands with open
+edges, which every common slicer repairs on import.
+
 Presets live in `LEVELS` at the top of the script; every number is in mm or mm².
 
 ---
@@ -112,3 +141,4 @@ Presets live in `LEVELS` at the top of the script; every number is in mm or mm²
 3. Add a bridge/tab generator for method B (connect light islands to the body with 1.5 mm tabs) so two-sheet builds need no hand placement.
 4. Name plate: the reference engraves a name in script in a light tab in the corner; a `--name` flag with a script font is a 20-line addition.
 5. Run the material test grid on real basswood + walnut and record the S1 numbers here.
+6. STL: merge the top bodies into one shell (boolean union) and add an optional hanging slot or magnet pocket on the back.
