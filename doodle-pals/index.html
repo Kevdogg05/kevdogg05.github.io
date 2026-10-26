@@ -333,6 +333,73 @@
   .c-art.artpaper { background-color: #fbfaf6; background-image: var(--grain); animation: none; }
   .peek.artpaper svg { width: 92%; height: 92%; }
   @keyframes toast { 0% { transform: translate(-50%, -160%) scale(.8); } 18%, 78% { transform: translate(-50%, 0) scale(1); } 100% { transform: translate(-50%, -160%) scale(.9); } }
+
+  /* ---------- My Studio ---------- */
+  @media (max-width: 560px) { .mode-tabs { gap: 8px; } .mode-tabs .mode-tab { flex-direction: column; justify-content: center; text-align: center; gap: 2px; padding: 8px 4px; } .mode-tabs .mode-tab small { display: none; } .mode-tabs .mode-tab b { font-size: 16px; } }
+  .promo { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #fff; border: 3px solid #ff7a45; border-radius: 24px; padding: 12px 18px; --sh: #d65a24; line-height: 1.2; }
+  .promo b { display: block; font-size: 20px; color: #d65a24; }
+  .promo small { display: block; font-size: 15px; font-weight: 500; color: #7a6e93; }
+  .promo > .lucide { margin-left: auto; color: #ff7a45; width: 28px; height: 28px; }
+  #studioHome section { scroll-margin-top: 90px; }
+  .studio-card { background: #fff; border-radius: 28px; padding: 20px; box-shadow: 0 6px 0 #eadccb; }
+  .chal { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: center; border: 4px solid #ffd23f; box-shadow: 0 6px 0 #dda600; }
+  .chal-thumb .pal-art { width: 100%; }
+  @media (max-width: 600px) { .chal { grid-template-columns: 1fr; text-align: center; } .chal-thumb { width: min(100%, 210px); margin: 0 auto; } .chal .week, .chal .flex { justify-content: center; } }
+  .kicker { font-weight: 700; color: #c47f00; text-transform: uppercase; letter-spacing: .04em; font-size: 15px; }
+  .chal-twist { margin-top: 6px; font-size: 20px; font-weight: 600; color: #6b5f86; }
+  .streak { font-weight: 700; font-size: 18px; background: #fff3d6; border-radius: 999px; padding: 8px 14px; }
+  .week { display: flex; gap: 8px; flex-wrap: wrap; }
+  .wk { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: #f2e8db; font-weight: 700; color: #9a8fae; font-size: 14px; }
+  .wk.on { background: #ff9f43; color: #fff; }
+  .wk.today { box-shadow: 0 0 0 3px #ffd23f; }
+  .chal-note { margin-top: 6px; font-weight: 700; color: #b87400; }
+  .new-pal .pal-art { background: repeating-linear-gradient(45deg, var(--tint), var(--tint) 12px, #fff 12px, #fff 24px); }
+  .plus { width: 64px; height: 64px; border-radius: 50%; background: var(--cat); color: #fff; display: grid; place-items: center; box-shadow: 0 4px 0 var(--cat-sh); }
+  .plus .lucide { width: 36px; height: 36px; }
+  .my-main { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  .my-acts { display: flex; gap: 10px; margin-top: 8px; }
+  .my-acts .tool { width: 40px; height: 40px; }
+  .sketch-go { background: #fff; --sh: #eadccb; font-size: 20px; }
+  .gal-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  @media (max-width: 440px) { .gal-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+  .gal-item { display: flex; flex-direction: column; min-width: 0; background: #fff; border-radius: 20px; padding: 8px; box-shadow: 0 5px 0 #eadccb; text-align: left; }
+  .gal-item img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; background: var(--paper); }
+  .gal-cap { margin-top: 6px; font-weight: 600; font-size: 15px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gal-item small { color: #8d82a6; font-weight: 500; }
+  .empty { grid-column: 1 / -1; color: #8d82a6; font-weight: 500; font-size: 17px; background: #fff; border-radius: 20px; padding: 18px; }
+  .viewer-card { position: relative; width: min(640px, 100%); max-height: calc(100dvh - 32px); overflow: auto; background: #fff; border-radius: 28px; padding: 18px; text-align: center; box-shadow: 0 10px 0 #eadccb; animation: cardIn .4s cubic-bezier(.3,1.6,.5,1); }
+  .viewer-card img { width: 100%; max-height: 60dvh; object-fit: contain; border-radius: 18px; background: var(--paper); }
+  /* quick sketch reuses the guide screen */
+  #guide.sketch .speed, #guide.sketch #playBtn, #guide.sketch #peekBtn, #guide.sketch #traceBtn, #guide.sketch #trace, #guide.sketch .legend, #guide.sketch #peek { display: none !important; }
+  .step-badge.hurry { background: #ff4f6d; animation: tipPop .5s ease infinite alternate; }
+  #guide.sketch .step-badge { font-size: 26px; }
+  .pad-over { position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 10px 14px; border-radius: 18px; background: rgba(255,255,255,.95); text-align: center; font-weight: 700; font-size: 18px; color: var(--cat-sh); box-shadow: 0 4px 0 #eadccb; }
+  /* make your own pal */
+  .mk-wrap { display: grid; gap: 20px; grid-template-columns: minmax(260px, 400px) minmax(0, 1fr); align-items: start; }
+  .mk-left { position: sticky; top: 12px; display: flex; flex-direction: column; gap: 12px; }
+  .mk-stage { aspect-ratio: 1; border-radius: 28px; background: var(--tint); display: grid; place-items: center; box-shadow: 0 6px 0 var(--cat-sh); border: 4px solid #fff; --hole: var(--tint); }
+  .mk-stage svg { width: 86%; height: 86%; overflow: visible; }
+  @media (max-width: 760px) {
+    .mk-wrap { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .mk-left { position: static; }
+    .mk-stage { width: min(100%, 260px); margin: 0 auto; }
+  }
+  .mk-name { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 18px; padding: 8px 14px; box-shadow: 0 4px 0 #eadccb; font-weight: 700; color: #6b5f86; }
+  .mk-name input { flex: 1; min-width: 0; font: inherit; font-size: 22px; border: 0; outline: none; background: transparent; color: var(--ink); }
+  .mk-name:focus-within { box-shadow: 0 0 0 3px var(--cat), 0 4px 0 #eadccb; }
+  .mk-panel { background: #fff; border-radius: 28px; padding: 4px 18px 20px; box-shadow: 0 6px 0 #eadccb; min-width: 0; }
+  .mk-panel .chip[aria-pressed="true"] { background: var(--c); color: #fff; --sh: var(--csh); }
+  .mk-h { margin-top: 16px; font-size: 18px; font-weight: 700; }
+  .mk-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .mk-opt { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 92px; padding: 6px; border-radius: 18px; background: #fffaf3; border: 3px solid transparent; box-shadow: 0 4px 0 #eadccb; }
+  .mk-opt[aria-pressed="true"] { border-color: var(--cat); background: var(--tint); }
+  .mk-thumb { width: 74px; height: 74px; display: grid; place-items: center; }
+  .mk-thumb svg { width: 100%; height: 100%; }
+  .mk-opt.wig .mk-thumb svg { overflow: visible; }
+  .mk-lbl { font-size: 14px; font-weight: 600; line-height: 1.1; }
+  .mk-sw { width: 44px; height: 44px; border-radius: 50%; background: var(--c); border: 4px solid #fff; box-shadow: 0 0 0 2px #e3d7c6; transition: transform .15s; }
+  .mk-sw[aria-pressed="true"] { box-shadow: 0 0 0 4px var(--ink); transform: scale(1.1); }
+  @media (max-width: 480px) { .mk-panel { padding: 2px 12px 16px; } .mk-opt { width: 76px; } .mk-thumb { width: 60px; height: 60px; } .mk-sw { width: 38px; height: 38px; } }
 </style>
 </head>
 <body class="font-display antialiased">
@@ -361,9 +428,10 @@
     <button id="soundBtn" class="icon-btn btn3d shrink-0" aria-label="Sound on" title="Sound on/off"></button>
   </header>
 
-  <div class="grid grid-cols-2 gap-3 mb-4" role="tablist" aria-label="Choose what to learn">
+  <div class="mode-tabs grid grid-cols-3 gap-3 mb-4" role="tablist" aria-label="Choose what to do">
     <button id="tabPals" class="mode-tab btn3d" role="tab" aria-selected="true" style="--c:#f35fae;--csh:#c93d88"><span class="mode-emoji" aria-hidden="true">🐱</span><span><b>Cartoon Pals</b><small id="palCount">60 cute characters</small></span></button>
     <button id="tabArt" class="mode-tab btn3d" role="tab" aria-selected="false" style="--c:#7a5af8;--csh:#5838d6"><span class="mode-emoji" aria-hidden="true">🎨</span><span><b>Art School</b><small>Real paper &amp; pencil</small></span></button>
+    <button id="tabStudio" class="mode-tab btn3d" role="tab" aria-selected="false" style="--c:#ff7a45;--csh:#d65a24"><span class="mode-emoji" aria-hidden="true">🖍️</span><span><b>My Studio</b><small>Make, practice, show off</small></span></button>
   </div>
 
   <div class="rounded-[28px] bg-white p-4 sm:p-5 shadow-[0_6px_0_#eadccb] flex flex-wrap items-center gap-4">
@@ -387,6 +455,7 @@
     <div id="sections"></div>
   </div>
   <div id="artHome" hidden></div>
+  <div id="studioHome" hidden></div>
 
   <footer class="mt-14 text-center text-[#8d82a6] font-medium">
     <p>Tip: watch the pencil, then try it yourself — on the sketchpad or on real paper! ✏️</p>
@@ -416,6 +485,7 @@
         <div id="stepOf" class="text-sm font-bold uppercase tracking-wide text-[var(--cat)]">Step 1 of 5</div>
         <p id="tipText" class="text-xl sm:text-2xl font-semibold leading-snug"></p>
         <p id="artTip" class="mt-1 text-base sm:text-lg font-medium leading-snug text-[#6b5f86]" hidden></p>
+        <p id="chalNote" class="chal-note" hidden></p>
       </div>
       <button id="speakBtn" class="tool btn3d shrink-0" aria-label="Read it to me" title="Read it to me" data-ico="volume-2"></button>
     </div>
@@ -424,7 +494,7 @@
   <main class="panels px-3 sm:px-5 mt-3">
     <div class="panel">
       <div class="panel-bar">
-        <span class="panel-title"><span data-ico="eye"></span> Watch me!</span>
+        <span id="stageTitle" class="panel-title"><span data-ico="eye"></span> Watch me!</span>
         <button id="speedBtn" class="speed btn3d" role="switch" aria-checked="false" aria-label="Fast drawing" title="Slow down or speed up">
           <span class="sp-slow" data-ico="turtle"></span>
           <span class="sp-track"><span class="sp-knob"></span></span>
@@ -454,6 +524,7 @@
         <svg id="trace" viewBox="0 0 200 200" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden></svg>
         <canvas id="pad" aria-label="Practice sketchpad"></canvas>
         <div id="padHint" class="pad-hint">Draw here with your finger or mouse!</div>
+        <div id="padOver" class="pad-over" role="status" hidden></div>
       </div>
       <div id="swatches" class="flex flex-wrap items-center gap-3 px-1 pt-1"></div>
     </div>
@@ -480,6 +551,30 @@
   </nav>
 </section>
 
+<!-- ================= MAKE YOUR OWN PAL ================= -->
+<section id="maker" class="mx-auto max-w-6xl px-3 sm:px-6 pb-12" hidden>
+  <header class="flex items-center gap-3 pt-3 pb-4">
+    <button id="mkHome" class="icon-btn btn3d shrink-0" aria-label="Back to My Studio" title="My Studio" data-ico="house"></button>
+    <h2 id="mkTitle" class="text-2xl sm:text-3xl font-bold leading-tight">Make your own pal</h2>
+  </header>
+  <div class="mk-wrap">
+    <div class="mk-left">
+      <div id="mkStage" class="mk-stage" role="img" aria-label="Your pal"></div>
+      <label class="mk-name">Name <input id="mkName" maxlength="14" autocomplete="off" spellcheck="false"></label>
+      <p id="mkInfo" class="text-center font-semibold text-[#6b5f86]"></p>
+      <div class="flex flex-wrap gap-3 justify-center">
+        <button id="mkRandom" class="nav-btn btn3d bg-white">🎲 Mix it up</button>
+        <button id="mkSave" class="nav-btn btn3d bg-white"><span data-ico="check"></span> Save</button>
+      </div>
+      <button id="mkDraw" class="nav-btn nav-next btn3d w-full">Draw my pal! <span data-ico="pencil"></span></button>
+    </div>
+    <div class="mk-panel">
+      <div id="mkTabs" class="chip-row flex gap-2 overflow-x-auto pt-4 pb-1" role="tablist" aria-label="Choose what to change"></div>
+      <div id="mkPanel"></div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= CELEBRATION ================= -->
 <div id="celebrate" class="celebrate" role="dialog" aria-modal="true" aria-labelledby="cTitle" hidden>
   <div class="c-card">
@@ -496,6 +591,18 @@
       <label id="cPhoto" class="nav-btn btn3d bg-white text-lg cursor-pointer" hidden><input id="cPhotoIn" type="file" accept="image/*" capture="environment" class="sr-only"><span data-ico="camera"></span> Add my photo</label>
       <button id="cAgain" class="nav-btn btn3d bg-white text-lg"><span data-ico="rotate-ccw"></span> Again</button>
       <button id="cHome" class="nav-btn btn3d bg-white text-lg"><span data-ico="house"></span> All pals</button>
+    </div>
+  </div>
+</div>
+<div id="viewer" class="celebrate" role="dialog" aria-modal="true" aria-labelledby="vTitle" hidden>
+  <div class="viewer-card">
+    <img id="vImg" alt="">
+    <h2 id="vTitle" class="mt-3 text-2xl font-bold"></h2>
+    <p id="vDate" class="text-[#6b5f86] font-medium"></p>
+    <div class="mt-4 flex flex-wrap justify-center gap-3">
+      <a id="vSave" class="nav-btn btn3d bg-white text-lg" download><span data-ico="download"></span> Save it</a>
+      <button id="vDel" class="nav-btn btn3d bg-white text-lg"><span data-ico="trash-2"></span> Delete</button>
+      <button id="vClose" class="nav-btn nav-next btn3d text-lg" style="--cat:#ff7a45;--cat-sh:#d65a24">Close</button>
     </div>
   </div>
 </div>
@@ -594,7 +701,7 @@ const flower = (x, y, s, petal, mid) => [S(scallop(x, y, s, s, 5, 1), petal), S(
 const snow = (x, y, s, dl = 0) => [90, 30, -30].map(a => { const [x1, y1] = pol(x, y, s, a), [x2, y2] = pol(x, y, s, a + 180); return S(P`M${x1} ${y1}L${x2} ${y2}`, null, { sc: '#7cc4ff', w: 3.5, a: 'twinkle', dl }); });
 
 /* =====================================================================
-   2. CHARACTER LIBRARY — 60 pals, 7 themes, every one fully drawable
+   2. CHARACTER LIBRARY — 60 pals, 7 themes, every one fully drawable (plus the ones you make yourself)
    ===================================================================== */
 const CATS = [
   { id: 'kids', name: 'Cool Kids', emoji: '🧒', blurb: 'Cartoon friends of every look', c: '#e8574e', t: '#ffe9e6', sh: '#bb3a32' },
@@ -1132,15 +1239,115 @@ add('ava', 'Ava', 'Ponytail', 'kids', 'jfloat', [
 
 /* index shapes; split multi-part paths so the pencil lifts between them */
 const byId = {};
-CHARS.forEach(ch => {
+function indexChar(ch) {
   let i = 0;
   ch.steps.forEach(st => {
     st.s.forEach(s => { s._i = i++; });
     st.g = st.s.filter(s => !s.deco).flatMap(s => s.d.split(/(?=M)/).map(d => ({ d: d.trim(), ink: s.ink })));
   });
   ch._layers = ch.steps.flatMap(st => st.s).sort((a, b) => (a.z || 0) - (b.z || 0) || a._i - b._i);
-  byId[ch.id] = ch;
-});
+  return ch;
+}
+CHARS.forEach(ch => { byId[ch.id] = indexChar(ch); });
+
+/* =====================================================================
+   2b. MAKE YOUR OWN PAL — pick the parts, get a step-by-step guide for your own character
+   ===================================================================== */
+CAT.mine = { id: 'mine', name: 'My Pals', emoji: '🖍️', c: '#ff7a45', t: '#fff0e6', sh: '#d65a24' };
+const shade = (hex, k = .62) => '#' + [1, 3, 5].map(i => Math.min(255, Math.round(parseInt(hex.slice(i, i + 2), 16) * k)).toString(16).padStart(2, '0')).join('');
+/* swirl lines in curly hair: lighter on dark hair, darker on light hair */
+const texC = hex => { const v = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)); return v[0] * .3 + v[1] * .59 + v[2] * .11 < 110 ? '#' + v.map(x => Math.round(x + (255 - x) * .3).toString(16).padStart(2, '0')).join('') : shade(hex, .72); };
+const MK_FACES = [
+  ['round', 'Round', C(100, 80, 42), 41, "Draw a big round circle for NAME's face — like a cookie! 🍪"],
+  ['oval', 'Oval', E(100, 82, 40, 44), 40, "Draw an oval for NAME's face, like an egg standing up. 🥚"],
+  ['heart', 'Heart', 'M100 40C128 40 142 60 141 82C140 104 120 120 100 124C80 120 60 104 59 82C58 60 72 40 100 40Z', 41, "Draw a heart-shaped face for NAME — round on top, a soft point at the chin. 💗"],
+  ['square', 'Square', 'M62 54Q62 40 78 40H122Q138 40 138 54V96Q138 122 100 122Q62 122 62 96Z', 38, "Draw a soft square for NAME's face — like a slice of toast! 🍞"],
+  ['wide', 'Chubby', 'M100 42C130 42 146 62 146 86C146 110 126 124 100 124C74 124 54 110 54 86C54 62 70 42 100 42Z', 45, "Draw a wide, squishy face for NAME — like a dinner roll! 🥐"],
+].map(([id, name, d, ex, t]) => ({ id, name, d, ex, t }));
+const MK_SKIN = ['#ffe3cc', '#ffd2b0', '#f1c27d', '#e0ac69', '#c68642', '#a86b3c', '#8d5524', '#5e3a22'];
+const MK_HAIRC = ['#2b2733', '#3b2621', '#6b4226', '#a0522d', '#e0773a', '#f2c94c', '#ff8fc4', '#9b7bff', '#4aa3ff', '#3ec18c'];
+const MK_CLOTH = ['#ff6b6b', '#ff9f43', '#ffcf3f', '#3ec18c', '#2ec4b6', '#4f8ef7', '#7c6cff', '#b38cff', '#ff8fc4', '#ffffff', '#3d3552'];
+const TIE = '#ff7aa8';
+const capHair = 'M58 78C56 48 76 34 100 34C124 34 144 48 142 78C134 62 118 56 100 56C82 56 66 62 58 78Z';
+const partHair = 'M60 86C56 48 76 32 100 32C124 32 144 48 140 86C136 62 118 50 100 52C82 50 64 62 60 86Z';
+const partLine = c => S('M100 34V51', null, { sc: shade(c, .55), w: 2.5, z: 1.2 });
+/* each hairstyle: name, the step text, the shapes, which ears still show, where a bow sits, where a crown sits */
+const MK_HAIR = [
+  ['short', 'Short', 'Draw short hair: a cap on top with a pointy fringe, like little mountains. ⛰️', c => [S('M57 78C55 46 76 30 100 30C124 30 145 46 143 78C138 66 132 60 125 58L119 64L112 56L104 63L96 55L88 63L80 56L74 62C67 64 61 70 57 78Z', c, { z: 1 })], [-1, 1], [128, 40], 32],
+  ['curly', 'Curly', 'Make curly hair with a bumpy cloud shape across the top. ☁️', c => [S(scallop(100, 46, 46, 22, 14, 1.1), c, { z: 1 })], [-1, 1], [132, 36], 26],
+  ['puffs', 'Puffs', 'Draw a cap of hair, then two puffy cloud buns, each with a hair tie. ☁️', c => [S('M58 76C57 46 76 32 100 32C124 32 143 46 142 76C132 62 118 56 100 56C82 56 68 62 58 76Z', c, { z: 1 }), S(scallop(56, 42, 24, 24, 12, 1.1), c, { z: -1, a: 'bob', o: [56, 42] }), S(scallop(144, 42, 24, 24, 12, 1.1), c, { z: -1, a: 'bob', o: [144, 42], dl: .3 }), S(ER(67, 51, 8, 4, -49), TIE, { z: 1.5 }), S(ER(133, 51, 8, 4, 49), TIE, { z: 1.5 })], [-1, 1], [100, 36], 34],
+  ['afro', 'Afro', 'Draw a big round afro behind the head — a huge bumpy cloud — then the hairline. ☁️', c => [S(scallop(100, 64, 60, 50, 18, 1.12), c, { z: -4 }), S(capHair, c, { z: 1 }), ...[[62, 40], [138, 40], [100, 24], [48, 78], [152, 78]].map(([x, y]) => S(spiral(x, y, 1, 6, 1.4), null, { sc: texC(c), w: 2.5, z: -3.9 }))], [-1, 1], [140, 30], 18],
+  ['bob', 'Bob', 'Draw a bob: a big rounded box behind the face, then bangs with a zig-zag edge. ✂️', c => [S('M52 120C46 92 46 56 62 40C76 26 124 26 138 40C154 56 154 92 148 120Z', c, { z: -4 }), S('M60 76C58 46 78 32 100 32C122 32 142 46 140 76L131 68L122 74L111 66L100 73L89 66L78 74L69 68Z', c, { z: 1 })], [], [126, 46], 28],
+  ['long', 'Long', 'Draw long hair falling past the shoulders, then a middle part on top, like curtains.', c => [S('M54 152C42 120 44 60 60 42C74 28 126 28 140 42C156 60 158 120 146 152Q100 160 54 152Z', c, { z: -4 }), S('M58 92C54 50 76 32 100 32C124 32 146 50 142 92C138 64 120 50 100 52C80 50 62 64 58 92Z', c, { z: 1 }), partLine(c)], [], [126, 44], 30],
+  ['ponytail', 'Ponytail', 'Draw side-swept hair, then a bouncy ponytail shaped like a big comma!', c => [S('M59 82C54 48 76 32 102 32C128 32 146 50 141 84C134 66 122 58 110 54C96 60 74 64 59 82Z', c, { z: 1 }), S('M124 38C150 24 174 50 168 84C164 104 154 116 146 124C150 104 154 84 150 70C146 56 136 48 126 46Z', c, { z: -1, a: 'wag', o: [128, 40] })], [-1, 1], [127, 40], 30],
+  ['braid', 'Braid', 'Draw a middle part, then a braid over the shoulder: stack little ovals like beads! 📿', c => [S(partHair, c, { z: 1 }), partLine(c), ...[[142, 92], [141, 104], [139, 116], [137, 128], [135, 140]].map(([x, y]) => S(E(x, y, 7.5, 6.5), c, { z: 0.5 })), S(E(134, 149, 5, 3.5), TIE, { z: 0.6 }), S('M131 152Q126 162 128 168Q133 163 134 155Q136 163 141 167Q141 159 137 152Z', c, { z: 0.55 })], [-1], [72, 50], 30],
+  ['pigtails', 'Pigtails', 'Draw a middle part, then two pigtails hanging from the sides, each with a hair tie.', c => {
+    const tail = 'M61 70C40 64 26 92 32 118C34 128 40 136 46 136C44 122 48 104 58 92Z';
+    return [S(partHair, c, { z: 1 }), partLine(c), S(tail, c, { z: -1.5, a: 'flop', o: [60, 80] }), S(mx(tail), c, { z: -1.5, a: 'flopR', o: [140, 80] }), S(ER(58, 78, 4.5, 8, 25), TIE, { z: 1.5 }), S(ER(142, 78, 4.5, 8, -25), TIE, { z: 1.5 })];
+  }, [-1, 1], [126, 44], 30],
+  ['buns', 'Space buns', 'Draw two round buns on top — like mouse ears! — then the cap of hair. 🐭', c => [S(C(68, 36, 15), c, { z: -1 }), S(C(132, 36, 15), c, { z: -1 }), S(spiral(68, 36, 1, 7, 1.4), null, { sc: texC(c), w: 2.5, z: -0.9 }), S(spiral(132, 36, 1, 7, 1.4), null, { sc: texC(c), w: 2.5, z: -0.9 }), S(capHair, c, { z: 1 })], [-1, 1], [100, 36], 34],
+].map(([id, name, t, shapes, ears, acc, crown]) => ({ id, name, t, shapes, ears, acc, crown }));
+const MK_EYES = [['shiny', 'Shiny', 'big shiny eyes'], ['lashes', 'Lashes', 'shiny eyes with lash flicks'], ['happy', 'Happy', 'happy curved eyes'], ['wink', 'Wink', 'one open eye and one wink'], ['sleepy', 'Sleepy', 'sleepy eyes']];
+const MK_BROWS = [['none', 'None', ''], ['thin', 'Thin', ', eyebrows'], ['thick', 'Thick', ', thick eyebrows']];
+const MK_MOUTH = [['smile', 'Smile', 'a smile'], ['open', 'Grin', 'a big open grin'], ['tongue', 'Silly', 'a silly tongue'], ['oh', 'Oh!', 'a little round "oh" mouth'], ['cat', 'Cat', 'a cat smile like a "w"'], ['fang', 'Tooth', 'a smile with one tiny tooth']];
+const MK_HEAD = [['none', 'None'], ['bow', 'Bow', 'a bow'], ['star', 'Star clip', 'a star clip'], ['flower', 'Flower', 'a flower clip'], ['crown', 'Crown', 'a crown'], ['cap', 'Cap', 'a baseball cap'], ['phones', 'Headphones', 'headphones']];
+const MK_TOP = [['tee', 'T-shirt', 'a T-shirt — like a wide letter T. 👕'], ['hoodie', 'Hoodie', 'a hoodie — draw it just like a T-shirt.'], ['collar', 'Collar', 'a top (the collar comes later).'], ['stripes', 'Stripes', 'a T-shirt (the stripes come later!).']];
+const MK_BOTTOM = [['shorts', 'Shorts', 'Draw noodle arms with round hands, shorts, and two bean-shaped shoes.'], ['skirt', 'Skirt', 'Draw a skirt like a triangle with the top cut off, then arms, legs and shoes.'], ['pants', 'Pants', 'Draw arms and hands, long pants, and two sneakers. 👟']];
+const MK_PIC = [['none', 'None'], ['heart', 'Heart', 'a heart'], ['star', 'Star', 'a star'], ['bolt', 'Lightning', 'a lightning bolt'], ['flower', 'Flower', 'a flower']];
+const MK_IDLE = [['bounce', 'Bouncy'], ['hop', 'Hoppy'], ['sway', 'Swaying'], ['jfloat', 'Floaty'], ['wobble', 'Wobbly']];
+const MK_NAMES = ['Zara', 'Kiki', 'Milo', 'Nova', 'Bea', 'Jojo', 'Remy', 'Luna', 'Sky', 'Pip', 'Tia', 'Max', 'Ivy', 'Rio', 'Coco', 'Juni', 'Ollie', 'Rosa'];
+const MK_DEFAULT = { face: 'round', skin: MK_SKIN[2], hair: 'puffs', hairC: MK_HAIRC[1], eyes: 'shiny', brows: 'thin', mouth: 'smile', head: 'none', glasses: false, freckles: false, top: 'tee', topC: MK_CLOTH[6], bottom: 'shorts', bottomC: MK_CLOTH[5], shoes: MK_CLOTH[8], pic: 'heart', idle: 'bounce' };
+const pick = (list, key) => list.find(x => (x.id ?? x[0]) === key) || list[0];
+const andList = a => a.length < 2 ? a.join('') : `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}`;
+const cap1 = s => s.charAt(0).toUpperCase() + s.slice(1);
+function headwear(kind, H, topC) {
+  const [ax, ay] = H.acc, cy = H.crown;
+  if (kind === 'bow') return [S(P`M${ax} ${ay}C${ax - 11} ${ay - 15} ${ax - 26} ${ay - 11} ${ax - 22} ${ay + 2}C${ax - 19} ${ay + 11} ${ax - 8} ${ay + 8} ${ax} ${ay}Z`, '#ff5fa2', { z: 2 }), S(P`M${ax} ${ay}C${ax + 11} ${ay - 15} ${ax + 26} ${ay - 11} ${ax + 22} ${ay + 2}C${ax + 19} ${ay + 11} ${ax + 8} ${ay + 8} ${ax} ${ay}Z`, '#ff5fa2', { z: 2 }), S(C(ax, ay, 5), '#ff8fc0', { z: 2 })];
+  if (kind === 'star') return [S(star(ax, ay + 4, 12, 6), K.yellow, { z: 2, a: 'twinkle' })];
+  if (kind === 'flower') return lay(flower(ax, ay + 4, 9, '#ff7aa8', K.yellow), 2);
+  if (kind === 'crown') return [S(P`M84 ${cy + 6}L82 ${cy - 12}L91 ${cy - 4}L100 ${cy - 16}L109 ${cy - 4}L118 ${cy - 12}L116 ${cy + 6}Z`, K.gold, { z: 2.2 }), S(C(100, cy - 2, 2.6), '#ff6b9a', { z: 2.3, w: 2.5 })];
+  if (kind === 'cap') return [S('M59 70C60 44 78 32 100 32C122 32 140 44 141 70Z', topC, { z: 1.6 }), S('M118 70Q150 62 168 72Q164 82 140 80Q124 78 118 70Z', shade(topC, .85), { z: 1.7 }), S(C(100, 32, 4), shade(topC, .85), { z: 1.8 })];
+  if (kind === 'phones') return [S('M54 92C46 30 154 30 146 92', '#4b4f66', { tw: 5, z: 2 }), S(RR(46, 80, 16, 24, 7), '#7c6cff', { z: 2.1 }), S(RR(138, 80, 16, 24, 7), '#7c6cff', { z: 2.1 })];
+  return [];
+}
+function shirtPic(kind, x, y, k = 1) {
+  if (kind === 'heart') return [S(heart(x, y, 7 * k), '#ff7aa8')];
+  if (kind === 'star') return [S(star(x, y, 9 * k, 4.5 * k), K.yellow)];
+  if (kind === 'bolt') return [S(P`M${x + 4 * k} ${y - 12 * k}L${x - 7 * k} ${y + 2 * k}H${x + 1 * k}L${x - 4 * k} ${y + 14 * k}L${x + 9 * k} ${y - 1 * k}H${x + 1 * k}Z`, K.yellow)];
+  if (kind === 'flower') return flower(x, y, 7 * k, '#ff7aa8', K.yellow);
+  return [];
+}
+/* turn the choices into a drawable pal: same 6-step recipe as the Cool Kids */
+function buildPal(m, id = 'preview') {
+  const o = { ...MK_DEFAULT, ...m.o }, name = (m.name || '').trim() || 'My Pal';
+  const F = pick(MK_FACES, o.face), H = pick(MK_HAIR, o.hair), skin = o.skin, hc = o.hairC;
+  const eyes = pick(MK_EYES, o.eyes), brows = pick(MK_BROWS, o.brows), mouth = pick(MK_MOUTH, o.mouth), top = pick(MK_TOP, o.top), bottom = pick(MK_BOTTOM, o.bottom);
+  const feat = o.eyes === 'wink' ? [...kidFace({ eyes: 'none', m: o.mouth }), ...eye(83, 86, 7), S('M112 88Q117 81 122 88', null, { w: 4 })] : kidFace({ eyes: ['shiny', 'lashes'].includes(o.eyes) ? 'dot' : o.eyes, m: o.mouth });
+  if (o.eyes === 'lashes') feat.push(S('M77 83L71 78', null, { w: 3 }), S('M123 83L129 78', null, { w: 3 }));
+  if (o.brows !== 'none') feat.push(...kidBrows(o.brows === 'thick' ? 5 : 3.5));
+  feat.push(kidNose());
+  const earSides = H.ears, earText = earSides.length === 2 ? 'ears, ' : earSides.length ? 'an ear, ' : '';
+  const details = [], said = [];
+  if (o.top === 'hoodie') { details.push(S('M86 152H114Q116 160 112 165H88Q84 160 86 152Z', shade(o.topC, .85)), S('M95 134V146', null, { w: 3 }), S('M105 134V146', null, { w: 3 }), S(C(95, 148, 2), '#fff', { w: 2 }), S(C(105, 148, 2), '#fff', { w: 2 })); said.push('a hoodie pocket and strings'); }
+  if (o.top === 'collar') { details.push(S('M88 131Q94 140 100 133Q106 140 112 131', '#fff')); said.push('a white collar'); }
+  if (o.top === 'stripes') { details.push(S('M71 153H129', null, { sc: o.topC === '#ffffff' ? '#4f8ef7' : '#ffffff', w: 5 }), S('M70 162H130', null, { sc: o.topC === '#ffffff' ? '#4f8ef7' : '#ffffff', w: 5 })); said.push('stripes'); }
+  if (o.pic !== 'none') { details.push(...(o.top === 'hoodie' ? shirtPic(o.pic, 117, 142, .7) : shirtPic(o.pic, 100, 146))); said.push(`${pick(MK_PIC, o.pic)[2]} on the shirt`); }
+  if (o.glasses) { details.push(S(C(83, 86, 12), '#e8f6ff', { fo: .35, z: 0.5 }), S(C(117, 86, 12), '#e8f6ff', { fo: .35, z: 0.5 }), S('M95 85Q100 81 105 85', null, { z: 0.5 })); said.push('round glasses'); }
+  if (o.freckles) { details.push(...freckles()); said.push('freckles'); }
+  if (o.head !== 'none') { details.push(...headwear(o.head, H, o.topC)); said.push(pick(MK_HEAD, o.head)[2]); }
+  const steps = [
+    [F.t.replace('NAME', name), [S(F.d, skin)]],
+    [H.t, H.shapes(hc)],
+    [`Draw ${eyes[2]}${brows[2]}, a tiny nose and ${mouth[2]}.`, feat],
+    [`Add ${earText}a neck and ${top[2]}`, [...kidEars(F.ex, skin, earSides), ...kidTop(skin, o.topC)]],
+    [bottom[2], kidLegs(skin, o.bottomC, o.shoes, o.bottom)],
+  ];
+  if (details.length) steps.push([`Finish with ${andList(said)}! ✨`, details]);
+  return indexChar({ id, name, what: 'Original Pal', cat: 'mine', idle: o.idle, mine: 1, o, steps: steps.map(([t, s]) => ({ t, s: s.flat() })) });
+}
+const myById = {};
+const loadMine = () => { for (const k in myById) delete myById[k]; prefs.mine.forEach(m => { myById[m.id] = buildPal(m, m.id); }); };
+const findPal = id => byId[id] || myById[id];
 
 /* =====================================================================
    3. RENDERING
@@ -1165,7 +1372,7 @@ function artSVG(ch, still = false) {
   const d = (Math.random() * 3).toFixed(2), bd = (Math.random() * 4).toFixed(2);
   return `<svg viewBox="0 0 200 200" class="art${still ? ' still' : ''}" style="--bd:-${bd}s" aria-hidden="true"><g class="idle idle-${ch.idle}" style="animation-delay:-${d}s" stroke-linecap="round" stroke-linejoin="round">${ch._body}</g></svg>`;
 }
-const ICON_FB = { house: '🏠', star: '⭐', trophy: '🏆', shuffle: '🎲', eye: '👀', pencil: '✏️', turtle: '🐢', rabbit: '🐇', sparkles: '✨', ghost: '👻', eraser: '🧽', 'undo-2': '↩️', 'trash-2': '🗑️', 'volume-2': '🔊', 'volume-x': '🔇', play: '▶️', pause: '⏸️', 'arrow-left': '⬅️', 'arrow-right': '➡️', download: '💾', 'rotate-ccw': '🔁' };
+const ICON_FB = { house: '🏠', star: '⭐', trophy: '🏆', shuffle: '🎲', eye: '👀', pencil: '✏️', turtle: '🐢', rabbit: '🐇', sparkles: '✨', ghost: '👻', eraser: '🧽', 'undo-2': '↩️', 'trash-2': '🗑️', 'volume-2': '🔊', 'volume-x': '🔇', play: '▶️', pause: '⏸️', 'arrow-left': '⬅️', 'arrow-right': '➡️', download: '💾', 'rotate-ccw': '🔁', plus: '➕', timer: '⏱️', 'skip-forward': '⏭️', check: '✔️', image: '🖼️', 'qr-code': '🔳', copy: '📋' };
 function ico(name) {
   const node = window.lucide && window.lucide.icons && window.lucide.icons[name.replace(/(^|-)(\w)/g, (_, __, c) => c.toUpperCase())];
   if (!node) return `<span aria-hidden="true">${ICON_FB[name] || ''}</span>`;
@@ -1182,6 +1389,7 @@ const prefs = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {};
 prefs.done = Array.isArray(prefs.done) ? prefs.done : [];
 prefs.sound = prefs.sound !== false; prefs.fast = !!prefs.fast; prefs.trace = !!prefs.trace;
 prefs.art = Array.isArray(prefs.art) ? prefs.art : []; prefs.kit = Array.isArray(prefs.kit) ? prefs.kit : [];
+prefs.mine = Array.isArray(prefs.mine) ? prefs.mine.filter(m => m && m.id && m.o) : []; prefs.daily = prefs.daily && typeof prefs.daily === 'object' ? prefs.daily : {};
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(prefs)); } catch (e) { /* private mode: progress lasts for this visit */ } };
 const isDone = id => prefs.done.includes(id);
 const doneCount = () => prefs.done.filter(id => byId[id]).length;
@@ -1875,10 +2083,20 @@ function lessonCard(L) {
 }
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('inview', e.isIntersecting)), { rootMargin: '120px' }) : null;
 function renderLibrary() {
-  const art = libMode === 'art', total = art ? LESSONS.length : CHARS.length, n = art ? artDone() : doneCount();
-  $('#tabPals').setAttribute('aria-selected', !art); $('#tabArt').setAttribute('aria-selected', art);
-  $('#palsHome').hidden = art; $('#artHome').hidden = !art;
+  const art = libMode === 'art', studio = libMode === 'studio', total = art ? LESSONS.length : CHARS.length, n = art ? artDone() : doneCount();
+  $('#tabPals').setAttribute('aria-selected', libMode === 'pals'); $('#tabArt').setAttribute('aria-selected', art); $('#tabStudio').setAttribute('aria-selected', studio);
+  $('#palsHome').hidden = art || studio; $('#artHome').hidden = !art; $('#studioHome').hidden = !studio;
   $('#palCount').textContent = `${CHARS.length} cute characters`;
+  if (studio) {
+    const week = lastWeek().filter(d => prefs.daily[dayKey(d)]).length, streak = streakCount();
+    $('#progCount').textContent = `${week} of 7`; $('#progNoun').textContent = 'challenge days this week';
+    $('#progBar').style.width = `${week / 7 * 100}%`; $('#progBarWrap').setAttribute('aria-valuemax', 7); $('#progBarWrap').setAttribute('aria-valuenow', week);
+    $('#rank').textContent = streak ? `🔥 ${streak}-day streak` : `${prefs.mine.length} pal${prefs.mine.length === 1 ? '' : 's'} made`;
+    $('#chips').innerHTML = [['s-challenge', '🏆 Challenge'], ['s-maker', '✨ Make a pal'], ['s-sketch', '⏱️ Quick sketch'], ['s-gallery', '🖼️ Gallery']].map(([id, l]) => `<button class="chip btn3d" data-jump="${id}">${l}</button>`).join('');
+    io?.disconnect(); renderStudio();
+    document.querySelectorAll('#studioHome .pal-card').forEach(el => io ? io.observe(el) : el.classList.add('inview'));
+    return;
+  }
   $('#progCount').textContent = `${n} of ${total}`; $('#progNoun').textContent = art ? 'lessons finished' : 'pals drawn';
   $('#progBar').style.width = `${n / total * 100}%`;
   $('#progBarWrap').setAttribute('aria-valuemax', total); $('#progBarWrap').setAttribute('aria-valuenow', n);
@@ -1887,7 +2105,8 @@ function renderLibrary() {
   $('#chips').innerHTML = groups.map(c => `<button class="chip btn3d" data-f="${c.id}" aria-pressed="${f === c.id}" style="--c:${c.c};--csh:${c.sh}">${c.emoji} ${c.name}</button>`).join('');
   io?.disconnect();
   if (art) return renderArtHome();
-  $('#featured').innerHTML = filter === 'all' ? `<h2 class="text-2xl sm:text-3xl font-bold mb-1 flex items-center gap-2">⭐ Star Lessons <span class="text-base sm:text-lg font-medium text-[#6b5f86]">— start here!</span></h2>
+  $('#featured').innerHTML = filter === 'all' ? `<button class="promo btn3d" data-act="new"><span class="text-3xl" aria-hidden="true">✨</span><span><b>New! Make your own pal</b><small>Design a character, then learn to draw it step by step</small></span>${ico('arrow-right')}</button>
+    <h2 class="mt-6 text-2xl sm:text-3xl font-bold mb-1 flex items-center gap-2">⭐ Star Lessons <span class="text-base sm:text-lg font-medium text-[#6b5f86]">— start here!</span></h2>
     <div class="pal-grid big mt-3">${CHARS.filter(c => c.star).map(cardHTML).join('')}</div>` : '';
   $('#sections').innerHTML = CATS.filter(c => filter === 'all' || filter === c.id).map(c => {
     const list = CHARS.filter(ch => ch.cat === c.id), got = list.filter(ch => isDone(ch.id)).length;
@@ -2026,7 +2245,7 @@ const Pad = {
     this.cv.addEventListener('pointermove', e => this.move(e));
     for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) this.cv.addEventListener(ev, () => this.up());
   },
-  use(id) { this.strokes = padMemory[id] ||= []; this.active = null; this.resize(); },
+  use(id) { this.strokes = padMemory[id] ||= []; this.active = null; this.locked = false; this.resize(); },
   resize() {
     const r = this.cv.getBoundingClientRect(); if (!r.width) return;
     this.dpr = Math.min(2.5, window.devicePixelRatio || 1); this.W = r.width; this.H = r.height;
@@ -2035,7 +2254,7 @@ const Pad = {
   },
   pt(e) { const r = this.cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; },
   down(e) {
-    if (e.button > 0) return;
+    if (e.button > 0 || this.locked) return;
     e.preventDefault();
     try { this.cv.setPointerCapture(e.pointerId); } catch (err) { /* keep drawing without capture */ }
     this.active = { c: this.color, w: SIZES[this.size], er: this.eraser, p: [this.pt(e)] };
@@ -2091,10 +2310,14 @@ const G = { mode: 'pal', ch: null, les: null, step: 0 };
 const curItem = () => G.mode === 'art' ? G.les : G.ch;
 const ART_CHEERS = ['Nice shading! ✨', 'Real artist moves! 🎨', 'Looking pro! 🌟', 'So smooth! 🧈', 'Keep going! ✏️', 'Great control! 💪'];
 function enterGuide(theme, title) {
+  if (G.mode !== 'sketch') stopSketch();
   document.title = title;
   for (const id of ['#guide', '#celebrate', '#toast']) $(id).style.cssText = catVars(theme);
-  $('#guide').classList.toggle('art', G.mode === 'art');
-  $('#library').hidden = true; $('#guide').hidden = false; window.scrollTo(0, 0);
+  $('#guide').classList.toggle('art', G.mode === 'art'); $('#guide').classList.toggle('sketch', G.mode === 'sketch');
+  $('#stageWrap').classList.remove('artpaper');
+  $('#stageTitle').innerHTML = G.mode === 'sketch' ? `${ico('image')} Draw this!` : `${ico('eye')} Watch me!`;
+  const chal = G.challenge && todayChallenge(); $('#chalNote').hidden = !chal; $('#chalNote').textContent = chal ? `🏆 Today's challenge: ${chal.twist}` : '';
+  $('#library').hidden = true; $('#maker').hidden = true; $('#guide').hidden = false; window.scrollTo(0, 0);
   $('#peek').hidden = true;
   Demo.setPlaying(true); paintSpeed();
 }
@@ -2154,10 +2377,18 @@ function goStep(i, cheer) {
   if (cheer) toast(list[Math.floor(Math.random() * list.length)]);
 }
 function next() {
+  if (G.mode === 'sketch') return sketchNext();
   if (G.step === curItem().steps.length - 1) return celebrate();
   Sfx.play('next'); goStep(G.step + 1, true);
 }
-function back() { if (G.step > 0) { Sfx.play('back'); goStep(G.step - 1); } }
+function back() {
+  if (G.mode === 'sketch') {
+    const pool = (QS.src === 'art' ? LESSONS.filter(L => L.level < 3) : [...CHARS, ...Object.values(myById)]).filter(x => !QS.picks.includes(x));
+    if (pool.length) QS.picks[QS.round] = rnd(pool);
+    Sfx.play('back'); return sketchRound();
+  }
+  if (G.step > 0) { Sfx.play('back'); goStep(G.step - 1); }
+}
 function paintSpeed() {
   const b = $('#speedBtn'); b.setAttribute('aria-checked', prefs.fast);
   b.setAttribute('aria-label', prefs.fast ? 'Speed: fast. Tap to slow down' : 'Speed: slow. Tap to speed up');
@@ -2191,13 +2422,15 @@ function nextUp(list, item, done) {
   return rest.find(x => !done(x.id)) || rest[0];
 }
 function celebrate() {
-  const art = G.mode === 'art', item = curItem(), list = art ? prefs.art : prefs.done, first = !list.includes(item.id);
+  const art = G.mode === 'art', item = curItem(), mine = !art && !!item.mine, list = art ? prefs.art : prefs.done, first = !mine && !list.includes(item.id);
   if (first) { list.push(item.id); save(); }
+  let chal = '';
+  if (G.challenge) { const was = prefs.daily[G.challenge]; prefs.daily[G.challenge] = 1; save(); if (!was) chal = ` 🔥 Challenge done: ${streakCount()}-day streak!`; }
   Sfx.play('win'); confetti(); Demo.stop(); $('#toast').classList.remove('show');
   $('#cArt').classList.toggle('artpaper', art); $('#cPhoto').hidden = !art;
   if (art) {
     $('#cTitle').textContent = 'Lesson complete! 🎨';
-    $('#cSub').textContent = first ? `+1 star! ${artDone()} of ${LESSONS.length} lessons finished. Now snap a photo of your paper!` : 'Practice makes progress! 🌈';
+    $('#cSub').textContent = (first ? `+1 star! ${artDone()} of ${LESSONS.length} lessons finished. Now snap a photo of your paper!` : 'Practice makes progress! 🌈') + chal;
     $('#cArt').innerHTML = drawingSVG(item, 'cb');
     const ph = photos[item.id];
     $('#cMine').hidden = !ph; $('#cSave').hidden = true; $('#cMineCap').textContent = 'My paper drawing!';
@@ -2206,40 +2439,291 @@ function celebrate() {
     $('#cNext').innerHTML = `Next lesson ${ico('arrow-right')}`; $('#cNext').dataset.href = `#/lesson/${nl.id}`;
   } else {
     $('#cTitle').textContent = `You drew ${item.name}! 🎉`;
-    $('#cSub').textContent = first ? `+1 star! That's ${doneCount()} of ${CHARS.length} pals.` : 'Even better the second time! 🌈';
+    $('#cSub').textContent = (mine ? 'Your very own pal: designed AND drawn by you! 🖍️' : first ? `+1 star! That's ${doneCount()} of ${CHARS.length} pals.` : 'Even better the second time! 🌈') + chal;
     $('#cArt').innerHTML = artSVG(item);
     const snap = Pad.snapshot();
     $('#cMine').hidden = !snap; $('#cSave').hidden = !snap; $('#cMineCap').textContent = 'Your drawing!';
-    if (snap) { $('#cImg').src = snap; $('#cSave').href = snap; $('#cSave').download = `doodle-pals-${item.id}.png`; }
-    const np = nextUp(CHARS, item, isDone);
-    $('#cNext').innerHTML = `Next: ${np.name} ${ico('arrow-right')}`; $('#cNext').dataset.href = `#/draw/${np.id}`;
+    if (snap) { $('#cImg').src = snap; $('#cSave').href = snap; $('#cSave').download = `doodle-pals-${item.id}.png`; $('#cMineCap').textContent = 'Saved to your gallery!'; toGallery(item.name, mine ? 'mine' : 'pal', snap); }
+    if (mine) { $('#cNext').innerHTML = `Make another pal ${ico('arrow-right')}`; $('#cNext').dataset.href = '#/maker'; }
+    else { const np = nextUp(CHARS, item, isDone); $('#cNext').innerHTML = `Next: ${np.name} ${ico('arrow-right')}`; $('#cNext').dataset.href = `#/draw/${np.id}`; }
   }
-  $('#cHome').innerHTML = `${ico('house')} ${art ? 'All lessons' : 'All pals'}`;
+  $('#cHome').innerHTML = `${ico('house')} ${mine || G.challenge ? 'My Studio' : art ? 'All lessons' : 'All pals'}`;
   $('#gDone').hidden = false;
   $('#celebrate').hidden = false; $('#cNext').focus();
 }
 function closeCelebrate() { $('#celebrate').hidden = true; $('#confetti').replaceChildren(); }
 
 /* =====================================================================
-   11. ROUTER + WIRING
+   11. MY STUDIO — make your own pal, daily challenge, quick sketch, gallery
+   ===================================================================== */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const rnd = list => list[Math.floor(Math.random() * list.length)];
+
+/* ---------- the gallery lives in IndexedDB, so photos of paper drawings fit too ---------- */
+const Gallery = {
+  db: null,
+  open() {
+    return this.db ||= new Promise((res, rej) => {
+      const r = indexedDB.open('doodlePals', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('gallery', { keyPath: 'id', autoIncrement: true });
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    });
+  },
+  async run(mode, fn) {
+    const db = await this.open();
+    return new Promise((res, rej) => { const t = db.transaction('gallery', mode), req = fn(t.objectStore('gallery')); t.oncomplete = () => res(req.result); t.onerror = () => rej(t.error); });
+  },
+  add(item) { return this.run('readwrite', s => s.add({ t: Date.now(), ...item })).catch(() => null); },
+  all() { return this.run('readonly', s => s.getAll()).then(r => r.sort((a, b) => b.t - a.t)).catch(() => null); },
+  del(id) { return this.run('readwrite', s => s.delete(id)).catch(() => null); },
+};
+const dataBlob = url => fetch(url).then(r => r.blob());
+function shrinkPhoto(file, max = 1280) {
+  return new Promise(res => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      c.toBlob(b => res(b || file), 'image/jpeg', .85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); res(file); };
+    img.src = url;
+  });
+}
+const KIND = { pal: '✏️', photo: '📸', quick: '⏱️', mine: '🖍️' };
+const fmtDay = t => new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+let galURLs = [], galItems = [];
+async function fillGallery() {
+  const grid = $('#galGrid'); if (!grid) return;
+  const items = await Gallery.all();
+  galURLs.forEach(u => URL.revokeObjectURL(u)); galURLs = []; galItems = items || [];
+  if (!$('#galGrid')) return;
+  if (items === null) { grid.innerHTML = '<p class="empty">This browser can\'t keep a gallery (private browsing?). You can still save drawings with the "Save it" button.</p>'; return; }
+  if (!items.length) { grid.innerHTML = '<p class="empty">No drawings yet! Finish a pal on the sketchpad, do a quick sketch, or add a photo of a paper drawing. 🖍️</p>'; return; }
+  grid.innerHTML = items.map(it => {
+    const u = URL.createObjectURL(it.blob); galURLs.push(u); it.url = u;
+    return `<button class="gal-item" data-gal="${it.id}"><img src="${u}" alt="${esc(it.title)}" loading="lazy"><span class="gal-cap">${KIND[it.kind] || '🖼️'} ${esc(it.title)}</span><small>${fmtDay(it.t)}</small></button>`;
+  }).join('');
+}
+function openViewer(id) {
+  const it = galItems.find(x => x.id === id); if (!it) return;
+  $('#vImg').src = it.url; $('#vImg').alt = it.title; $('#vTitle').textContent = `${KIND[it.kind] || '🖼️'} ${it.title}`; $('#vDate').textContent = fmtDay(it.t);
+  $('#vSave').href = it.url; $('#vSave').download = `doodle-pals-${it.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.${it.blob.type.includes('jpeg') ? 'jpg' : 'png'}`;
+  $('#vDel').dataset.id = id; $('#viewer').hidden = false; $('#vClose').focus(); Sfx.play('pop');
+}
+const toGallery = (title, kind, blobOrUrl) => Promise.resolve(typeof blobOrUrl === 'string' ? dataBlob(blobOrUrl) : blobOrUrl).then(blob => Gallery.add({ title, kind, blob }));
+
+/* ---------- daily challenge: the same pick for everyone on a given day, plus a fun twist ---------- */
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const hashStr = s => [...s].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261);
+const PAL_TWISTS = ['Draw it with your OTHER hand! 🤚', 'Give it brand-new colours or an outfit 🎨', 'Draw it really BIG — fill the whole page! 📏', 'Add a best friend next to it 👯', 'Draw it from memory first, then check 🧠', 'Give it a funny hat 🎩', 'Use only 3 colours 🖍️', 'Draw it on real paper too! 📝'];
+const ART_TWISTS = ['Do it on real paper and snap a photo 📸', 'Go extra light on the first steps 🪶', 'Try it twice and compare the two 🔁', 'Squint at it when you finish 😑'];
+function todayChallenge(key = dayKey()) {
+  const h = hashStr(key), h2 = hashStr(key + '!');
+  if (h % 3 === 2) { const pool = LESSONS.filter(L => L.level < 3); return { kind: 'art', item: pool[h2 % pool.length], twist: ART_TWISTS[h % ART_TWISTS.length] }; }
+  return { kind: 'pal', item: CHARS[h2 % CHARS.length], twist: PAL_TWISTS[h % PAL_TWISTS.length] };
+}
+function streakCount() {
+  const d = new Date(); let n = 0;
+  if (!prefs.daily[dayKey(d)]) d.setDate(d.getDate() - 1);
+  while (prefs.daily[dayKey(d)]) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+const lastWeek = () => Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - 6 + i); return d; });
+
+/* ---------- studio home ---------- */
+const SKETCH_TIMES = [[30, '30 sec'], [60, '1 min'], [120, '2 min']];
+function myCard(m) {
+  const ch = myById[m.id]; if (!ch) return '';
+  return `<div class="pal-card my-card" style="${catVars(CAT.mine)}">
+    <button class="my-main" data-my="${m.id}" aria-label="Draw ${esc(ch.name)}, ${ch.steps.length} steps"><span class="pal-art">${artSVG(ch)}</span><span class="pal-name">${esc(ch.name)}</span><span class="pal-what">My pal · ${ch.steps.length} steps</span></button>
+    <div class="my-acts"><button class="tool btn3d" data-edit="${m.id}" aria-label="Change ${esc(ch.name)}" title="Change">${ico('pencil')}</button><button class="tool btn3d" data-del="${m.id}" aria-label="Delete ${esc(ch.name)}" title="Delete">${ico('trash-2')}</button></div>
+  </div>`;
+}
+function renderStudio() {
+  const c = todayChallenge(), key = dayKey(), done = !!prefs.daily[key], streak = streakCount(), item = c.item;
+  const thumb = c.kind === 'pal' ? `<span class="pal-art" style="${catVars(CAT[item.cat])}">${artSVG(item)}</span>` : `<span class="pal-art art-thumb">${drawingSVG(item, 'dc')}<i class="grain"></i></span>`;
+  const week = lastWeek().map(d => `<span class="wk${prefs.daily[dayKey(d)] ? ' on' : ''}${dayKey(d) === key ? ' today' : ''}" title="${d.toLocaleDateString(undefined, { weekday: 'long' })}">${d.toLocaleDateString(undefined, { weekday: 'narrow' })}</span>`).join('');
+  const src = prefs.qsSrc === 'art' ? 'art' : 'pals';
+  $('#studioHome').innerHTML = `
+  <section id="s-challenge" class="studio-card chal mt-2">
+    <div class="chal-thumb">${thumb}</div>
+    <div class="chal-body">
+      <p class="kicker">🏆 Today's challenge${done ? ' · done! ✅' : ''}</p>
+      <h2 class="text-2xl sm:text-3xl font-bold leading-tight">${c.kind === 'pal' ? `Draw ${item.name} the ${item.what}` : `Art School: ${item.title}`}</h2>
+      <p class="chal-twist">${c.twist}</p>
+      <div class="week mt-3" aria-label="Challenge days this week">${week}</div>
+      <div class="flex flex-wrap items-center gap-3 mt-4">
+        <button class="nav-btn nav-next btn3d" data-act="challenge" style="--cat:#ff9f43;--cat-sh:#d97a1f">${done ? 'Do it again' : 'Let\'s go!'} ${ico('arrow-right')}</button>
+        <span class="streak">🔥 ${streak ? `${streak}-day streak` : 'Start a streak today!'}</span>
+      </div>
+    </div>
+  </section>
+  <section id="s-maker" class="mt-10">
+    <h2 class="text-2xl sm:text-3xl font-bold" style="color:${CAT.mine.c}">✨ Make your own pal</h2>
+    <p class="text-[#6b5f86] font-medium">Pick a face, hair and clothes — then learn to draw your very own character, step by step!</p>
+    <div class="pal-grid mt-4">
+      <button class="pal-card new-pal" data-act="new" style="${catVars(CAT.mine)}"><span class="pal-art"><span class="plus">${ico('plus')}</span></span><span class="pal-name">New pal</span><span class="pal-what">Design a character</span></button>
+      ${prefs.mine.map(myCard).join('')}
+    </div>
+  </section>
+  <section id="s-sketch" class="studio-card mt-10">
+    <h2 class="text-2xl sm:text-3xl font-bold">⏱️ Quick sketch</h2>
+    <p class="text-[#6b5f86] font-medium">Draw 5 pictures, super fast! Quick, loose drawings train your eye — real artists warm up this way.</p>
+    <div class="mt-3 flex flex-wrap items-center gap-2"><span class="font-bold mr-1">Draw:</span>
+      <button class="chip btn3d" data-src="pals" aria-pressed="${src === 'pals'}" style="--c:#f35fae;--csh:#c93d88">🐱 Cartoon pals</button>
+      <button class="chip btn3d" data-src="art" aria-pressed="${src === 'art'}" style="--c:#7a5af8;--csh:#5838d6">🎨 Real drawings</button>
+    </div>
+    <div class="mt-3 flex flex-wrap gap-3">${SKETCH_TIMES.map(([s, l]) => `<button class="nav-btn btn3d sketch-go" data-sketch="${s}">${ico('timer')} ${l}</button>`).join('')}</div>
+  </section>
+  <section id="s-gallery" class="mt-10">
+    <h2 class="text-2xl sm:text-3xl font-bold">🖼️ My gallery</h2>
+    <p class="text-[#6b5f86] font-medium">Your finished drawings, quick sketches and photos of your paper drawings. They stay on this device.</p>
+    <div id="galGrid" class="gal-grid mt-4"><p class="empty">Loading…</p></div>
+  </section>`;
+  fillGallery();
+}
+
+/* ---------- quick sketch: 5 timed drawings, saved to the gallery ---------- */
+const QS = { secs: 60, src: 'pals', round: 0, picks: [], end: 0, timer: 0, up: false, saved: 0, last: null };
+const QS_TIPS = ['Big shapes first, details last!', 'No erasing — keep your pencil moving!', 'Look at the picture more than your paper.', 'Loose, wobbly lines are perfect!', 'Start with the biggest shape you see.'];
+function stopSketch() { clearInterval(QS.timer); QS.timer = 0; $('#guide').classList.remove('sketch'); $('#padOver').hidden = true; Pad.locked = false; }
+function startSketch(secs, src) {
+  stopSketch(); Demo.stop();
+  const pool = src === 'art' ? LESSONS.filter(L => L.level < 3) : [...CHARS, ...Object.values(myById)];
+  QS.secs = secs; QS.src = src; QS.round = 0; QS.saved = 0; QS.picks = [...pool].sort(() => Math.random() - .5).slice(0, 5);
+  G.mode = 'sketch'; G.ch = null; G.les = null; G.step = 0;
+  enterGuide(CAT.mine, 'Quick sketch · Doodle Pals');
+  $('#gIcon').innerHTML = '<span class="text-3xl" aria-hidden="true">⏱️</span>'; $('#gName').textContent = 'Quick sketch';
+  $('#gCat').textContent = `${SKETCH_TIMES.find(t => t[0] === secs)?.[1] || `${secs} sec`} each · 5 drawings`;
+  $('#legend').innerHTML = ''; $('#gDone').hidden = true; $('#artTip').hidden = true;
+  sketchRound();
+}
+function sketchRound() {
+  const ref = QS.picks[QS.round], art = QS.src === 'art';
+  QS.up = false; Pad.use(`qs-${Date.now()}`); paintTools(); $('#padOver').hidden = true;
+  $('#stageWrap').classList.toggle('artpaper', art);
+  if (art) { buildLesson(ref); const a = artLayers(ref, ref.steps.length - 1, 'qs', -1, false); $('#stage').innerHTML = `<defs>${a.defs}</defs>${a.past}`; }
+  else $('#stage').innerHTML = `<g style="--hole:#fffdf9">${ref._layers.map(shapeSVG).join('')}</g>`;
+  $('#stepOf').textContent = `Quick sketch ${QS.round + 1} of ${QS.picks.length}`;
+  $('#tipText').textContent = `${art ? `Copy this drawing: ${ref.title}` : `Draw ${ref.name}`}! ${rnd(QS_TIPS)}`;
+  $('#dots').innerHTML = QS.picks.map((_, i) => `<span class="dot ${i < QS.round ? 'past' : i === QS.round ? 'now' : ''}"></span>`).join('');
+  $('#backBtn').disabled = false; $('#backBtn').innerHTML = `${ico('skip-forward')} Skip`;
+  $('#nextBtn').classList.remove('finish'); $('#nextBtn').innerHTML = `Done ${ico('check')}`;
+  QS.end = performance.now() + QS.secs * 1000; clearInterval(QS.timer); QS.timer = setInterval(sketchTick, 200); sketchTick();
+  const tc = $('#tipCard'); tc.classList.remove('tip-pop'); void tc.offsetWidth; tc.classList.add('tip-pop');
+}
+function sketchTick() {
+  const left = Math.max(0, Math.ceil((QS.end - performance.now()) / 1000)), b = $('#stepBadge');
+  b.textContent = left > 59 ? `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}` : left;
+  b.classList.toggle('hurry', left <= 5);
+  if (left === 0) sketchUp();
+}
+function sketchUp() {
+  if (QS.up) return;
+  QS.up = true; clearInterval(QS.timer); Pad.locked = true; $('#stepBadge').classList.remove('hurry'); $('#stepBadge').textContent = '✋';
+  const ref = QS.picks[QS.round], snap = Pad.snapshot(); QS.last = snap;
+  if (snap) { QS.saved++; toGallery(`Quick sketch: ${QS.src === 'art' ? ref.title : ref.name}`, 'quick', snap); }
+  $('#padOver').hidden = false; $('#padOver').textContent = snap ? 'Time\'s up! ✋ Saved to your gallery.' : 'Time\'s up! ✋';
+  Sfx.play('win');
+  const last = QS.round === QS.picks.length - 1, nb = $('#nextBtn');
+  nb.classList.toggle('finish', last);
+  nb.innerHTML = last ? `<span class="long">All done!</span><span class="short">Done!</span> ${ico('star')}` : `Next sketch ${ico('arrow-right')}`;
+}
+function sketchNext() {
+  if (!QS.up) return sketchUp();
+  if (QS.round < QS.picks.length - 1) { QS.round++; Sfx.play('next'); return sketchRound(); }
+  // round finished: a small celebration with the last reference and sketch
+  Sfx.play('win'); confetti(); $('#toast').classList.remove('show');
+  const ref = QS.picks[QS.round], art = QS.src === 'art';
+  $('#cTitle').textContent = 'Speed artist! ⚡';
+  $('#cSub').textContent = QS.saved ? `${QS.saved} quick sketch${QS.saved > 1 ? 'es' : ''} saved to your gallery.` : 'Try drawing on the sketchpad next time — your sketches get saved!';
+  $('#cArt').classList.toggle('artpaper', art); $('#cArt').innerHTML = art ? drawingSVG(ref, 'cb') : artSVG(ref);
+  $('#cMine').hidden = !QS.last; $('#cSave').hidden = true; $('#cPhoto').hidden = true; if (QS.last) { $('#cImg').src = QS.last; $('#cMineCap').textContent = 'Your last sketch!'; }
+  $('#cNext').innerHTML = `Another round ${ico('rotate-ccw')}`; $('#cNext').dataset.href = `#/sketch/${QS.secs}/${QS.src}`;
+  $('#cHome').innerHTML = `${ico('house')} My Studio`;
+  $('#celebrate').hidden = false; $('#cNext').focus();
+}
+
+/* ---------- the maker screen ---------- */
+const MKS = { id: null, name: '', o: {}, tab: 'face' };
+const MK_TABS = [['face', '😊 Face'], ['hair', '💇 Hair'], ['clothes', '👕 Clothes'], ['wiggle', '💃 Wiggle']];
+const HEAD_VB = '30 6 140 140', BODY_VB = '44 118 112 82';
+function randomOpts() {
+  const r = list => { const x = rnd(list); return x.id ?? x[0] ?? x; };
+  return { face: r(MK_FACES), skin: rnd(MK_SKIN), hair: r(MK_HAIR), hairC: rnd(MK_HAIRC), eyes: r(MK_EYES), brows: r(MK_BROWS.slice(1)), mouth: r(MK_MOUTH.slice(0, 5)), head: Math.random() < .5 ? 'none' : r(MK_HEAD.slice(1)),
+    glasses: Math.random() < .2, freckles: Math.random() < .3, top: r(MK_TOP), topC: rnd(MK_CLOTH), bottom: r(MK_BOTTOM), bottomC: rnd(MK_CLOTH), shoes: rnd(MK_CLOTH), pic: r(MK_PIC), idle: r(MK_IDLE) };
+}
+function thumbSVG(o, vb) {
+  const ch = buildPal({ name: MKS.name, o: { ...MKS.o, ...o } });
+  return `<svg viewBox="${vb}" class="art still" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round" style="--hole:#fff">${ch._layers.map(shapeSVG).join('')}</g></svg>`;
+}
+const optRow = (title, k, list, vb, label = x => x[1]) => `<h3 class="mk-h">${title}</h3><div class="mk-row">${list.map(x => {
+  const v = x.id ?? x[0], on = MKS.o[k] === v;
+  return `<button class="mk-opt" data-k="${k}" data-v="${v}" aria-pressed="${on}"><span class="mk-thumb">${thumbSVG({ [k]: v }, vb)}</span><span class="mk-lbl">${x.name ?? label(x)}</span></button>`;
+}).join('')}</div>`;
+const swRow = (title, k, list) => `<h3 class="mk-h">${title}</h3><div class="mk-row sw">${list.map((c, i) => `<button class="mk-sw" data-k="${k}" data-v="${c}" style="--c:${c}" aria-pressed="${MKS.o[k] === c}" aria-label="${title} ${i + 1}"></button>`).join('')}</div>`;
+const toggleRow = () => `<h3 class="mk-h">Glasses &amp; freckles</h3><div class="mk-row">${[['glasses', 'Glasses'], ['freckles', 'Freckles']].map(([k, l]) => `<button class="mk-opt" data-k="${k}" data-toggle="1" aria-pressed="${!!MKS.o[k]}"><span class="mk-thumb">${thumbSVG({ [k]: true, head: 'none' }, '50 52 100 70')}</span><span class="mk-lbl">${l}</span></button>`).join('')}</div>`;
+function renderMakerPanel() {
+  const t = MKS.tab;
+  $('#mkTabs').innerHTML = MK_TABS.map(([id, l]) => `<button class="chip btn3d" role="tab" data-tab="${id}" aria-selected="${t === id}" aria-pressed="${t === id}" style="--c:${CAT.mine.c};--csh:${CAT.mine.sh}">${l}</button>`).join('');
+  $('#mkPanel').innerHTML = t === 'face' ? optRow('Face shape', 'face', MK_FACES, HEAD_VB) + swRow('Skin', 'skin', MK_SKIN) + optRow('Eyes', 'eyes', MK_EYES, '56 62 88 48') + optRow('Eyebrows', 'brows', MK_BROWS, '56 56 88 48') + optRow('Mouth', 'mouth', MK_MOUTH, '76 86 48 30') + toggleRow()
+    : t === 'hair' ? optRow('Hairstyle', 'hair', MK_HAIR, HEAD_VB) + swRow('Hair colour', 'hairC', MK_HAIRC) + optRow('Hat or hair clip', 'head', MK_HEAD, HEAD_VB)
+    : t === 'clothes' ? optRow('Top', 'top', MK_TOP, BODY_VB) + swRow('Top colour', 'topC', MK_CLOTH) + optRow('Picture on the top', 'pic', MK_PIC, BODY_VB) + optRow('Bottoms', 'bottom', MK_BOTTOM, BODY_VB) + swRow('Bottoms colour', 'bottomC', MK_CLOTH) + swRow('Shoes', 'shoes', MK_CLOTH)
+    : `<h3 class="mk-h">How does your pal move?</h3><div class="mk-row">${MK_IDLE.map(([v, l]) => `<button class="mk-opt wig" data-k="idle" data-v="${v}" aria-pressed="${MKS.o.idle === v}"><span class="mk-thumb">${(() => { const ch = buildPal({ name: MKS.name, o: { ...MKS.o, idle: v } }); return artSVG(ch); })()}</span><span class="mk-lbl">${l}</span></button>`).join('')}</div>`;
+}
+function renderMakerPreview() {
+  const ch = buildPal(MKS);
+  $('#mkStage').innerHTML = artSVG(ch);
+  $('#mkInfo').textContent = `${ch.steps.length} steps to draw`;
+}
+function openMaker(id) {
+  stopSketch(); Demo.stop(); closeCelebrate();
+  const m = id && prefs.mine.find(x => x.id === id);
+  MKS.id = m ? m.id : null; MKS.name = m ? m.name : rnd(MK_NAMES); MKS.o = { ...MK_DEFAULT, ...(m ? m.o : randomOpts()) }; MKS.tab = 'face';
+  document.title = 'Make a pal · Doodle Pals';
+  for (const sel of ['#maker', '#toast']) $(sel).style.cssText = catVars(CAT.mine);
+  $('#library').hidden = true; $('#guide').hidden = true; $('#maker').hidden = false; window.scrollTo(0, 0);
+  $('#mkTitle').textContent = m ? `Change ${m.name}` : 'Make your own pal';
+  $('#mkName').value = MKS.name;
+  renderMakerPanel(); renderMakerPreview();
+}
+function saveMaker() {
+  const name = ($('#mkName').value || '').trim().slice(0, 14) || rnd(MK_NAMES), entry = { id: MKS.id || `my${Date.now().toString(36)}`, name, o: { ...MKS.o } };
+  const i = prefs.mine.findIndex(x => x.id === entry.id);
+  if (i >= 0) prefs.mine[i] = entry; else prefs.mine.unshift(entry);
+  prefs.mine = prefs.mine.slice(0, 40); save(); loadMine();
+  return entry;
+}
+
+/* =====================================================================
+   12. ROUTER + WIRING
    ===================================================================== */
 function showLibrary() {
-  Demo.stop(); if ('speechSynthesis' in window) speechSynthesis.cancel();
-  closeCelebrate(); document.title = libMode === 'art' ? 'Art School · Doodle Pals' : 'Doodle Pals';
-  $('#guide').hidden = true; $('#library').hidden = false; renderLibrary();
+  Demo.stop(); stopSketch(); if ('speechSynthesis' in window) speechSynthesis.cancel();
+  closeCelebrate(); document.title = libMode === 'art' ? 'Art School · Doodle Pals' : libMode === 'studio' ? 'My Studio · Doodle Pals' : 'Doodle Pals';
+  $('#guide').hidden = true; $('#maker').hidden = true; $('#library').hidden = false; renderLibrary();
 }
 function route() {
-  const h = location.hash, m = h.match(/^#\/(draw|lesson)\/([\w-]+)/);
-  if (m && m[1] === 'draw' && byId[m[2]]) { closeCelebrate(); openGuide(byId[m[2]]); }
+  const h = location.hash, m = h.match(/^#\/(draw|lesson|maker|sketch)(?:\/([\w-]+))?(?:\/(\w+))?/);
+  G.challenge = null; $('#viewer').hidden = true;
+  if (h === '#/challenge') { const c = todayChallenge(); closeCelebrate(); G.challenge = dayKey(); if (c.kind === 'art') openLesson(c.item); else openGuide(c.item); }
+  else if (m && m[1] === 'draw' && findPal(m[2])) { closeCelebrate(); openGuide(findPal(m[2])); }
   else if (m && m[1] === 'lesson' && lessonById[m[2]]) { closeCelebrate(); openLesson(lessonById[m[2]]); }
+  else if (m && m[1] === 'maker') openMaker(m[2]);
+  else if (m && m[1] === 'sketch') { closeCelebrate(); startSketch([30, 60, 120].includes(+m[2]) ? +m[2] : 60, m[3] === 'art' ? 'art' : 'pals'); }
   else {
-    const mode = h.startsWith('#/art') ? 'art' : 'pals', switched = mode !== libMode;
+    const mode = h.startsWith('#/art') ? 'art' : h.startsWith('#/studio') ? 'studio' : 'pals', switched = mode !== libMode;
     libMode = mode; showLibrary();
     if (switched) window.scrollTo(0, 0);
   }
 }
 const go = id => { location.hash = `#/draw/${id}`; };
-const home = () => { if (/^#\/(draw|lesson)\//.test(location.hash)) location.hash = G.mode === 'art' ? '#/art' : '#/'; else showLibrary(); };
+const home = () => {
+  const dest = G.mode === 'sketch' || G.challenge || G.ch?.mine ? '#/studio' : G.mode === 'art' ? '#/art' : '#/';
+  if (/^#\/(draw|lesson|challenge|sketch)/.test(location.hash)) location.hash = dest; else showLibrary();
+};
 
 function wire() {
   document.querySelectorAll('[data-ico]').forEach(el => { el.innerHTML = ico(el.dataset.ico); });
@@ -2247,7 +2731,19 @@ function wire() {
   $('#soundBtn').onclick = toggleSound; $('#soundBtn2').onclick = toggleSound;
   $('#tabPals').onclick = () => { Sfx.play('pop'); location.hash = '#/'; };
   $('#tabArt').onclick = () => { Sfx.play('pop'); location.hash = '#/art'; };
+  $('#tabStudio').onclick = () => { Sfx.play('pop'); location.hash = '#/studio'; };
   $('#library').addEventListener('click', e => {
+    const act = e.target.closest('[data-act]');
+    if (act) { Sfx.play('tap'); location.hash = act.dataset.act === 'challenge' ? '#/challenge' : '#/maker'; return; }
+    const my = e.target.closest('[data-my]'); if (my) { Sfx.play('tap'); return go(my.dataset.my); }
+    const ed = e.target.closest('[data-edit]'); if (ed) { Sfx.play('tap'); location.hash = `#/maker/${ed.dataset.edit}`; return; }
+    const del = e.target.closest('[data-del]');
+    if (del) { const m = prefs.mine.find(x => x.id === del.dataset.del); if (m && confirm(`Delete ${m.name}? Drawings in your gallery stay.`)) { prefs.mine = prefs.mine.filter(x => x !== m); save(); loadMine(); renderLibrary(); } return; }
+    const sk = e.target.closest('[data-sketch]'); if (sk) { Sfx.play('tap'); location.hash = `#/sketch/${sk.dataset.sketch}/${prefs.qsSrc === 'art' ? 'art' : 'pals'}`; return; }
+    const src = e.target.closest('[data-src]');
+    if (src) { prefs.qsSrc = src.dataset.src; save(); Sfx.play('pop'); document.querySelectorAll('[data-src]').forEach(b => b.setAttribute('aria-pressed', b === src)); return; }
+    const gal = e.target.closest('[data-gal]'); if (gal) return openViewer(+gal.dataset.gal);
+    const jump = e.target.closest('[data-jump]'); if (jump) { Sfx.play('pop'); document.getElementById(jump.dataset.jump)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     const lessonBtn = e.target.closest('.art-card'); if (lessonBtn) { Sfx.play('tap'); location.hash = `#/lesson/${lessonBtn.dataset.lesson}`; return; }
     const card = e.target.closest('.pal-card'); if (card) { Sfx.play('tap'); return go(card.dataset.id); }
     const kit = e.target.closest('.kit-item');
@@ -2257,14 +2753,15 @@ function wire() {
   });
   $('#surpriseBtn').onclick = () => {
     Sfx.play('tap');
+    if (libMode === 'studio') { location.hash = '#/maker'; return; }
     if (libMode === 'art') { const left = LESSONS.filter(L => !prefs.art.includes(L.id)), pool = left.length ? left : LESSONS; location.hash = `#/lesson/${pool[Math.floor(Math.random() * pool.length)].id}`; return; }
     const left = CHARS.filter(c => !isDone(c.id)), pool = left.length ? left : CHARS; go(pool[Math.floor(Math.random() * pool.length)].id);
   };
   $('#resetBtn').onclick = () => { if (confirm('Erase all your stars and start over?')) { prefs.done = []; prefs.art = []; save(); renderLibrary(); } };
   $('#homeBtn').onclick = () => { Sfx.play('back'); home(); };
   $('#nextBtn').onclick = next; $('#backBtn').onclick = back;
-  $('#dots').addEventListener('click', e => { const d = e.target.closest('.dot'); if (d) { Sfx.play('pop'); goStep(+d.dataset.step); } });
-  $('#speakBtn').onclick = () => { const st = curItem().steps[G.step]; speak(`Step ${G.step + 1}. ${st.t}${G.mode === 'art' && st.tip ? ` Artist tip: ${st.tip}` : ''}`); };
+  $('#dots').addEventListener('click', e => { const d = e.target.closest('.dot'); if (d && G.mode !== 'sketch') { Sfx.play('pop'); goStep(+d.dataset.step); } });
+  $('#speakBtn').onclick = () => { if (G.mode === 'sketch') return speak($('#tipText').textContent); const st = curItem().steps[G.step]; speak(`Step ${G.step + 1}. ${st.t}${G.mode === 'art' && st.tip ? ` Artist tip: ${st.tip}` : ''}`); };
   $('#speedBtn').onclick = () => { prefs.fast = !prefs.fast; save(); paintSpeed(); Sfx.play(prefs.fast ? 'next' : 'back'); };
   $('#playBtn').onclick = () => { Demo.setPlaying(!Demo.playing); Sfx.play('pop'); };
   $('#peekBtn').onclick = peek; $('#peek').onclick = peek;
@@ -2292,19 +2789,38 @@ function wire() {
     if (!file || G.mode !== 'art') return;
     if (photos[G.les.id]) URL.revokeObjectURL(photos[G.les.id]);
     photos[G.les.id] = URL.createObjectURL(file);
-    $('#cImg').src = photos[G.les.id]; $('#cMine').hidden = false; Sfx.play('pop'); toast('Look at that! You\'re a real artist 📸');
+    $('#cImg').src = photos[G.les.id]; $('#cMine').hidden = false; Sfx.play('pop'); toast('Saved to your gallery! 📸');
+    shrinkPhoto(file).then(b => toGallery(G.les.title, 'photo', b));
   };
-  $('#cNext').onclick = () => { closeCelebrate(); location.hash = $('#cNext').dataset.href; };
-  $('#cAgain').onclick = () => { closeCelebrate(); if (G.mode === 'pal') { Pad.strokes.length = 0; Pad.redraw(); } G.step = 0; renderStep(); Demo.start(); };
+  $('#cNext').onclick = () => { closeCelebrate(); const h = $('#cNext').dataset.href; if (location.hash === h) route(); else location.hash = h; };
+  $('#cAgain').onclick = () => { closeCelebrate(); if (G.mode === 'sketch') return startSketch(QS.secs, QS.src); if (G.mode === 'pal') { Pad.strokes.length = 0; Pad.redraw(); } G.step = 0; renderStep(); Demo.start(); };
   $('#cHome').onclick = () => { closeCelebrate(); home(); };
+  $('#mkHome').onclick = () => { Sfx.play('back'); location.hash = '#/studio'; };
+  $('#mkTabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (!b) return; MKS.tab = b.dataset.tab; Sfx.play('pop'); renderMakerPanel(); });
+  $('#mkPanel').addEventListener('click', e => {
+    const b = e.target.closest('[data-k]'); if (!b) return;
+    const k = b.dataset.k, v = b.dataset.v; MKS.o[k] = b.dataset.toggle ? !MKS.o[k] : v; Sfx.play('pop');
+    renderMakerPanel(); renderMakerPreview();
+    $('#mkPanel').querySelector(b.dataset.toggle ? `[data-k="${k}"]` : `[data-k="${k}"][data-v="${v}"]`)?.focus({ preventScroll: true });
+  });
+  $('#mkName').oninput = e => { MKS.name = e.target.value; };
+  $('#mkRandom').onclick = () => { MKS.o = { ...MK_DEFAULT, ...randomOpts() }; Sfx.play('next'); renderMakerPanel(); renderMakerPreview(); };
+  $('#mkSave').onclick = () => { const m = saveMaker(); Sfx.play('win'); toast(`${m.name} is saved! 🖍️`); location.hash = '#/studio'; };
+  $('#mkDraw').onclick = () => { const m = saveMaker(); Sfx.play('next'); location.hash = `#/draw/${m.id}`; };
+  $('#vClose').onclick = () => { $('#viewer').hidden = true; };
+  $('#viewer').addEventListener('click', e => { if (e.target.id === 'viewer') $('#viewer').hidden = true; });
+  $('#vDel').onclick = async () => { if (!confirm('Delete this drawing from your gallery?')) return; await Gallery.del(+$('#vDel').dataset.id); $('#viewer').hidden = true; Sfx.play('clear'); fillGallery(); };
   document.addEventListener('keydown', e => {
-    if (!$('#celebrate').hidden) { if (e.key === 'Escape') { closeCelebrate(); Demo.start(); } return; }
+    if (!$('#viewer').hidden) { if (e.key === 'Escape') $('#viewer').hidden = true; return; }
+    if (!$('#maker').hidden) { if (e.key === 'Escape' && !e.target.closest('input')) location.hash = '#/studio'; return; }
+    if (!$('#celebrate').hidden) { if (e.key === 'Escape') { closeCelebrate(); if (G.mode !== 'sketch') Demo.start(); } return; }
     if ($('#guide').hidden || e.target.closest('input, textarea')) return;
     if (e.key === 'ArrowRight') next(); else if (e.key === 'ArrowLeft') back(); else if (e.key === 'Escape') home();
   });
   window.addEventListener('hashchange', route);
 }
 
+loadMine();
 Pad.init(); wire(); route();
 // prepare the Art School lessons in spare moments so the tab opens instantly
 const whenIdle = window.requestIdleCallback || (f => setTimeout(f, 120));
