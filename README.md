@@ -5,7 +5,8 @@ upload a portrait, and get back a talking-avatar video. Everything runs on your
 own machine. No HeyGen services or accounts are involved.
 
 > This repository also hosts the static GitHub Pages site (`brain-gate-quest/`,
-> `sewcraft-3d/`). OpenAvatarStudio lives in `frontend/` and `backend/` and runs
+> `sewcraft-3d/`, `doodle-pals/`). The home page, `index.html`, links to Brain Gate
+> Quest and Doodle Pals. OpenAvatarStudio lives in `frontend/` and `backend/` and runs
 > locally; GitHub Pages does not serve it. Its project page, with screenshots,
 > setup steps and a QR code, is `open-avatar-studio/`:
 > https://kevdogg05.github.io/open-avatar-studio/
@@ -22,6 +23,12 @@ own machine. No HeyGen services or accounts are involved.
 > repository, [Kevdogg05/Road-Queen-Fitness](https://github.com/Kevdogg05/Road-Queen-Fitness),
 > and is served at https://roadqueenfitness.com. `road-queen-fitness/` here only
 > redirects old links and QR codes there.
+>
+> **Doodle Pals**, a drawing app for kids, is a single page in `doodle-pals/`:
+> animated step-by-step cartoon pals, a make-your-own-pal maker, daily
+> challenges, quick sketches, a gallery, and real paper-and-pencil art lessons.
+> It installs on a tablet and works offline. Its QR code is
+> `doodle-pals/qr-code.png`: https://kevdogg05.github.io/doodle-pals/
 
 ## Status
 

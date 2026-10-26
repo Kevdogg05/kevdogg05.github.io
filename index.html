@@ -3,21 +3,52 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Brain Gate Quest</title>
-  <!-- The site's home page sends visitors straight to the game. -->
-  <meta http-equiv="refresh" content="0; url=./brain-gate-quest/">
-  <link rel="canonical" href="https://kevdogg05.github.io/brain-gate-quest/">
-  <link rel="icon" href="brain-gate-quest/icon.svg" type="image/svg+xml">
-  <script>window.location.replace('./brain-gate-quest/' + window.location.search);</script>
+  <title>Games &amp; Apps</title>
+  <meta name="description" content="Play Brain Gate Quest, learn to draw with Doodle Pals, and find more projects.">
+  <!-- Old links that carry a query string still go straight to the game, as they always did. -->
+  <script>if (location.search) location.replace('./brain-gate-quest/' + location.search);</script>
+  <link rel="icon" href="doodle-pals/icon.svg" type="image/svg+xml">
   <style>
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #1b1d3a; color: #fffaf0; font: 18px/1.5 "Trebuchet MS", system-ui, sans-serif; text-align: center; }
-    a { display: inline-block; margin-top: 12px; padding: 12px 28px; border-radius: 14px; background: #ffd23f; color: #1b1d3a; font-weight: 800; text-decoration: none; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: #1b1d3a; color: #fffaf0; font: 18px/1.45 "Trebuchet MS", system-ui, sans-serif; }
+    main { width: min(820px, 100%); text-align: center; }
+    h1 { margin: 0 0 6px; font-size: clamp(30px, 6vw, 44px); color: #ffd23f; }
+    .sub { margin: 0 0 24px; color: #c9cbe8; }
+    .cards { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .card { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 22px 18px 20px; border-radius: 26px; text-decoration: none; transition: transform .15s ease; }
+    .card:hover, .card:focus-visible { transform: translateY(-4px) rotate(-1deg); }
+    .card:focus-visible { outline: 4px solid #ffd23f; outline-offset: 4px; }
+    .card img { width: 104px; height: 104px; border-radius: 24px; }
+    .card b { display: block; font-size: 26px; }
+    .card small { display: block; font-size: 16px; margin-top: 4px; }
+    .card em { margin-top: 6px; font-style: normal; font-weight: 800; font-size: 20px; padding: 10px 26px; border-radius: 16px; }
+    .bgq { background: #2a2d5c; color: #fffaf0; box-shadow: 0 8px 0 #12142b; }
+    .bgq small { color: #c9cbe8; }
+    .bgq em { background: #ffd23f; color: #1b1d3a; box-shadow: 0 4px 0 #b8901b; }
+    .dp { background: #fff6ea; color: #2b2340; box-shadow: 0 8px 0 #c93d88; }
+    .dp small { color: #6b5f86; }
+    .dp em { background: #f35fae; color: #fff; box-shadow: 0 4px 0 #c93d88; }
+    .more { margin-top: 30px; color: #c9cbe8; font-size: 16px; }
+    .more a { color: #fffaf0; }
   </style>
 </head>
 <body>
   <main>
-    <p>Loading Brain Gate Quest…</p>
-    <a href="./brain-gate-quest/">▶ Play Brain Gate Quest</a>
+    <h1>Pick something fun! 🎉</h1>
+    <p class="sub">Play a game or learn to draw.</p>
+    <div class="cards">
+      <a class="card bgq" href="./brain-gate-quest/">
+        <img src="brain-gate-quest/icon.svg" alt="" width="104" height="104">
+        <span><b>Brain Gate Quest</b><small>A retro platformer: answer times tables and trivia to open the gates.</small></span>
+        <em>▶ Play</em>
+      </a>
+      <a class="card dp" href="./doodle-pals/">
+        <img src="doodle-pals/icon.svg" alt="" width="104" height="104">
+        <span><b>Doodle Pals</b><small>Draw cartoon pals step by step, make your own, and take real pencil art lessons.</small></span>
+        <em>✏️ Draw</em>
+      </a>
+    </div>
+    <p class="more">More projects: <a href="./sewcraft-3d/">SewCraft 3D</a> · <a href="./sns-palace/">SnS Palace</a> · <a href="./open-avatar-studio/">OpenAvatarStudio</a></p>
   </main>
 </body>
 </html>
