@@ -4,9 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Doodle Pals</title>
-<meta name="description" content="Doodle Pals: learn to draw 60 cartoon characters step by step with an animated pencil guide and a practice sketchpad.">
+<meta name="description" content="Doodle Pals: learn to draw 60 cartoon characters step by step with an animated pencil, design your own pal, practise with daily challenges, and take real paper-and-pencil art lessons.">
 <meta name="theme-color" content="#fff6ea">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%8F%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Doodle Pals">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -369,6 +374,11 @@
   .empty { grid-column: 1 / -1; color: #8d82a6; font-weight: 500; font-size: 17px; background: #fff; border-radius: 20px; padding: 18px; }
   .viewer-card { position: relative; width: min(640px, 100%); max-height: calc(100dvh - 32px); overflow: auto; background: #fff; border-radius: 28px; padding: 18px; text-align: center; box-shadow: 0 10px 0 #eadccb; animation: cardIn .4s cubic-bezier(.3,1.6,.5,1); }
   .viewer-card img { width: 100%; max-height: 60dvh; object-fit: contain; border-radius: 18px; background: var(--paper); }
+  .grown-btn { display: inline-flex; align-items: center; gap: 8px; background: #fff; border-radius: 999px; padding: 8px 18px; font-weight: 600; color: #6b5f86; }
+  .grown-card .qr-img { width: 220px; height: 220px; max-height: none; margin: 14px auto 6px; border-radius: 16px; border: 4px solid #f3e6d6; background: #fff; }
+  .gr-list { margin-top: 6px; padding-left: 0; list-style: none; text-align: left; display: grid; gap: 6px; color: #6b5f86; font-weight: 500; }
+  .gr-list li { background: #fffaf3; border-radius: 14px; padding: 8px 12px; }
+  .gr-list b { color: var(--ink); }
   /* quick sketch reuses the guide screen */
   #guide.sketch .speed, #guide.sketch #playBtn, #guide.sketch #peekBtn, #guide.sketch #traceBtn, #guide.sketch #trace, #guide.sketch .legend, #guide.sketch #peek { display: none !important; }
   .step-badge.hurry { background: #ff4f6d; animation: tipPop .5s ease infinite alternate; }
@@ -459,7 +469,8 @@
 
   <footer class="mt-14 text-center text-[#8d82a6] font-medium">
     <p>Tip: watch the pencil, then try it yourself — on the sketchpad or on real paper! ✏️</p>
-    <button id="resetBtn" class="mt-3 underline underline-offset-4 decoration-2 text-sm">Reset my stars</button>
+    <button id="grownBtn" class="grown-btn btn3d mt-4"><span data-ico="qr-code"></span> For grown-ups: QR code &amp; install</button>
+    <br><button id="resetBtn" class="mt-3 underline underline-offset-4 decoration-2 text-sm">Reset my stars</button>
   </footer>
 </section>
 
@@ -604,6 +615,27 @@
       <button id="vDel" class="nav-btn btn3d bg-white text-lg"><span data-ico="trash-2"></span> Delete</button>
       <button id="vClose" class="nav-btn nav-next btn3d text-lg" style="--cat:#ff7a45;--cat-sh:#d65a24">Close</button>
     </div>
+  </div>
+</div>
+<div id="grown" class="celebrate" role="dialog" aria-modal="true" aria-labelledby="grTitle" hidden>
+  <div class="viewer-card grown-card">
+    <h2 id="grTitle" class="text-2xl sm:text-3xl font-bold outline-none" tabindex="-1">👪 For grown-ups</h2>
+    <p class="mt-1 text-[#6b5f86] font-medium">Open Doodle Pals on a tablet or phone: point its camera at this code.</p>
+    <img class="qr-img" src="qr-code.svg" width="220" height="220" alt="QR code linking to https://kevdogg05.github.io/doodle-pals/">
+    <p class="font-semibold text-[15px] sm:text-lg">kevdogg05.github.io/doodle-pals</p>
+    <div class="flex flex-wrap justify-center gap-3 mt-3">
+      <button id="grCopy" class="nav-btn btn3d bg-white text-lg"><span data-ico="copy"></span> Copy link</button>
+      <a class="nav-btn btn3d bg-white text-lg" href="qr-code.png" download="doodle-pals-qr.png"><span data-ico="download"></span> QR card</a>
+    </div>
+    <h3 class="mt-5 text-xl font-bold">📲 Put it on the home screen</h3>
+    <ul class="gr-list">
+      <li><b>iPad or iPhone:</b> open it in Safari, tap Share, then "Add to Home Screen".</li>
+      <li><b>Android:</b> open it in Chrome, tap the ⋮ menu, then "Install app" or "Add to Home screen".</li>
+      <li>After the first visit it also works with no internet, which is handy for car rides.</li>
+    </ul>
+    <h3 class="mt-4 text-xl font-bold">🔒 Privacy</h3>
+    <p class="text-[#6b5f86] font-medium">No accounts and no ads. Stars, home-made pals and the gallery are saved only in this browser, on this device.</p>
+    <button id="grClose" class="nav-btn nav-next btn3d text-lg mt-4" style="--cat:#7c6cff;--cat-sh:#5b4bd6">Close</button>
   </div>
 </div>
 <div id="confetti" class="confetti" aria-hidden="true"></div>
@@ -2948,10 +2980,18 @@ function wire() {
   $('#mkSave').onclick = () => { const m = saveMaker(); Sfx.play('win'); toast(`${m.name} is saved! 🖍️`); location.hash = '#/studio'; };
   $('#mkDraw').onclick = () => { const m = saveMaker(); Sfx.play('next'); location.hash = `#/draw/${m.id}`; };
   $('#vClose').onclick = () => { $('#viewer').hidden = true; };
+  $('#grownBtn').onclick = () => { Sfx.play('pop'); $('#grown').hidden = false; $('.grown-card').scrollTop = 0; $('#grTitle').focus(); };
+  $('#grClose').onclick = () => { $('#grown').hidden = true; $('#grownBtn').focus(); };
+  $('#grown').addEventListener('click', e => { if (e.target.id === 'grown') $('#grown').hidden = true; });
+  $('#grCopy').onclick = () => {
+    const url = 'https://kevdogg05.github.io/doodle-pals/';
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast('Link copied! 📋'), () => prompt('Copy this link:', url));
+  };
   $('#viewer').addEventListener('click', e => { if (e.target.id === 'viewer') $('#viewer').hidden = true; });
   $('#vDel').onclick = async () => { if (!confirm('Delete this drawing from your gallery?')) return; await Gallery.del(+$('#vDel').dataset.id); $('#viewer').hidden = true; Sfx.play('clear'); fillGallery(); };
   document.addEventListener('keydown', e => {
     if (!$('#viewer').hidden) { if (e.key === 'Escape') $('#viewer').hidden = true; return; }
+    if (!$('#grown').hidden) { if (e.key === 'Escape') $('#grown').hidden = true; return; }
     if (!$('#maker').hidden) { if (e.key === 'Escape' && !e.target.closest('input')) location.hash = '#/studio'; return; }
     if (!$('#celebrate').hidden) { if (e.key === 'Escape') { closeCelebrate(); if (G.mode !== 'sketch') Demo.start(); } return; }
     if ($('#guide').hidden || e.target.closest('input, textarea')) return;
@@ -2967,6 +3007,8 @@ const whenIdle = window.requestIdleCallback || (f => setTimeout(f, 120));
 let toBuild = 0;
 const buildNext = () => { if (toBuild < LESSONS.length) { buildLesson(LESSONS[toBuild++]); whenIdle(buildNext); } };
 whenIdle(buildNext);
+// offline support, once the app is served from a real web address
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 })();
 </script>
 </body>
