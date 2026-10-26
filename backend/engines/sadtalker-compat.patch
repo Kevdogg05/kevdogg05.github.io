@@ -1,0 +1,81 @@
+diff --git a/src/face3d/util/my_awing_arch.py b/src/face3d/util/my_awing_arch.py
+index cd56561..647fa11 100644
+--- a/src/face3d/util/my_awing_arch.py
++++ b/src/face3d/util/my_awing_arch.py
+@@ -15,7 +15,7 @@ def calculate_points(heatmaps):
+     indexes = np.argmax(heatline, axis=2)
+ 
+     preds = np.stack((indexes % W, indexes // W), axis=2)
+-    preds = preds.astype(np.float, copy=False)
++    preds = preds.astype(np.float64, copy=False)
+ 
+     inr = indexes.ravel()
+ 
+diff --git a/src/face3d/util/preprocess.py b/src/face3d/util/preprocess.py
+index b77a3a4..7d03436 100644
+--- a/src/face3d/util/preprocess.py
++++ b/src/face3d/util/preprocess.py
+@@ -9,7 +9,7 @@ import os
+ from skimage import transform as trans
+ import torch
+ import warnings
+-warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning) 
++warnings.filterwarnings("ignore", category=getattr(np, "exceptions", np).VisibleDeprecationWarning) 
+ warnings.filterwarnings("ignore", category=FutureWarning) 
+ 
+ 
+@@ -34,7 +34,7 @@ def POS(xp, x):
+     sTx = k[3]
+     sTy = k[7]
+     s = (np.linalg.norm(R1) + np.linalg.norm(R2))/2
+-    t = np.stack([sTx, sTy], axis=0)
++    t = np.stack([sTx, sTy], axis=0).reshape(-1)
+ 
+     return t, s
+     
+diff --git a/src/facerender/animate.py b/src/facerender/animate.py
+index 781f5a3..3bab3b1 100644
+--- a/src/facerender/animate.py
++++ b/src/facerender/animate.py
+@@ -20,7 +20,6 @@ from src.facerender.modules.generator import OcclusionAwareGenerator, OcclusionA
+ from src.facerender.modules.make_animation import make_animation 
+ 
+ from pydub import AudioSegment 
+-from src.utils.face_enhancer import enhancer_generator_with_len, enhancer_list
+ from src.utils.paste_pic import paste_pic
+ from src.utils.videoio import save_video_with_watermark
+ 
+@@ -234,6 +233,7 @@ class AnimateFromCoeff():
+ 
+         #### paste back then enhancers
+         if enhancer:
++            from src.utils.face_enhancer import enhancer_generator_with_len, enhancer_list
+             video_name_enhancer = x['video_name']  + '_enhanced.mp4'
+             enhanced_path = os.path.join(video_save_dir, 'temp_'+video_name_enhancer)
+             av_path_enhancer = os.path.join(video_save_dir, video_name_enhancer) 
+diff --git a/src/utils/croper.py b/src/utils/croper.py
+index 3d9a0ac..b9b6fef 100644
+--- a/src/utils/croper.py
++++ b/src/utils/croper.py
+@@ -128,7 +128,7 @@ class Preprocesser:
+         lm = self.get_landmark(img_np)
+ 
+         if lm is None:
+-            raise 'can not detect the landmark from source image'
++            raise ValueError('can not detect the landmark from source image')
+         rsize, crop, quad = self.align_face(img=Image.fromarray(img_np), lm=lm, output_size=xsize)
+         clx, cly, crx, cry = crop
+         lx, ly, rx, ry = quad
+diff --git a/src/utils/preprocess.py b/src/utils/preprocess.py
+index 0f784e6..611965d 100644
+--- a/src/utils/preprocess.py
++++ b/src/utils/preprocess.py
+@@ -145,7 +145,7 @@ class CropAndExtract():
+ 
+                 trans_params, im1, lm1, _ = align_img(frame, lm1, self.lm3d_std)
+  
+-                trans_params = np.array([float(item) for item in np.hsplit(trans_params, 5)]).astype(np.float32)
++                trans_params = np.asarray(trans_params, dtype=np.float32).reshape(-1)
+                 im_t = torch.tensor(np.array(im1)/255., dtype=torch.float32).permute(2, 0, 1).to(self.device).unsqueeze(0)
+                 
+                 with torch.no_grad():

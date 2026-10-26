@@ -1,0 +1,91 @@
+diff --git a/audio.py b/audio.py
+index 32b20c4..ea7af71 100644
+--- a/audio.py
++++ b/audio.py
+@@ -7,7 +7,7 @@ from scipy.io import wavfile
+ from hparams import hparams as hp
+ 
+ def load_wav(path, sr):
+-    return librosa.core.load(path, sr=sr)[0]
++    return librosa.load(path, sr=sr)[0]
+ 
+ def save_wav(wav, path, sr):
+     wav *= 32767 / max(0.01, np.max(np.abs(wav)))
+@@ -97,7 +97,7 @@ def _linear_to_mel(spectogram):
+ 
+ def _build_mel_basis():
+     assert hp.fmax <= hp.sample_rate // 2
+-    return librosa.filters.mel(hp.sample_rate, hp.n_fft, n_mels=hp.num_mels,
++    return librosa.filters.mel(sr=hp.sample_rate, n_fft=hp.n_fft, n_mels=hp.num_mels,
+                                fmin=hp.fmin, fmax=hp.fmax)
+ 
+ def _amp_to_db(x):
+diff --git a/face_detection/detection/sfd/sfd_detector.py b/face_detection/detection/sfd/sfd_detector.py
+index 8fbce15..9b813ec 100644
+--- a/face_detection/detection/sfd/sfd_detector.py
++++ b/face_detection/detection/sfd/sfd_detector.py
+@@ -21,7 +21,7 @@ class SFDDetector(FaceDetector):
+         if not os.path.isfile(path_to_detector):
+             model_weights = load_url(models_urls['s3fd'])
+         else:
+-            model_weights = torch.load(path_to_detector)
++            model_weights = torch.load(path_to_detector, map_location='cpu')
+ 
+         self.face_detector = s3fd()
+         self.face_detector.load_state_dict(model_weights)
+diff --git a/face_detection/utils.py b/face_detection/utils.py
+index 3dc4cf3..a328596 100644
+--- a/face_detection/utils.py
++++ b/face_detection/utils.py
+@@ -112,7 +112,7 @@ def crop(image, center, scale, resolution=256.0):
+                            image.shape[2]], dtype=np.int32)
+         newImg = np.zeros(newDim, dtype=np.uint8)
+     else:
+-        newDim = np.array([br[1] - ul[1], br[0] - ul[0]], dtype=np.int)
++        newDim = np.array([br[1] - ul[1], br[0] - ul[0]], dtype=np.int32)
+         newImg = np.zeros(newDim, dtype=np.uint8)
+     ht = image.shape[0]
+     wd = image.shape[1]
+diff --git a/inference.py b/inference.py
+index 9069252..ef78b04 100644
+--- a/inference.py
++++ b/inference.py
+@@ -53,7 +53,7 @@ parser.add_argument('--nosmooth', default=False, action='store_true',
+ args = parser.parse_args()
+ args.img_size = 96
+ 
+-if os.path.isfile(args.face) and args.face.split('.')[1] in ['jpg', 'png', 'jpeg']:
++if os.path.isfile(args.face) and os.path.splitext(args.face)[1].lower() in ['.jpg', '.png', '.jpeg']:
+ 	args.static = True
+ 
+ def get_smoothened_boxes(boxes, T):
+@@ -182,7 +182,7 @@ def main():
+ 	if not os.path.isfile(args.face):
+ 		raise ValueError('--face argument must be a valid path to video/image file')
+ 
+-	elif args.face.split('.')[1] in ['jpg', 'png', 'jpeg']:
++	elif os.path.splitext(args.face)[1].lower() in ['.jpg', '.png', '.jpeg']:
+ 		full_frames = [cv2.imread(args.face)]
+ 		fps = args.fps
+ 
+@@ -216,9 +216,7 @@ def main():
+ 
+ 	if not args.audio.endswith('.wav'):
+ 		print('Extracting raw audio...')
+-		command = 'ffmpeg -y -i {} -strict -2 {}'.format(args.audio, 'temp/temp.wav')
+-
+-		subprocess.call(command, shell=True)
++		subprocess.call(['ffmpeg', '-y', '-i', args.audio, '-strict', '-2', 'temp/temp.wav'])
+ 		args.audio = 'temp/temp.wav'
+ 
+ 	wav = audio.load_wav(args.audio, 16000)
+@@ -273,8 +271,7 @@ def main():
+ 
+ 	out.release()
+ 
+-	command = 'ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}'.format(args.audio, 'temp/result.avi', args.outfile)
+-	subprocess.call(command, shell=platform.system() != 'Windows')
++	subprocess.call(['ffmpeg', '-y', '-i', args.audio, '-i', 'temp/result.avi', '-strict', '-2', '-q:v', '1', args.outfile])
+ 
+ if __name__ == '__main__':
+ 	main()

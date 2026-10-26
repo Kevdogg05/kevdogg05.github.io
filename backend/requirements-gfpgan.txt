@@ -1,0 +1,12 @@
+# Face libraries for the GFPGAN enhancer and SadTalker. Install with
+# scripts/setup_gfpgan.sh or scripts/setup_sadtalker.sh, which install PyTorch
+# and torchvision first, then add facexlib==0.3.0 and gfpgan==1.3.8 with
+# --no-deps: their declared dependencies pull in basicsr, which does not build
+# on Python 3.13, and opencv-python, which clashes with opencv-python-headless.
+# These are the dependencies they actually need.
+# Tested with: filterpy 1.4.5, opencv-python-headless 5.0.0.93, torchvision 0.29.1.
+opencv-python-headless>=4.8
+filterpy>=1.4
+numba>=0.58
+scipy>=1.11
+tqdm>=4.64

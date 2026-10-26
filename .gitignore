@@ -1,0 +1,18 @@
+# Docker settings (see .env.example)
+/.env
+
+# OpenAvatarStudio backend
+backend/.venv/
+backend/.env
+backend/storage/
+backend/engines/Wav2Lip/
+backend/engines/SadTalker/
+backend/engines/gfpgan/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/

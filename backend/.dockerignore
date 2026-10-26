@@ -1,0 +1,10 @@
+# Local state and installs; the image builds its own.
+.venv/
+.env
+storage/
+engines/Wav2Lip/
+engines/SadTalker/
+engines/gfpgan/
+**/__pycache__/
+.pytest_cache/
+tests/

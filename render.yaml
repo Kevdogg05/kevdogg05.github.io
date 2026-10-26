@@ -1,0 +1,36 @@
+# Puts SnS Palace (sns-palace/) online with Render, so the family can post and
+# watch from anywhere with the home computer switched off. Use the "Deploy to
+# Render" button in sns-palace/README.md ("Use it from anywhere").
+# The rest of this repository is the GitHub Pages site; Render ignores it.
+services:
+  - type: web
+    name: sns-palace
+    runtime: docker
+    # Pick the region closest to home before deploying; it can't change later.
+    # oregon, ohio, virginia, frankfurt or singapore.
+    region: oregon
+    # Standard: 2 GB of memory and 1 CPU. Editing a video and recognising the
+    # speech in it need about 1 GB on top of the app; Starter's 512 MB runs
+    # out of memory while editing.
+    plan: standard
+    dockerfilePath: ./sns-palace/Dockerfile
+    dockerContext: ./sns-palace
+    healthCheckPath: /unlock
+    # Redeploy only when the app changes, not the GitHub Pages site.
+    buildFilter:
+      paths:
+        - sns-palace/**
+    # The database, the videos and the speech model. Render snapshots it daily.
+    disk:
+      name: sns-palace-data
+      mountPath: /data
+      sizeGB: 10
+    envVars:
+      # Render asks for these two when you deploy. Online, use 6+ digits for
+      # both; PARENT_PIN must be different from FAMILY_PIN.
+      - key: FAMILY_PIN
+        sync: false
+      - key: PARENT_PIN
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true

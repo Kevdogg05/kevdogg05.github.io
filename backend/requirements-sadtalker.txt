@@ -1,0 +1,14 @@
+# SadTalker (engine "sadtalker"). Install with scripts/setup_sadtalker.sh, which
+# also installs PyTorch and the face libraries in requirements-gfpgan.txt.
+# Tested with: kornia 0.8.3, scikit-image 0.26.0, imageio 2.38.1, yacs 0.1.8,
+# pydub 0.25.1, audioop-lts 0.2.2, easydict 1.13, librosa 1.0.0, numpy 2.5.4.
+kornia>=0.7
+yacs>=0.1.8
+pydub>=0.25
+audioop-lts>=0.2; python_version >= "3.13"
+scikit-image>=0.22
+imageio>=2.31
+easydict>=1.10
+safetensors>=0.4
+librosa>=0.10
+pyyaml>=6

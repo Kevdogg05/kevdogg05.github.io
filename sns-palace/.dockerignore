@@ -1,0 +1,19 @@
+# Never bake secrets or household data into the image.
+.env*
+data
+worker/.venv
+**/__pycache__
+
+# Rebuilt inside the image.
+node_modules
+.next
+*.tsbuildinfo
+next-env.d.ts
+
+# The GitHub Pages project page.
+index.html
+site
+
+.git
+Dockerfile
+.dockerignore

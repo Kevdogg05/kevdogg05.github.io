@@ -1,0 +1,5 @@
+# Coqui TTS (OAS_TTS_PROVIDER=coqui). Install with scripts/setup_coqui.sh, which
+# installs PyTorch first. Also needs the espeak-ng system package
+# (apt install espeak-ng / brew install espeak-ng) for its phonemizer.
+# The `codec` extra pulls in torchcodec, which PyTorch >= 2.9 needs for audio I/O.
+coqui-tts[codec]==0.28.0
