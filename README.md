@@ -28,6 +28,11 @@ own machine. No HeyGen services or accounts are involved.
 > `hgu55-velcro-jig/`: STL files, the generator script and a project page
 > with a 3D preview. See [hgu55-velcro-jig/README.md](hgu55-velcro-jig/README.md):
 > https://kevdogg05.github.io/hgu55-velcro-jig/
+>
+> **TeleBot**, a $30 Wi-Fi telepresence robot (ESP32-CAM, DRV8833, TT motors,
+> one 18650 cell) driven from a phone browser with live video, lives in
+> `telepresence-bot/`: firmware, the dashboard, OpenSCAD chassis with STLs,
+> wiring diagrams and BOM. See [telepresence-bot/README.md](telepresence-bot/README.md).
 
 ## Status
 
