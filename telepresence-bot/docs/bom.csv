@@ -1,21 +1,22 @@
 id,category,part,specification,qty,unit_usd,line_usd,required,where_to_look,notes
 1,Controller,ESP32-CAM + ESP32-CAM-MB,"AI-Thinker ESP32-CAM, OV2640 camera, 4 MB PSRAM, with the ESP32-CAM-MB USB programmer board",1,7.50,7.50,yes,"AliExpress/Amazon: ""ESP32-CAM MB OV2640""","The MB board is only for flashing over USB; after the first flash, updates go over Wi-Fi (OTA)"
 2,Motor driver,DRV8833 dual H-bridge module,"2 channels, 2.7-10.8 V, 1.5 A per channel, inputs with internal pull-downs",1,1.20,1.20,yes,"""DRV8833 motor driver module""","Preferred over the L298N: about 0.2 V drop instead of 2+ V, and it keeps GPIO 12 low at boot. L298N works with ENA/ENB jumpers fitted but wastes power"
-3,Drive,TT gear motor 1:48 with 65 mm wheel,"Yellow in-line gearbox, 3-6 V, ~200 rpm at 6 V, dual shaft",2,2.00,4.00,yes,"""TT motor wheel kit""",Usually sold as motor + wheel sets; buy a 2- or 4-pack
-4,Drive,Caster ball,16 mm glass marble or 5/8 in (15.9 mm) steel ball,1,0.30,0.30,yes,"Hardware store or ""5/8 steel ball""",Rolls in the printed caster holder
-5,Power,18650 Li-ion cell,"2500-3500 mAh brand-name cell, 10 A+ continuous (e.g. Samsung 25R/35E, LG HG2, Molicel P26A)",1,4.00,4.00,yes,Reputable battery vendor,"Avoid ""9900 mAh"" cells: they are fakes with a fraction of the capacity and no real discharge rating"
-6,Power,18650 single-cell holder,"Holder with leads, ~78 x 21 mm",1,0.40,0.40,yes,"""18650 battery holder 1 slot""",Zip-tied to the deck
-7,Power,"Charge, protection and 5 V boost module","IP5306-based ""18650 charge/discharge"" board: USB-C charging, over-charge/over-discharge/short protection, 5 V 2.1 A output",1,1.50,1.50,yes,"""IP5306 type-C 5V 2.1A module""","Acts as the BMS and the step-up converter in one. Alternative: TP4056 with DW01 protection + a 5 V 2 A boost; avoid the MT3608, which sags when the motors start"
-8,Power,Power switch,"KCD11 mini rocker switch (13 x 9 mm cutout), 3 A",1,0.15,0.15,yes,"""KCD11 rocker switch""",Between the boost output and the 5 V rail
-9,Power,Bulk capacitor,"1000 uF 10 V electrolytic, low ESR",1,0.15,0.15,yes,Any electronics supplier,"Across 5V/GND right at the ESP32-CAM pins: the main fix for brownout resets"
-10,Power,Ceramic capacitors,100 nF 50 V,4,0.02,0.08,yes,Any electronics supplier,"One across each motor's terminals, one at the driver's VM pin"
-11,Wiring,Stacking female headers,"1 x 8, 2.54 mm, long (~11 mm) tails",2,0.10,0.20,yes,"""8 pin stackable header Arduino""",Socket for the ESP32-CAM in the camera bracket
-12,Wiring,Dupont jumper wires,"Female-female, 10 cm, 20-pack",1,0.60,0.60,yes,"""dupont jumper F-F 10cm""",Logic and 5 V wiring
-13,Wiring,Silicone wire,"22 AWG red + black, 1 m each",1,0.40,0.40,yes,Any electronics supplier,Battery and motor leads
-14,Hardware,M3 screws and nuts,"4x M3x10 (bracket, caster), 2x M3 nut, plus spares",1,0.80,0.80,yes,"""M3 screw nut assortment""",Caster screws self-tap into the printed holder
+3,Drive,TT gear motor 1:48 (motor only),"Yellow in-line gearbox, 3-6 V, ~200 rpm at 6 V, dual double-D shaft",2,1.30,2.60,yes,"""TT gear motor 3-6V"" (without wheel)",The printed wheel (chassis/wheel.scad) replaces the kit wheel. Motor + wheel sets (~$2.00 each) work too: set printed_wheels = false in assembly.scad
+4,Drive,O-rings for the printed wheels,"NBR, 55 mm ID x 3.5 mm cross-section (53-56 mm ID works)",4,0.05,0.20,yes,"""O-ring 55x3.5"" or a metric O-ring assortment",Two per wheel; they are the tires. Wide rubber bands also work. Printed TPU tires (tire_tpu.scad) grip less
+5,Drive,Caster ball,16 mm glass marble or 5/8 in (15.9 mm) steel ball,1,0.30,0.30,yes,"Hardware store or ""5/8 steel ball""","Rolls in the printed caster holder. On hard floors only, caster_skid.scad needs no ball"
+6,Power,18650 Li-ion cell,"2500-3500 mAh brand-name cell, 10 A+ continuous (e.g. Samsung 25R/35E, LG HG2, Molicel P26A)",1,4.00,4.00,yes,Reputable battery vendor,"Avoid ""9900 mAh"" cells: they are fakes with a fraction of the capacity and no real discharge rating"
+7,Power,18650 single-cell holder,"Holder with leads, ~78 x 21 mm",1,0.40,0.40,yes,"""18650 battery holder 1 slot""",Zip-tied to the deck
+8,Power,"Charge, protection and 5 V boost module","IP5306-based ""18650 charge/discharge"" board: USB-C charging, over-charge/over-discharge/short protection, 5 V 2.1 A output",1,1.50,1.50,yes,"""IP5306 type-C 5V 2.1A module""","Acts as the BMS and the step-up converter in one. Alternative: TP4056 with DW01 protection + a 5 V 2 A boost; avoid the MT3608, which sags when the motors start"
+9,Power,Power switch,"KCD11 mini rocker switch (13 x 9 mm cutout), 3 A",1,0.15,0.15,yes,"""KCD11 rocker switch""",Between the boost output and the 5 V rail
+10,Power,Bulk capacitor,"1000 uF 10 V electrolytic, low ESR",1,0.15,0.15,yes,Any electronics supplier,Across 5V/GND right at the ESP32-CAM pins: the main fix for brownout resets
+11,Power,Ceramic capacitors,100 nF 50 V,4,0.02,0.08,yes,Any electronics supplier,"One across each motor's terminals, one at the driver's VM pin"
+12,Wiring,Stacking female headers,"1 x 8, 2.54 mm, long (~11 mm) tails",2,0.10,0.20,yes,"""8 pin stackable header Arduino""",Socket for the ESP32-CAM in the camera bracket
+13,Wiring,Dupont jumper wires,"Female-female, 10 cm, 20-pack",1,0.60,0.60,yes,"""dupont jumper F-F 10cm""",Logic and 5 V wiring
+14,Wiring,Silicone wire,"22 AWG red + black, 1 m each",1,0.40,0.40,yes,Any electronics supplier,Battery and motor leads
 15,Hardware,Zip ties,"100 x 2.5 mm, 4 pieces",1,0.10,0.10,yes,Any hardware store,Two for the motors and two for the battery holder
 16,Hardware,Double-sided foam tape,"~10 cm, 1 mm thick",1,0.20,0.20,yes,Any hardware store,For the driver and power modules
-17,Fabrication,PLA or PETG filament,About 95 g for all printed parts,1,2.00,2.00,yes,Any filament at ~$20/kg,"Base ~70 g, caster holder ~10 g, camera bracket ~8 g, plus waste"
+17,Fabrication,PLA or PETG filament,"About 100 g: base, caster holder, camera bracket, 2 wheels, push pins, shaft fit test",1,2.00,2.00,yes,Any filament at ~$20/kg,"Base ~47 g, wheels ~12 g each, caster holder ~6 g, bracket ~7 g, pins and test coupon ~4 g, plus waste. PETG preferred for the pins"
 18,Wiring,Heat-shrink tubing,Small assortment,1,0.20,0.20,yes,Any electronics supplier,
-19,Optional,External 2.4 GHz antenna,"IPEX/U.FL pigtail antenna, 3 dBi",1,1.00,1.00,optional,"""ESP32-CAM external antenna""",Needs the on-board 0-ohm antenna-select resistor moved; doubles usable range
-20,Optional,Spare ESP32-CAM,Same as item 1 without the MB board,1,5.50,5.50,optional,,Clones vary; a spare saves a week of shipping if the first has a weak camera
+19,Hardware,M3 screws and nuts (instead of printed pins),"4x M3x10, 2x M3 nut",1,0.80,0.80,optional,"""M3 screw nut assortment""",Only if you skip the printed push pins (chassis/push_pin.scad); same holes
+20,Optional,External 2.4 GHz antenna,"IPEX/U.FL pigtail antenna, 3 dBi",1,1.00,1.00,optional,"""ESP32-CAM external antenna""",Needs the on-board 0-ohm antenna-select resistor moved; doubles usable range
+21,Optional,Spare ESP32-CAM,Same as item 1 without the MB board,1,5.50,5.50,optional,,Clones vary; a spare saves a week of shipping if the first has a weak camera

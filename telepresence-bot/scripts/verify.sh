@@ -27,7 +27,8 @@ required=(
   firmware/scripts/embed_web.py firmware/test/test_drive/test_main.cpp
   web/index.html
   chassis/lib/telebot_common.scad chassis/chassis_base.scad chassis/caster_holder.scad
-  chassis/esp32cam_bracket.scad chassis/assembly.scad
+  chassis/esp32cam_bracket.scad chassis/assembly.scad chassis/wheel.scad chassis/tire_tpu.scad
+  chassis/push_pin.scad chassis/shaft_fit_test.scad chassis/caster_skid.scad docs/printed-parts.md
   scripts/verify.sh scripts/mock_robot.py scripts/e2e_dashboard.js scripts/host-unity/unity.h
 )
 missing=0
@@ -57,7 +58,7 @@ for r in rows:
     assert abs(qty * unit - line) < 0.005, "row %s: %d x %.2f != %.2f" % (r["id"], qty, unit, line)
     assert r["required"] in total, "row %s: required must be yes/optional" % r["id"]
     total[r["required"]] += line
-for word in ("ESP32-CAM", "DRV8833", "TT gear motor", "18650", "boost", "Caster"):
+for word in ("ESP32-CAM", "DRV8833", "TT gear motor", "18650", "boost", "Caster", "O-ring"):
     assert any(word.lower() in (r["part"] + r["specification"]).lower() for r in rows), "BOM lacks " + word
 print("        required parts $%.2f, optional $%.2f (target $30-40 incl. shipping)" % (total["yes"], total["optional"]))
 assert total["yes"] <= 40, "required parts exceed $40"
@@ -175,8 +176,9 @@ else
 fi
 
 section "Chassis (OpenSCAD)"
+PARTS="chassis_base caster_holder caster_skid esp32cam_bracket wheel tire_tpu push_pin shaft_fit_test"
 if have openscad; then
-  for part in chassis_base caster_holder esp32cam_bracket; do
+  for part in $PARTS; do
     if openscad -o "$TMP/$part.stl" "chassis/$part.scad" >"$TMP/$part.log" 2>&1 \
        && ! grep -qiE '^(WARNING|ERROR)' "$TMP/$part.log" && grep -q 'Simple: *yes' "$TMP/$part.log"; then
       ok "$part renders to a manifold solid ($(grep -c 'facet normal' "$TMP/$part.stl") facets)"
@@ -189,7 +191,7 @@ if have openscad; then
 else
   skp "OpenSCAD not installed: chassis render (prebuilt STLs are in chassis/stl/)"
 fi
-for part in chassis_base caster_holder esp32cam_bracket; do
+for part in $PARTS; do
   [ -s "chassis/stl/$part.stl" ] || bad "chassis/stl/$part.stl missing (make stl)"
 done
 

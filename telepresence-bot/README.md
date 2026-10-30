@@ -2,12 +2,14 @@
 
 A two-wheel robot with a live camera that you drive from a phone browser. An
 ESP32-CAM serves its own dashboard, streams MJPEG video and drives two TT gear
-motors through a DRV8833, all from one 18650 cell. The chassis is three
-3D-printed parts.
+motors through a DRV8833, all from one 18650 cell. The chassis, wheels,
+caster holder and fasteners are 3D-printed.
 
 ![Dashboard on a phone in landscape](docs/img/dashboard-landscape.png)
 
-* **Parts:** $23.78 required ([docs/bom.csv](docs/bom.csv)), ~$30-35 with shipping and spares.
+* **Parts:** $21.78 required ([docs/bom.csv](docs/bom.csv)), ~$30-35 with shipping and spares.
+  [docs/printed-parts.md](docs/printed-parts.md) covers which parts are printed to save money
+  and which are not worth printing.
 * **Control:** joystick, D-pad (forward, reverse, spin left, spin right, stop),
   keyboard or gamepad, over a WebSocket at 20 Hz. The robot stops by itself
   500 ms after commands stop arriving.
@@ -27,7 +29,8 @@ Full design, pinout, wiring, protocol and troubleshooting:
 | `docs/bom.csv` | Bill of materials with prices and sourcing notes |
 | `firmware/` | PlatformIO project: `src/main.cpp`, pins and tuning in `include/config.h`, testable drive logic in `include/drive.h` |
 | `web/index.html` | The dashboard: one self-contained file, embedded into the firmware at build time |
-| `chassis/` | OpenSCAD sources (base, caster holder, camera bracket, assembly preview) and ready-to-print `stl/` |
+| `docs/printed-parts.md` | Which parts to print to save money, which to buy, and the research behind it |
+| `chassis/` | OpenSCAD sources (base, caster holder or skid, camera bracket, wheels, TPU tire, push pins, shaft fit test, assembly preview) and ready-to-print `stl/` |
 | `scripts/` | `verify.sh`, the mock robot, the dashboard end-to-end test |
 | `Makefile` | Every build, flash, test and render command |
 

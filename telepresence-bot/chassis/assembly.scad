@@ -9,8 +9,11 @@ include <lib/telebot_common.scad>
 use <chassis_base.scad>
 use <caster_holder.scad>
 use <esp32cam_bracket.scad>
+use <wheel.scad>
+use <push_pin.scad>
 
-explode = 0;    // set to e.g. 15 to pull the parts apart
+explode = 0;            // set to e.g. 15 to pull the parts apart
+printed_wheels = true;  // false: bought TT wheels
 
 color("lightgray") chassis_base();
 color("orange") translate([0, 0, -explode]) caster_holder();
@@ -19,7 +22,16 @@ color("orange") translate([cam_x, 0, deck_t + explode]) esp32cam_bracket();
 // motors and wheels
 for (s = [-1, 1]) mirror([0, s < 0 ? 1 : 0, 0]) {
     translate([axle_x, motor_y_out, axle_z - explode]) tt_motor_model();
-    translate([axle_x, motor_y_out + 3, axle_z - explode]) wheel_model();
+    if (printed_wheels)
+        translate([axle_x, motor_y_out, axle_z - explode]) rotate([-90, 0, 0]) wheel_with_tires();
+    else
+        translate([axle_x, motor_y_out + wheel_gap, axle_z - explode]) wheel_model();
+}
+
+// push pins: two through the camera bracket, two through the caster flange
+color("white") for (s = [-1, 1]) {
+    translate([cam_x, s * cam_mount_dy, deck_t + 3.5 + 2 * explode]) rotate([180, 0, 0]) pin_upright();
+    translate([caster_x, s * caster_mount_dy, deck_t + explode]) rotate([180, 0, 0]) pin_upright();
 }
 
 // caster ball

@@ -21,7 +21,7 @@ ESP32_INDEX := https://espressif.github.io/arduino-esp32/package_esp32_index.jso
 ESP32_CORE  ?= 3.3.12
 FQBN        ?= esp32:esp32:esp32cam
 SKETCH      := $(BUILD)/arduino/telebot
-PARTS       := chassis_base caster_holder esp32cam_bracket
+PARTS       := chassis_base caster_holder caster_skid esp32cam_bracket wheel tire_tpu push_pin shaft_fit_test
 
 .PHONY: help setup embed build upload monitor ota test test-pio e2e mock stl \
         arduino-deps arduino-build arduino-upload verify clean

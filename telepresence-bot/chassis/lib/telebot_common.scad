@@ -34,8 +34,20 @@ tt_bolt_dx = 20.5;  // holes are this far behind the axle...
 tt_bolt_dz = 17.5;  // ...and this far apart vertically, centred on the axle
 
 // ---------------------------------------------------------------- wheels and stance
-wheel_d = 65;
-wheel_w = 26;
+wheel_d = 65;                   // overall diameter, bought or printed (sets the ride height)
+wheel_w = 26;                   // bought TT wheel width
+wheel_gap = 3;                  // wheel inner face to gearbox outer face
+
+// ---------------------------------------------------------------- printed wheel (wheel.scad)
+// The TT output shaft is a "double D": round faces and two flats. Sellers
+// differ by a tenth or two, so print shaft_fit_test.scad first and set
+// shaft_clr to the size that slid on snugly.
+tt_shaft_d = 5.4;               // across the round faces
+tt_shaft_flat = 3.7;            // across the flats
+shaft_clr = 0.15;               // per side
+pw_width = 20;                  // printed wheel rim width
+oring_cs = 3.5;                 // O-ring cross-section (55 x 3.5 mm O-rings)
+tpu_tire_t = 3;                 // TPU tire thickness, for wheel.scad's tpu mode
 axle_x = 20;                    // axle position along the deck
 axle_z = -tt_h / 2;             // gearbox top rests against the deck underside
 ground_clear = wheel_d / 2 - axle_z;   // deck underside height above the floor (~43.7)
@@ -56,9 +68,9 @@ caster_x = -56;
 caster_ball_d = 16;             // 16 mm glass marble or 5/8" (15.9 mm) steel ball
 caster_ball_clr = 0.6;          // diametral clearance around the ball
 caster_wall = 3;
-caster_mount_dy = 12;           // M3 screws at y = +/- this
+caster_mount_dy = 15;           // printed pins or M3 screws at y = +/- this, clear of the column
 caster_floor_gap = 3;           // holder bottom stays this far above the floor
-caster_flange_t = 3;
+caster_flange_t = 3.5;          // same as the camera bracket foot, so one pin length fits both
 caster_ball_z = -ground_clear + caster_ball_d / 2;              // ball centre
 caster_bottom_z = -ground_clear + caster_floor_gap;             // holder bottom
 caster_seat_z = caster_ball_z + caster_ball_d / 2 + 0.2;        // post end = ball seat
@@ -89,6 +101,10 @@ wire_hole_d = 8;
 switch_cut = [13.2, 8.9];       // KCD11-style mini rocker switch (panel cutout)
 switch_pos = [-62, -34];
 
+// ---------------------------------------------------------------- printed push pins (push_pin.scad)
+pin_hole_d = m3_d;              // the pins use the M3 clearance holes
+pin_grip = deck_t + 3.5;        // deck + caster flange or camera bracket foot
+
 // ================================================================= helpers
 module rounded_rect(size, r) {
     // 2D rounded rectangle centred on the origin
@@ -100,6 +116,24 @@ module slot(len, w, h) {
     hull() {
         for (s = [-1, 1]) translate([s * (len - w) / 2, 0, 0]) cylinder(d = w, h = h, center = true);
     }
+}
+
+module double_d(clearance, h) {
+    // TT motor output shaft (round with two flats), grown by `clearance` per side
+    linear_extrude(h) intersection() {
+        circle(d = tt_shaft_d + 2 * clearance, $fn = 64);
+        square([tt_shaft_flat + 2 * clearance, tt_shaft_d + 2], center = true);
+    }
+}
+
+module caster_flange() {
+    // plate against the deck underside, shared by the caster holder and the skid
+    translate([caster_x, 0, -caster_flange_t / 2]) cube([14, 2 * caster_mount_dy + 8, caster_flange_t], center = true);
+}
+
+module caster_mount_holes() {
+    // for push_pin.scad pins, or M3 x 10 screws with nuts
+    for (s = [-1, 1]) translate([caster_x, s * caster_mount_dy, -caster_flange_t - 1]) cylinder(d = pin_hole_d, h = caster_flange_t + 2);
 }
 
 module zip_slot(h = 20) {

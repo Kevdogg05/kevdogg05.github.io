@@ -1,6 +1,6 @@
 # TeleBot architecture
 
-A two-wheel telepresence robot for about $24 in parts ($30-35 with shipping and
+A two-wheel telepresence robot for about $22 in parts ($30-35 with shipping and
 spares), driven from a phone browser over Wi-Fi with live video. No app, no
 cloud: the robot serves its own dashboard.
 
@@ -29,14 +29,14 @@ cloud: the robot serves its own dashboard.
 
 | # | Requirement | How it is met |
 |---|---|---|
-| R1 | Parts cost $30-40 | $23.78 of required parts in [bom.csv](bom.csv); the rest of the budget covers shipping and spares |
+| R1 | Parts cost $30-40 | $21.78 of required parts in [bom.csv](bom.csv) (printed wheels and pins, see [printed-parts.md](printed-parts.md)); the rest of the budget covers shipping and spares |
 | R2 | Controlled from a phone, no app install | Dashboard served by the robot at `http://telebot.local/`, works in any modern mobile browser |
 | R3 | Live video | OV2640 MJPEG stream, 320x240 to 800x600, up to 20 fps |
 | R4 | Low-latency driving | WebSocket text commands at 20 Hz, Nagle disabled, Wi-Fi modem sleep disabled, video on a separate server so frames never queue ahead of commands |
 | R5 | Forward, reverse, spin left, spin right, stop | D-pad and STOP buttons map to `move ...` / `stop`; joystick and keyboard add proportional arcs |
 | R6 | Safe when the link drops | 500 ms command watchdog, stop on driver disconnect, stop when the page is hidden, driver held asleep during boot and OTA |
 | R7 | Works without a home network | Falls back to its own access point (`TeleBot-XXXX`, 192.168.4.1) |
-| R8 | Printable chassis | Three OpenSCAD parts, no supports, about 95 g of filament |
+| R8 | Printable chassis | OpenSCAD parts (deck, caster, camera bracket, wheels, push pins), no supports, about 100 g of filament |
 
 ## 2. System overview
 
@@ -470,17 +470,24 @@ ready-to-print STLs in `chassis/stl/` (`make stl` regenerates them).
 | Base | `chassis_base.scad` | Upside down, as exported | 140 x 100 x 3 mm deck; integrated motor walls, front stops and caster post grow up from the bed |
 | Caster holder | `caster_holder.scad` | Flange down, as exported | 16 mm ball; throat retains it, the base's post is its seat |
 | Camera bracket | `esp32cam_bracket.scad` | Foot down, as exported | 10° up-tilt, two stacking-header pockets |
-| Preview only | `assembly.scad` | | Reference models of motors, wheels, battery, board |
+| Wheel (x2) | `wheel.scad` | Outer face down | 65 mm with two 55 x 3.5 mm O-ring tires; double-D bore for the TT shaft |
+| Push pins (plate of 6) | `push_pin.scad` | Flat | Replace the M3 screws and nuts; PETG preferred |
+| Shaft fit test | `shaft_fit_test.scad` | As exported | Print before the wheels to choose `shaft_clr` |
+| Caster skid (optional) | `caster_skid.scad` | Flange down | Ball-free alternative for hard floors |
+| TPU tire (optional) | `tire_tpu.scad` | Flat | For `wheel.scad` with `tire = "tpu"` |
+| Preview only | `assembly.scad` | | Reference models of motors, battery, board; printed or kit wheels |
 
 Print settings: PLA or PETG, 0.2 mm layers, 3 walls, 25 % infill, no supports.
+Which parts are worth printing, the research behind them and the cost
+effect: [printed-parts.md](printed-parts.md).
 
 ### Geometry
 
 | | |
 |---|---|
 | Wheelbase (axle to caster) | 76 mm |
-| Track (wheel centres) | ~132 mm |
-| Overall footprint | 140 x ~158 mm including wheels |
+| Track (wheel centres) | 126 mm with printed wheels (132 mm with 26 mm kit wheels) |
+| Overall footprint | 140 x 146 mm including printed wheels (158 mm with kit wheels) |
 | Deck underside above floor | 43.7 mm |
 | Camera height | ~100 mm above the floor (raise `cam_mast_h` for more) |
 | Centre of mass | ~24 mm behind the axle with the battery at `batt_x = -15`: about 2/3 of the weight on the drive wheels, and it will not tip forward under braking |
@@ -493,11 +500,16 @@ Print settings: PLA or PETG, 0.2 mm layers, 3 walls, 25 % infill, no supports.
    edge. The gearbox's own M3 holes are not used by default because their
    position varies between sellers; measure yours and set
    `tt_bolt_slots = true` if you want bolts as well.
-2. Press the wheels on.
-3. Drop the ball into the caster holder, slide it over the post and fix it
-   with two M3 x 10 screws from the top of the deck.
+2. Roll two O-rings into each printed wheel's grooves and press the wheels
+   onto the shafts, spacer side toward the gearbox (print
+   `shaft_fit_test.scad` first to get a snug bore). An M2 self-tapping screw
+   into the shaft's centre hole is optional.
+3. Drop the ball into the caster holder (or use the skid on hard floors),
+   slide it over the post and push two printed pins down through the deck
+   and the flange until they click. M3 x 10 screws with nuts fit the same
+   holes.
 4. Glue the two stacking headers into the bracket pockets (bodies in front,
-   tails out the back), then bolt the bracket on with two M3 x 10 + nuts.
+   tails out the back), then pin the bracket on the same way.
 5. Zip-tie the 18650 holder across the deck behind the axle; stick the
    DRV8833 and IP5306 modules to the rear deck with foam tape. Motor leads come
    up through the two holes behind the motor cans; the switch clips into the
