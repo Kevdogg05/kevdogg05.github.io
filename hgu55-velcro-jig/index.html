@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="3D-printable jigs that place the battery pack Velcro on an HGU-55/P helmet: a 2 x 4 in pile patch, centred, 1-1/2 in above the edge roll, on Medium, Large and X-Large shells.">
+  <title>HGU-55/P Velcro Jig</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect x='2' y='2' width='36' height='36' rx='9' fill='%2314304a'/%3E%3Cpath d='M9 30V18a11 11 0 0 1 22 0v12' fill='none' stroke='%2339b7e6' stroke-width='3'/%3E%3Crect x='14' y='20' width='12' height='7' fill='%23ffb547'/%3E%3C/svg%3E">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #f4f6f9; --panel: #ffffff; --ink: #14202e; --muted: #556275; --line: #d9e0e8;
+      --accent: #1f6fb2; --accent-ink: #ffffff; --tape: #f3b54a; --code: #eef2f7;
+      --viewer: #e9eef4;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0d151f; --panel: #142130; --ink: #e8eef5; --muted: #9aabbf; --line: #24364a;
+        --accent: #4aa3e8; --accent-ink: #08131f; --code: #1a2a3c; --viewer: #101b27;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0d151f; --panel: #142130; --ink: #e8eef5; --muted: #9aabbf; --line: #24364a;
+      --accent: #4aa3e8; --accent-ink: #08131f; --code: #1a2a3c; --viewer: #101b27;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    .nb { white-space: nowrap; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+    h1 { font-size: 1.9rem; line-height: 1.2; margin: 8px 0 6px; }
+    h2 { font-size: 1.3rem; margin: 40px 0 10px; }
+    p, li { max-width: 72ch; }
+    .lede { color: var(--muted); font-size: 1.08rem; margin: 0 0 20px; }
+    a { color: var(--accent); }
+    code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+    pre { background: var(--code); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+    .viewer-card { display: grid; grid-template-columns: 1fr 300px; overflow: hidden; }
+    #viewer { position: relative; min-height: 420px; background: var(--viewer); }
+    #viewer canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+    #viewer .hint { position: absolute; left: 12px; bottom: 10px; font-size: .8rem; color: var(--muted); pointer-events: none; }
+    #viewer .status { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
+    .side { padding: 16px; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+    .parts { display: flex; flex-direction: column; gap: 6px; }
+    .parts button { text-align: left; font: inherit; font-size: .95rem; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+    .parts button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); font-weight: 600; }
+    .parts small { display: block; color: var(--muted); font-weight: 400; font-size: .8rem; }
+    .desc { font-size: .9rem; color: var(--muted); margin: 0; }
+    .btn { display: inline-block; text-align: center; padding: 10px 14px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); font-weight: 600; text-decoration: none; }
+    label.toggle { font-size: .9rem; display: flex; gap: 8px; align-items: center; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid2 .card { padding: 16px; }
+    .grid2 h3 { margin: 0 0 6px; font-size: 1.05rem; }
+    .grid2 p { margin: 0; }
+    .tag { display: inline-block; font-size: .75rem; font-weight: 700; letter-spacing: .03em; padding: 2px 8px; border-radius: 99px; background: var(--tape); color: #3a2600; margin-bottom: 6px; }
+    ol.steps li { margin-bottom: 8px; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; min-width: 520px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: .93rem; }
+    th { font-weight: 600; }
+    img.layout { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); background: #fff; }
+    .note { border-left: 4px solid var(--tape); padding: 8px 12px; background: var(--panel); border-radius: 0 8px 8px 0; }
+    footer { color: var(--muted); font-size: .85rem; margin-top: 40px; }
+    @media (max-width: 760px) {
+      .viewer-card { grid-template-columns: 1fr; }
+      #viewer { min-height: 320px; }
+      .side { border-left: 0; border-top: 1px solid var(--line); }
+      .grid2 { grid-template-columns: 1fr; }
+      h1 { font-size: 1.55rem; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>HGU-55/P battery pack Velcro jig</h1>
+  <p class="lede">3D-printable jigs for the non-ejection low-profile battery pack. The rear jig puts the
+    2&nbsp;×&nbsp;4&nbsp;in pile patch in the same place every time: centred on the back of the shell,
+    <span class="nb">1-1/2 in</span> above the edge roll, on Medium, Large and X-Large helmets.</p>
+
+  <section class="card viewer-card" aria-label="3D preview">
+    <div id="viewer"><div class="status" id="status">Loading 3D preview…</div><span class="hint">Drag to turn · scroll or pinch to zoom</span></div>
+    <div class="side">
+      <div class="parts" id="parts" role="group" aria-label="Part"></div>
+      <label class="toggle" id="shell-toggle"><input type="checkbox" id="show-shell" checked> Show helmet shell (estimated)</label>
+      <p class="desc" id="desc"></p>
+      <a class="btn" id="download" href="#" download>Download STL</a>
+      <p class="desc" id="filename"></p>
+    </div>
+  </section>
+
+  <h2>Which rear jig to print</h2>
+  <div class="grid2">
+    <div class="card">
+      <span class="tag">START HERE</span>
+      <h3>Universal (flat, flexible)</h3>
+      <p>It prints flat and bends onto the back of any of the three shells. Bending doesn't stretch it, so
+        the 4&nbsp;in window and the <span class="nb">1-1/2 in</span> offset stay exact along the shell on every size.</p>
+    </div>
+    <div class="card">
+      <h3>Pre-curved M, L, XL</h3>
+      <p>Curved to the estimated shell of each size, so they sit on the helmet without being held flat.
+        No HGU-55/P shell measurements are published, so these curves are estimates. The jigs are thin
+        enough to flex the last millimetre or two onto the real shell.</p>
+    </div>
+  </div>
+
+  <h2>How it works</h2>
+  <img class="layout" src="img/rear-jig-layout.png" alt="Flat layout of the rear jig. The bottom edge seats on the edge roll. The ledge is 38.1 mm (1-1/2 in) above it. The posts are 103.1 mm apart, 4 in plus clearance. Tick marks on the posts sit 2 in above the ledge.">
+
+  <h2>Using the rear jig</h2>
+  <ol class="steps">
+    <li><strong>Find the rear centreline.</strong> Measure along the edge roll between matching hardware on the
+      left and right sides of the shell. Mark the halfway point with a grease pencil or masking tape.</li>
+    <li><strong>Seat the jig.</strong> Set its bottom edge down on top of the edge roll, with the V-notch and
+      arrow on your mark. Hold it with a rubber band or strap through the end slots, or with painter's tape.</li>
+    <li><strong>Apply the pile.</strong> Cut it 2&nbsp;×&nbsp;4&nbsp;in, peel the backing, and set its bottom
+      edge on the ledge between the posts. Its top edge meets the ticks on the posts. Press it down.</li>
+    <li>Remove the jig and press the patch down firmly.</li>
+  </ol>
+  <p class="note">Prepare the surface and handle the adhesive as the T.O. directs. Check your first install
+    against the T.O. with a ruler before you use the jig for production.</p>
+  <p><strong>Cord patches (1&nbsp;×&nbsp;<span class="nb">1-1/2 in</span>):</strong> hold the stencil where the T.O. puts each patch
+    and press the tape through the window. <strong>Battery pack (3-3/4&nbsp;×&nbsp;2&nbsp;in hook):</strong>
+    lay the template on the back of the pack, even out the margins around the frame, and press the strip in
+    through the window.</p>
+
+  <h2>Print settings</h2>
+  <ul>
+    <li><strong>PETG</strong> is best because it flexes without cracking. PLA is fine for the pre-curved
+      jigs and the templates.</li>
+    <li>Use 0.2&nbsp;mm layers and 3 walls, so every 2&nbsp;mm section prints solid. No supports for any part.</li>
+    <li>Print the universal jig and the templates flat, as exported. The smooth side on the bed touches the helmet.</li>
+    <li>Print M, L and XL standing on the bottom edge, as exported, with a 5–8&nbsp;mm brim.</li>
+    <li>Check the first print: 103.1&nbsp;mm between the posts, and 38.1&nbsp;mm from the bottom edge to the ledge.</li>
+  </ul>
+
+  <h2>Helmet sizes and curvature</h2>
+  <p>Gentex makes the HGU-55/P shell in <strong>Medium, Large and X-Large</strong>. Its manual (TP0351, Table 2-1)
+    sizes helmets by the wearer's head. Gentex doesn't publish the shell's outside dimensions or curvature, so
+    the shell shapes below are estimated from the head sizes plus about 25&nbsp;mm of liner and shell.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Size</th><th>Head length (Table 2-1)</th><th>Max head width</th><th>Est. shell L × W</th><th>Horizontal radius at back</th><th>Vertical radius</th></tr></thead>
+      <tbody>
+        <tr><td>M</td><td>7.2–7.8 in</td><td>≈ 6.2 in (assumed)</td><td>9.8 × 8.4 in</td><td>100 mm (3.9 in)</td><td>145 mm (5.7 in)</td></tr>
+        <tr><td>L</td><td>7.7–8.3 in</td><td>6.5 in</td><td>10.3 × 8.7 in</td><td>103 mm (4.1 in)</td><td>150 mm (5.9 in)</td></tr>
+        <tr><td>XL</td><td>8.2–8.7 in</td><td>6.8 in</td><td>10.7 × 9.0 in</td><td>106 mm (4.2 in)</td><td>155 mm (6.1 in)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Over the area the jig covers, one size to the next changes the shape by about <strong>1&nbsp;mm</strong>
+    (Medium to X-Large: 2&nbsp;mm at the band, 4&nbsp;mm at the post tips). The patch size and offset are the
+    same for every size, so one thin jig that bends covers all three. The uncertainty in the estimate is bigger
+    than the difference between sizes.</p>
+  <p>To make a pre-curved jig from measurements of your own helmets, see the
+    <a href="https://github.com/Kevdogg05/kevdogg05.github.io/tree/main/hgu55-velcro-jig#a-pre-curved-jig-for-your-own-helmets">README</a>.
+    It takes a steel rule and two gap measurements, then one command:</p>
+  <pre><code>pip install numpy manifold3d matplotlib
+python3 generate.py --only-custom --custom 104 150 -8   # rh rv lean</code></pre>
+
+  <h2>Sources</h2>
+  <ul>
+    <li>Gentex TP0351, HGU-55/P Operation and Maintenance Instructions (sizes, Table 2-1):
+      <a href="https://shop.gentexcorp.com/content/TP0351-Rev6.pdf">TP0351-Rev6.pdf</a></li>
+    <li>Gentex HGU-55/P Fixed Wing Helmet System data sheet:
+      <a href="https://shop.gentexcorp.com/content/Gentex_HGU55P_Fixed_Wing_Helmet_System.pdf">PDF</a></li>
+    <li>Smithsonian NASM, Helmet, Flying, Type HGU-55/P (10 × 9-1/2 × 12 in overall):
+      <a href="https://airandspace.si.edu/collection-objects/helmet-flying-type-hgu-55p-united-states-air-force/nasm_A20080402000">collection record</a></li>
+    <li>Tape sizes and placement: T.O. 14P3-4-151, non-ejection low-profile battery pack.</li>
+  </ul>
+
+  <footer>Not a Gentex or U.S. Air Force product. The T.O. governs the installation; this is a shop aid.</footer>
+</main>
+
+<script type="module">
+  import * as THREE from "three";
+  import { STLLoader } from "three/addons/loaders/STLLoader.js";
+  import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+  // Same shell model as generate.py (SIZES and shell_map).
+  const SIZES = { M: [100, 145, -8], L: [103, 150, -8], XL: [106, 155, -8] };
+  const PARTS = [
+    { id: "universal", name: "Rear jig, universal", sub: "Flat, flexible · fits M, L, XL", file: "hgu55-rear-pile-jig-universal.stl", size: "L", wrap: true,
+      desc: "Print this one first. It's flat and 2 mm thick, and bends onto any of the three shells. The preview shows the flat print and, with the shell on, how it sits once bent onto a Large shell." },
+    { id: "M", name: "Rear jig, Medium", sub: "Pre-curved", file: "hgu55-rear-pile-jig-M.stl", size: "M",
+      desc: "Pre-curved to the estimated Medium shell. Print standing on its bottom edge with a brim." },
+    { id: "L", name: "Rear jig, Large", sub: "Pre-curved", file: "hgu55-rear-pile-jig-L.stl", size: "L",
+      desc: "Pre-curved to the estimated Large shell. Print standing on its bottom edge with a brim." },
+    { id: "XL", name: "Rear jig, X-Large", sub: "Pre-curved", file: "hgu55-rear-pile-jig-XL.stl", size: "XL",
+      desc: "Pre-curved to the estimated X-Large shell. Print standing on its bottom edge with a brim." },
+    { id: "cord", name: "Cord patch stencil", sub: "1 × 1-1/2 in window", file: "hgu55-cord-pile-stencil.stl",
+      desc: "For the two pile patches that hold the power cord. Flat, 1.4 mm thick, so it bends onto the crown. The notches and lines are centre marks." },
+    { id: "batt", name: "Battery pack template", sub: "3-3/4 × 2 in window", file: "hgu55-battery-hook-template.stl",
+      desc: "Lay it on the back of the battery pack and even out the margins. The window centres the hook strip." },
+  ];
+
+  const css = getComputedStyle(document.documentElement);
+  const el = document.getElementById("viewer");
+  const statusEl = document.getElementById("status");
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  el.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 1, 5000);
+  camera.up.set(0, 0, 1);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 1.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.8);
+  sun.position.set(-200, -300, 400);
+  scene.add(sun);
+
+  const partMat = new THREE.MeshStandardMaterial({ color: 0x2f7fd0, roughness: 0.55, metalness: 0.05 });
+  const shellMat = new THREE.MeshStandardMaterial({ color: 0x9aa7b4, roughness: 0.8, transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false });
+  const rollMat = new THREE.MeshStandardMaterial({ color: 0x3b2b20, roughness: 0.9 });
+  const tapeMat = new THREE.MeshStandardMaterial({ color: 0xf3b54a, roughness: 0.9, side: THREE.DoubleSide });
+
+  function shellMap([rh, rv, lean]) {
+    const p0 = lean * Math.PI / 180;
+    return (u, v, w) => {
+      const phi = p0 + v / rv;
+      const r = rh + rv * (Math.cos(phi) - Math.cos(p0));
+      const z = rv * (Math.sin(phi) - Math.sin(p0));
+      const th = u / r, rr = r + w * Math.cos(phi);  // u is arc length along the horizontal
+      return new THREE.Vector3(rr * Math.sin(th), -rr * Math.cos(th), z + w * Math.sin(phi));
+    };
+  }
+
+  // Surface patch over angle a (degrees around the axis) and arc length v.
+  function surface(size, a0, a1, v0, v1, w, nu, nv) {
+    const [rh, rv, lean] = SIZES[size], p0 = lean * Math.PI / 180, f = shellMap(SIZES[size]);
+    const pos = [], idx = [];
+    for (let j = 0; j <= nv; j++) for (let i = 0; i <= nu; i++) {
+      const v = v0 + (v1 - v0) * j / nv;
+      const r = rh + rv * (Math.cos(p0 + v / rv) - Math.cos(p0));
+      const p = f((a0 + (a1 - a0) * i / nu) * Math.PI / 180 * r, v, w);
+      pos.push(p.x, p.y, p.z);
+    }
+    for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) {
+      const a = j * (nu + 1) + i, b = a + 1, c = a + nu + 1, d = c + 1;
+      idx.push(a, b, d, a, d, c);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    return g;
+  }
+
+  function helmet(size) {
+    const grp = new THREE.Group();
+    // Back half of the shell, only as far up as the model holds.
+    grp.add(new THREE.Mesh(surface(size, -110, 110, 0, 120, -0.3, 88, 30), shellMat));
+    // Edge roll below the datum, standing proud of the shell.
+    grp.add(new THREE.Mesh(surface(size, -110, 110, -11, 0, 3, 88, 2), rollMat));
+    grp.add(new THREE.Mesh(surface(size, -110, 110, -11, 0, -1, 88, 2), rollMat));
+    // The 2 x 4 in pile patch where the jig puts it (4 in measured along the shell).
+    const f = shellMap(SIZES[size]), pos = [], idx = [];
+    for (let j = 0; j <= 8; j++) for (let i = 0; i <= 24; i++) {
+      const p = f(-50.8 + 101.6 * i / 24, 38.1 + 50.8 * j / 8, 0.4);
+      pos.push(p.x, p.y, p.z);
+    }
+    for (let j = 0; j < 8; j++) for (let i = 0; i < 24; i++) {
+      const a = j * 25 + i;
+      idx.push(a, a + 1, a + 26, a, a + 26, a + 25);
+    }
+    const tape = new THREE.BufferGeometry();
+    tape.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+    tape.setIndex(idx);
+    tape.computeVertexNormals();
+    grp.add(new THREE.Mesh(tape, tapeMat));
+    return grp;
+  }
+
+  const loader = new STLLoader();
+  const cache = new Map();
+  const load = (file) => cache.get(file) || cache.set(file, new Promise((ok, bad) => loader.load("stl/" + file, ok, undefined, bad))).get(file);
+
+  // Bend the flat universal jig onto a shell for the preview, the way it sits on a helmet.
+  function wrapped(geo, size) {
+    const f = shellMap(SIZES[size]);
+    const g = geo.clone();
+    const p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const q = f(p.getX(i), p.getY(i), p.getZ(i));
+      p.setXYZ(i, q.x, q.y, q.z);
+    }
+    g.computeVertexNormals();
+    return g;
+  }
+
+  let current = null, shown = [];
+  const showShell = document.getElementById("show-shell");
+  const shellToggle = document.getElementById("shell-toggle");
+
+  async function show(part) {
+    current = part;
+    document.querySelectorAll("#parts button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === part.id)));
+    document.getElementById("desc").textContent = part.desc;
+    const dl = document.getElementById("download");
+    dl.href = "stl/" + part.file;
+    document.getElementById("filename").textContent = part.file;
+    shellToggle.hidden = !part.size;
+    let geo;
+    try { geo = await load(part.file); }
+    catch { statusEl.textContent = "Couldn't load the STL. Use the download button."; statusEl.hidden = false; return; }
+    if (current !== part) return;
+    statusEl.hidden = true;
+    shown.forEach(o => scene.remove(o));
+    shown = [];
+    const onShell = part.size && showShell.checked;
+    const mesh = new THREE.Mesh(part.wrap && onShell ? wrapped(geo, part.size) : geo, partMat);
+    mesh.geometry.computeVertexNormals();
+    shown.push(mesh);
+    if (onShell) shown.push(helmet(part.size));
+    shown.forEach(o => scene.add(o));
+    frame(mesh, onShell);
+  }
+
+  function frame(mesh, behind) {
+    const box = new THREE.Box3().setFromObject(mesh);
+    const c = box.getCenter(new THREE.Vector3());
+    const r = box.getSize(new THREE.Vector3()).length() / 2;
+    const dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * (behind ? 1.25 : 1.05);
+    const flat = box.max.z - box.min.z < 5;
+    const dir = flat ? new THREE.Vector3(0, -0.35, 1) : new THREE.Vector3(-0.45, -1, 0.35);
+    camera.position.copy(c).add(dir.normalize().multiplyScalar(dist));
+    controls.target.copy(c);
+    controls.update();
+  }
+
+  const list = document.getElementById("parts");
+  for (const p of PARTS) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.id = p.id;
+    b.innerHTML = `${p.name}<small>${p.sub}</small>`;
+    b.addEventListener("click", () => show(p));
+    list.append(b);
+  }
+  showShell.addEventListener("change", () => current && show(current));
+
+  function resize() {
+    const w = el.clientWidth, h = el.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(el);
+  resize();
+  renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+  show(PARTS[0]);
+</script>
+</body>
+</html>

@@ -22,6 +22,12 @@ own machine. No HeyGen services or accounts are involved.
 > repository, [Kevdogg05/Road-Queen-Fitness](https://github.com/Kevdogg05/Road-Queen-Fitness),
 > and is served at https://roadqueenfitness.com. `road-queen-fitness/` here only
 > redirects old links and QR codes there.
+>
+> **HGU-55/P Velcro jig**, 3D-printable jigs that place the battery pack Velcro
+> on an HGU-55/P helmet (Medium, Large and X-Large), lives in
+> `hgu55-velcro-jig/`: STL files, the generator script and a project page
+> with a 3D preview. See [hgu55-velcro-jig/README.md](hgu55-velcro-jig/README.md):
+> https://kevdogg05.github.io/hgu55-velcro-jig/
 
 ## Status
 
