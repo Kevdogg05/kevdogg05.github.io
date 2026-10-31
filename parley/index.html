@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Parley: practice the conversations that matter. Bite-sized communication lessons, quizzes and flashcards, a small talk game, branching video scenarios, and a speech analyzer that scores your pace, pauses, filler words and tone. Free, private, works offline.">
+  <meta name="theme-color" content="#24178a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Parley">
+  <title>Parley</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="app" class="app" aria-live="polite">
+    <div class="boot">
+      <svg class="boot-logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#logo"/></svg>
+      <p>Loading Parley…</p>
+      <noscript><p>Parley needs JavaScript turned on.</p></noscript>
+    </div>
+  </div>
+  <nav id="tabs" class="tabs" hidden aria-label="Main"></nav>
+  <div id="overlay-root"></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="logo-g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#3a2bd8"/><stop offset="1" stop-color="#1a7cf2"/>
+      </linearGradient>
+      <symbol id="logo" viewBox="0 0 64 64">
+        <rect width="64" height="64" rx="16" fill="url(#logo-g)"/>
+        <path d="M14 30c0-9 7.5-16 18-16s18 7 18 16-7.5 16-18 16c-2.4 0-4.6-.3-6.6-1L16 49l2.6-7.4C15.7 38.9 14 34.7 14 30z" fill="#fff"/>
+        <path d="M32 21.5l2.3 5.6 5.7 2.3-5.7 2.3L32 37.3l-2.3-5.6-5.7-2.3 5.7-2.3z" fill="#2a5be8"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <script type="module" src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>

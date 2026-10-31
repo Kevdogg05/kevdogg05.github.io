@@ -33,6 +33,12 @@ own machine. No HeyGen services or accounts are involved.
 > one 18650 cell) driven from a phone browser with live video, lives in
 > `telepresence-bot/`: firmware, the dashboard, OpenSCAD chassis with STLs,
 > wiring diagrams and BOM. See [telepresence-bot/README.md](telepresence-bot/README.md).
+>
+> **Parley**, a communication skills coach (36 lessons with quizzes and
+> flashcards, a small talk game, branching video scenarios and a speech analyzer
+> that scores pace, pauses, filler words and tone), lives in `parley/`. It is a
+> static, installable web app that works offline. See [parley/README.md](parley/README.md):
+> https://kevdogg05.github.io/parley/
 
 ## Status
 
