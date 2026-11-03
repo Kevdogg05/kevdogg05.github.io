@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TeleBot</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='8' y='14' width='48' height='34' rx='10' fill='%2322c55e'/%3E%3Ccircle cx='32' cy='31' r='10' fill='%230b0f14'/%3E%3Ccircle cx='32' cy='31' r='4' fill='%2322c55e'/%3E%3Ccircle cx='18' cy='54' r='6' fill='%23e5e7eb'/%3E%3Ccircle cx='46' cy='54' r='6' fill='%23e5e7eb'/%3E%3C/svg%3E">
+<!--
+  TeleBot dashboard. One file, no external requests: it must work on the
+  robot's own Wi-Fi network, which has no internet.
+
+  Served by the robot at http://telebot.local/ (embedded into the firmware at
+  build time), or opened directly from disk, in which case it asks for the
+  robot's address. Protocol: firmware/include/drive.h.
+-->
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: rgba(13, 18, 25, 0.72);
+    --panel-solid: #111821;
+    --line: rgba(255, 255, 255, 0.12);
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --accent: #22c55e;
+    --accent-ink: #052e16;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --radius: 16px;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-l: env(safe-area-inset-left, 0px);
+    --safe-r: env(safe-area-inset-right, 0px);
+    --pad: 176px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  button, select, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+
+  #app { position: relative; height: 100dvh; width: 100vw; }
+
+  /* ---------- video ---------- */
+  #stage { position: absolute; inset: 0; background: #000; overflow: hidden; }
+  #video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; opacity: 0; transition: opacity .3s; }
+  #video.live { opacity: 1; }
+  #stage.cover #video { object-fit: cover; }
+  #novideo {
+    position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+    color: var(--muted); padding: 24px; pointer-events: none;
+  }
+  #novideo svg { width: 56px; height: 56px; opacity: .5; display: block; margin: 0 auto 10px; }
+  #crosshair {
+    position: absolute; left: 50%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px;
+    border: 2px solid rgba(255,255,255,.35); border-radius: 50%; pointer-events: none;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    position: absolute; z-index: 5; top: calc(var(--safe-t) + 10px);
+    left: calc(var(--safe-l) + 10px); right: calc(var(--safe-r) + 10px);
+    display: flex; gap: 8px; align-items: center; pointer-events: none;
+  }
+  .topbar > * { pointer-events: auto; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); white-space: nowrap;
+    font-variant-numeric: tabular-nums; font-size: 13px;
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+  .online .dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .connecting .dot { background: var(--warn); animation: pulse 1s infinite; }
+  .offline .dot { background: var(--danger); }
+  @keyframes pulse { 50% { opacity: .3; } }
+  .spacer { flex: 1; }
+  .icon-btn {
+    width: 40px; height: 40px; display: grid; place-items: center; padding: 0;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 50%;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .icon-btn svg { width: 20px; height: 20px; }
+  .icon-btn[aria-pressed="true"] { background: #fde68a; color: #422006; border-color: #fde68a; }
+  .hide-narrow { display: inline-flex; }
+
+  /* ---------- banner + toast ---------- */
+  #banner {
+    position: absolute; z-index: 6; left: 50%; transform: translateX(-50%);
+    top: calc(var(--safe-t) + 58px); max-width: min(560px, calc(100vw - 24px));
+    background: #451a03; color: #fde68a; border: 1px solid #92400e; border-radius: 12px;
+    padding: 10px 14px; font-size: 13px; pointer-events: auto;
+  }
+  #banner[hidden] { display: none; }
+  #banner a { color: #fff; }
+  #toast {
+    position: absolute; z-index: 7; left: 50%; bottom: calc(var(--safe-b) + 24px);
+    transform: translate(-50%, 20px); opacity: 0; transition: .2s; pointer-events: none;
+    background: var(--panel-solid); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- controls ---------- */
+  #controls {
+    position: absolute; z-index: 4; left: 0; right: 0; bottom: 0;
+    padding: 12px calc(var(--safe-r) + 16px) calc(var(--safe-b) + 16px) calc(var(--safe-l) + 16px);
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; pointer-events: none;
+  }
+  #controls > * { pointer-events: auto; }
+  .pad-slot { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .seg {
+    display: inline-flex; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .seg button { border: 0; background: none; padding: 5px 12px; border-radius: 999px; font-size: 13px; color: var(--muted); }
+  .seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+
+  .joystick {
+    position: relative; width: var(--pad); height: var(--pad); border-radius: 50%; touch-action: none;
+    background: radial-gradient(circle, rgba(255,255,255,.10) 0 30%, rgba(255,255,255,.04) 31% 100%), var(--panel);
+    border: 1px solid var(--line); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .joystick::before, .joystick::after {
+    content: ""; position: absolute; left: 50%; top: 12px; bottom: 12px; width: 1px; background: var(--line);
+  }
+  .joystick::after { top: 50%; bottom: auto; left: 12px; right: 12px; width: auto; height: 1px; }
+  .knob {
+    position: absolute; left: 50%; top: 50%; width: 72px; height: 72px; margin: -36px 0 0 -36px; z-index: 1;
+    border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f9fafb, #9ca3af);
+    box-shadow: 0 6px 18px rgba(0,0,0,.45); transition: transform .15s ease-out; pointer-events: none;
+  }
+  .knob.active { transition: none; background: radial-gradient(circle at 35% 30%, #bbf7d0, var(--accent)); }
+
+  .dpad {
+    width: var(--pad); height: var(--pad); display: grid; touch-action: none;
+    grid-template: repeat(3, 1fr) / repeat(3, 1fr); gap: 6px;
+  }
+  .dpad button {
+    border: 1px solid var(--line); background: var(--panel); border-radius: 14px; display: grid; place-items: center;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); touch-action: none;
+  }
+  .dpad button svg { width: 26px; height: 26px; }
+  .dpad button.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .dpad .up { grid-area: 1 / 2; } .dpad .left { grid-area: 2 / 1; } .dpad .center { grid-area: 2 / 2; }
+  .dpad .right { grid-area: 2 / 3; } .dpad .down { grid-area: 3 / 2; }
+  .dpad .center { background: rgba(239, 68, 68, .85); border-color: var(--danger); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+  [hidden] { display: none !important; }
+
+  .side { display: flex; flex-direction: column; align-items: stretch; gap: 10px; width: 188px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .row b { color: var(--text); font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--accent); height: 28px; touch-action: none; }
+  .motors { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+  .bar { position: relative; flex: 1; height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
+  .bar i { position: absolute; top: 0; bottom: 0; left: 50%; width: 0; background: var(--accent); }
+  .bar i.neg { background: var(--warn); }
+  .stop {
+    height: 64px; border-radius: var(--radius); border: 2px solid #fecaca; background: var(--danger); color: #fff;
+    font-weight: 800; font-size: 18px; letter-spacing: .08em; box-shadow: 0 6px 20px rgba(239,68,68,.35); touch-action: none;
+  }
+  .stop:active { transform: scale(.97); }
+  .failsafe { color: var(--warn); }
+
+  /* Portrait phones: video on top, controls below it. */
+  @media (orientation: portrait) {
+    #stage { bottom: auto; height: min(75vw, 56dvh); }
+    :root { --pad: min(200px, 46vw); }
+    #controls {
+      top: min(75vw, 56dvh); background: var(--bg); border-top: 1px solid var(--line);
+      display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr;
+      grid-template-areas: "card card" "pad stop"; align-items: end; gap: 16px 14px;
+      padding-left: calc(var(--safe-l) + 14px); padding-right: calc(var(--safe-r) + 14px);
+    }
+    .side { display: contents; }
+    .side .card { grid-area: card; align-self: start; }
+    .pad-slot { grid-area: pad; }
+    .stop { grid-area: stop; height: calc(var(--pad) * .6); }
+  }
+  @media (max-width: 420px) { .hide-narrow { display: none; } }
+  @media (max-height: 380px) and (orientation: landscape) { :root { --pad: 140px; } .stop { height: 52px; } }
+
+  /* ---------- settings dialog ---------- */
+  dialog {
+    width: min(440px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto;
+    background: var(--panel-solid); color: var(--text); border: 1px solid var(--line); border-radius: 18px; padding: 0;
+    -webkit-user-select: text; user-select: text;
+  }
+  dialog::backdrop { background: rgba(0,0,0,.6); }
+  dialog header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  dialog h2 { font-size: 17px; margin: 0; }
+  dialog h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 18px 0 8px; }
+  dialog .body { padding: 4px 16px 16px; }
+  dialog label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  dialog input[type=text], dialog input[type=password], dialog select {
+    width: 100%; height: 40px; padding: 0 10px; background: #0b1118; border: 1px solid var(--line); border-radius: 10px;
+  }
+  dialog .hint { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+  .check { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 14px; color: var(--text); }
+  .check input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .btn { height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line); background: #1f2937; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+  .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  dl.info { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; margin: 0; }
+  dl.info dt { color: var(--muted); } dl.info dd { margin: 0; font-variant-numeric: tabular-nums; word-break: break-all; }
+  kbd { background: #1f2937; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <img id="video" alt="Live camera view">
+    <div id="novideo">
+      <div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 10l4.5-2.5v9L15 14M4 7h9a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V9a2 2 0 012-2z"/><path d="M3 3l18 18"/></svg>
+        <div id="novideo-text">No video yet</div>
+      </div>
+    </div>
+    <div id="crosshair" hidden></div>
+  </div>
+
+  <div class="topbar">
+    <span id="conn" class="chip offline"><span class="dot"></span><span id="conn-text">Offline</span></span>
+    <span class="chip hide-narrow" title="Round-trip latency of the control link"><span id="rtt">-- ms</span></span>
+    <span class="chip hide-narrow" title="Wi-Fi signal at the robot"><span id="rssi">--</span></span>
+    <span class="chip" title="Video frames per second"><span id="fps">-- fps</span></span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="btn-light" aria-pressed="false" title="Headlight (L)" aria-label="Headlight">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.6.4 1 1.1 1 1.9V16h5v-.2c0-.8.4-1.5 1-1.9A6 6 0 0012 3z"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-snap" title="Save a snapshot" aria-label="Snapshot">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    </button>
+    <button class="icon-btn hide-narrow" id="btn-full" title="Full screen" aria-label="Full screen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-settings" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+    </button>
+  </div>
+
+  <div id="banner" hidden></div>
+
+  <div id="controls">
+    <div class="pad-slot">
+      <div class="seg" role="group" aria-label="Control style">
+        <button type="button" data-mode="joystick" aria-pressed="true">Joystick</button>
+        <button type="button" data-mode="dpad" aria-pressed="false">D-pad</button>
+      </div>
+      <div class="joystick" id="joystick" aria-label="Drive joystick"><div class="knob" id="knob"></div></div>
+      <div class="dpad" id="dpad" hidden aria-label="Direction pad">
+        <button type="button" class="up" data-move="forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5l7 9H5z"/></svg></button>
+        <button type="button" class="left" data-move="left" aria-label="Spin left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6H5v4"/><path d="M5.5 9.5A8 8 0 1112 20"/></svg></button>
+        <button type="button" class="center" id="dpad-stop" aria-label="Stop">STOP</button>
+        <button type="button" class="right" data-move="right" aria-label="Spin right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 6h4v4"/><path d="M18.5 9.5A8 8 0 1012 20"/></svg></button>
+        <button type="button" class="down" data-move="reverse" aria-label="Reverse"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 19l7-9H5z"/></svg></button>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <div class="row"><span>Speed limit</span><b id="speed-val">70%</b></div>
+        <input type="range" id="speed" min="10" max="100" step="5" value="70" aria-label="Speed limit">
+        <div class="motors" title="Wheel power (left, right)">
+          <div class="bar"><i id="bar-l"></i></div><div class="bar"><i id="bar-r"></i></div>
+        </div>
+        <div class="row" style="margin-top:4px"><span id="drive-state">Idle</span><span id="failsafe" class="failsafe" hidden>failsafe</span></div>
+      </div>
+      <button type="button" class="stop" id="stop">STOP</button>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<dialog id="settings">
+  <form id="settings-form">
+    <header><h2>Settings</h2><button type="button" class="btn" id="close-settings">Close</button></header>
+    <div class="body">
+      <h3>Robot</h3>
+      <label for="host">Address</label>
+      <input type="text" id="host" placeholder="telebot.local or 192.168.4.1" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <p class="hint" id="host-hint">The robot prints its address on the serial monitor. On its own network it is 192.168.4.1.</p>
+      <label for="token">Access token</label>
+      <input type="password" id="token" placeholder="only if ACCESS_TOKEN is set" autocomplete="off">
+      <div class="actions"><button type="submit" class="btn primary" id="connect">Connect</button></div>
+
+      <h3>Video</h3>
+      <label for="framesize">Resolution</label>
+      <select id="framesize">
+        <option value="qvga">320 × 240 (lowest latency)</option>
+        <option value="cif">400 × 296</option>
+        <option value="hvga">480 × 320</option>
+        <option value="vga" selected>640 × 480</option>
+        <option value="svga">800 × 600</option>
+      </select>
+      <label for="quality">JPEG quality <span id="quality-val"></span></label>
+      <input type="range" id="quality" min="10" max="40" step="1" value="12" aria-label="JPEG quality (lower is sharper)">
+      <p class="hint">Lower numbers are sharper but use more Wi-Fi.</p>
+      <label class="check"><input type="checkbox" id="vflip"> Flip vertically</label>
+      <label class="check"><input type="checkbox" id="hmirror"> Mirror horizontally</label>
+      <label class="check"><input type="checkbox" id="cover"> Fill the screen (crop)</label>
+      <label class="check"><input type="checkbox" id="crosshair-on"> Show centre mark</label>
+
+      <h3>Headlight</h3>
+      <input type="range" id="light" min="0" max="100" step="5" value="0" aria-label="Headlight brightness">
+
+      <h3>Robot info</h3>
+      <dl class="info" id="info"><dt>Status</dt><dd>not connected</dd></dl>
+
+      <h3>Keyboard &amp; gamepad</h3>
+      <p class="hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys drive, <kbd>Space</kbd> stops, <kbd>L</kbd> toggles the headlight, <kbd>1</kbd>-<kbd>9</kbd> set the speed limit (10-90 %, <kbd>0</kbd> = 100 %). A connected gamepad's left stick drives.</p>
+    </div>
+  </form>
+</dialog>
+
+<script>
+'use strict';
+(() => {
+  // ------------------------------------------------------------------ config
+  const DRIVE_HZ = 20;             // drive commands per second while a control is held
+  const DEADZONE = 0.08;           // joystick centre dead zone (fraction of radius)
+  const EXPO = 0.4;                // 0 = linear, 1 = fully cubic (finer control near centre)
+  const KEY_TURN = 60;             // keyboard spin strength, percent
+  const PING_MS = 2000;
+  const MAX_BUFFERED = 1024;       // skip drive frames rather than queue stale ones
+
+  const $ = (sel) => document.querySelector(sel);
+  const store = {
+    get(key, fallback) { try { const v = localStorage.getItem('telebot.' + key); return v === null ? fallback : v; } catch { return fallback; } },
+    set(key, value) { try { localStorage.setItem('telebot.' + key, value); } catch { /* private mode */ } },
+  };
+
+  // Where is the robot? Served by the robot itself: same host. Opened from a
+  // file or another site: ?host=..., or whatever was entered last time.
+  const params = new URLSearchParams(location.search);
+  const servedByRobot = location.protocol === 'http:' && location.host !== '';
+  let host = params.get('host') || (servedByRobot ? location.host : store.get('host', ''));
+  let token = params.get('token') || store.get('token', '');
+  if (params.get('host')) store.set('host', host);
+  if (params.get('token')) store.set('token', token);
+
+  // ------------------------------------------------------------------ state
+  let ws = null;
+  let retryMs = 500;
+  let retryTimer = 0;
+  let failures = 0;
+  let robot = null;                // last "state" message
+  let streamPort = null;
+  let streamRetry = 0;
+  let wasDriving = false;
+  let speedTouchedAt = 0;
+  let lightOn = 0;
+  const input = { joy: null, move: null, keys: new Set() };
+
+  // ------------------------------------------------------------------ ui helpers
+  const toastEl = $('#toast');
+  let toastTimer = 0;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  }
+  function banner(html) {
+    const el = $('#banner');
+    el.hidden = !html;
+    el.innerHTML = html || '';
+  }
+  function haptic() { if (navigator.vibrate) navigator.vibrate(8); }
+  function setConn(kind, text) {
+    $('#conn').className = 'chip ' + kind;
+    $('#conn-text').textContent = text;
+  }
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  // ------------------------------------------------------------------ websocket
+  function wsUrl() { return 'ws://' + host + '/ws' + (token ? '?token=' + encodeURIComponent(token) : ''); }
+
+  function connect() {
+    clearTimeout(retryTimer);
+    if (ws) { ws.onclose = null; ws.close(); ws = null; }
+    if (!host) {
+      setConn('offline', 'Not set up');
+      openSettings();
+      return;
+    }
+    if (location.protocol === 'https:') {
+      banner('This page is on HTTPS, so the browser blocks the robot\'s plain-HTTP connection. ' +
+             'Open the dashboard from the robot instead: <a href="http://' + escapeHtml(host) + '/">http://' + escapeHtml(host) + '/</a>');
+    }
+    setConn('connecting', 'Connecting');
+    let sock;
+    try { sock = new WebSocket(wsUrl()); } catch { scheduleRetry(); return; }
+    ws = sock;
+    sock.onopen = () => {
+      retryMs = 500;
+      failures = 0;
+      if (location.protocol !== 'https:') banner('');
+      setConn('online', 'Online');
+      ping();
+    };
+    sock.onmessage = (e) => onMessage(e.data);
+    sock.onclose = () => {
+      if (ws !== sock) return;
+      ws = null;
+      robot = null;
+      failures++;
+      setConn('offline', 'Offline');
+      updateTelemetry(null);
+      if (failures >= 3 && location.protocol !== 'https:') {
+        banner('Can\'t reach the robot at <b>' + escapeHtml(host) + '</b>. Check that this phone is on the same Wi-Fi ' +
+               'network, the address in Settings' + (token ? ', and the access token' : '') + '.');
+      }
+      scheduleRetry();
+    };
+  }
+
+  function scheduleRetry() {
+    clearTimeout(retryTimer);
+    retryTimer = setTimeout(connect, retryMs);
+    retryMs = Math.min(retryMs * 2, 5000);
+  }
+
+  function send(msg, force) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return false;
+    if (!force && ws.bufferedAmount > MAX_BUFFERED) return false;
+    ws.send(msg);
+    return true;
+  }
+
+  function ping() { send('ping ' + (Math.floor(performance.now()) % 4000000000)); }
+  setInterval(ping, PING_MS);
+
+  function onMessage(data) {
+    let m;
+    try { m = JSON.parse(data); } catch { return; }
+    switch (m.type) {
+      case 'state': applyState(m); break;
+      case 'telemetry': updateTelemetry(m); break;
+      case 'pong': {
+        const rtt = (Math.floor(performance.now()) % 4000000000) - m.t;
+        if (rtt >= 0 && rtt < 10000) $('#rtt').textContent = rtt + ' ms';
+        break;
+      }
+      case 'error': toast(m.msg || 'Robot error'); break;
+    }
+  }
+
+  function applyState(s) {
+    robot = s;
+    if (Date.now() - speedTouchedAt > 1500) { $('#speed').value = s.speed; $('#speed-val').textContent = s.speed + '%'; }
+    lightOn = s.light;
+    $('#btn-light').setAttribute('aria-pressed', s.light > 0 ? 'true' : 'false');
+    $('#light').value = s.light;
+    if (s.cam) {
+      $('#framesize').value = s.cam.framesize;
+      [...$('#framesize').options].forEach((o) => {
+        const order = ['qvga', 'cif', 'hvga', 'vga', 'svga'];
+        o.disabled = order.indexOf(o.value) > order.indexOf(s.cam.maxFramesize);
+      });
+      $('#quality').value = s.cam.quality;
+      $('#quality-val').textContent = '(' + s.cam.quality + ')';
+      $('#vflip').checked = !!s.cam.vflip;
+      $('#hmirror').checked = !!s.cam.hmirror;
+    }
+    $('#info').innerHTML = [
+      ['Name', s.name], ['Firmware', s.fw], ['Address', s.ip + (s.ap ? ' (robot\'s own network)' : '')],
+      ['Camera', s.cam && s.cam.ok ? 'OK, up to ' + s.cam.maxFramesize.toUpperCase() : 'not detected'],
+      ['Failsafe', s.failsafeMs + ' ms'],
+    ].map(([k, v]) => '<dt>' + escapeHtml(k) + '</dt><dd>' + escapeHtml(v) + '</dd>').join('');
+    if (s.cam && !s.cam.ok) setNoVideo('Camera not detected. Check the ribbon cable.');
+    else if (streamPort !== s.streamPort) { streamPort = s.streamPort; startStream(); }
+  }
+
+  function updateTelemetry(t) {
+    if (!t) {
+      $('#rtt').textContent = '-- ms'; $('#rssi').textContent = '--'; $('#fps').textContent = '-- fps';
+      setBars(0, 0);
+      $('#failsafe').hidden = true;
+      return;
+    }
+    $('#fps').textContent = t.streaming ? t.fps.toFixed(0) + ' fps' : 'no video';
+    $('#rssi').textContent = t.rssi ? signalBars(t.rssi) + ' ' + t.rssi + ' dBm' : 'AP mode';
+    setBars(t.left, t.right);
+    $('#failsafe').hidden = !t.failsafe;
+  }
+
+  function signalBars(rssi) { return rssi > -55 ? '▂▄▆█' : rssi > -67 ? '▂▄▆_' : rssi > -78 ? '▂▄__' : '▂___'; }
+
+  function setBars(l, r) {
+    for (const [el, v] of [[$('#bar-l'), l], [$('#bar-r'), r]]) {
+      const pct = Math.min(Math.abs(v) / 255, 1) * 50;
+      el.style.width = pct + '%';
+      el.style.left = v >= 0 ? '50%' : (50 - pct) + '%';
+      el.classList.toggle('neg', v < 0);
+    }
+  }
+
+  // ------------------------------------------------------------------ video
+  const video = $('#video');
+  video.crossOrigin = 'anonymous';     // the robot sends CORS headers, so snapshots work
+
+  function streamUrl() {
+    const hostname = host.replace(/:\d+$/, '');
+    const q = new URLSearchParams({ t: Date.now() });
+    if (token) q.set('token', token);
+    return 'http://' + hostname + ':' + (streamPort || 81) + '/stream?' + q;
+  }
+  function setNoVideo(text) {
+    video.classList.remove('live');
+    $('#novideo').hidden = false;
+    $('#novideo-text').textContent = text;
+  }
+  function markLive() {
+    if (video.classList.contains('live')) return;
+    video.classList.add('live');
+    $('#novideo').hidden = true;
+  }
+  function startStream() {
+    clearTimeout(streamRetry);
+    if (!host || document.hidden || !streamPort) return;
+    setNoVideo('Starting video…');
+    video.src = streamUrl();
+  }
+  function stopStream() {
+    clearTimeout(streamRetry);
+    video.removeAttribute('src');       // closes the connection: the robot serves one viewer at a time
+    video.src = '';
+  }
+  // Browsers differ on when (and how often) an MJPEG <img> fires "load", so
+  // also watch for the first decoded frame.
+  video.addEventListener('load', markLive);
+  setInterval(() => { if (video.getAttribute('src') && video.naturalWidth > 0) markLive(); }, 400);
+  video.addEventListener('error', () => {
+    if (!video.getAttribute('src')) return;
+    setNoVideo('Video unavailable. Retrying… (the robot streams to one viewer at a time)');
+    clearTimeout(streamRetry);
+    streamRetry = setTimeout(startStream, 2000);
+  });
+
+  // ------------------------------------------------------------------ driving
+  function driveCommand() {
+    if (input.joy) return 'joy ' + input.joy.x + ' ' + input.joy.y;
+    if (input.move) return 'move ' + input.move;
+    const k = keyVector();
+    if (k) return 'joy ' + k.x + ' ' + k.y;
+    const g = gamepadVector();
+    if (g) return 'joy ' + g.x + ' ' + g.y;
+    return null;
+  }
+
+  // Runs at DRIVE_HZ, and immediately on every press/release. Repeating the
+  // command keeps the robot's failsafe fed; releasing sends one "stop".
+  function driveTick() {
+    const cmd = driveCommand();
+    if (cmd) {
+      send(cmd);
+      wasDriving = true;
+    } else if (wasDriving) {
+      send('stop', true);
+      wasDriving = false;
+    }
+    $('#drive-state').textContent = cmd ? cmd.replace(/^move /, '').replace(/^joy .*/, 'Driving') : 'Idle';
+  }
+  setInterval(driveTick, 1000 / DRIVE_HZ);
+
+  function emergencyStop() {
+    input.move = null;
+    input.keys.clear();
+    joystick.reset();
+    document.querySelectorAll('.dpad .active').forEach((b) => b.classList.remove('active'));
+    send('stop', true);
+    wasDriving = false;
+    haptic();
+    driveTick();
+  }
+
+  const shape = (v) => (1 - EXPO) * v + EXPO * v * v * v;
+
+  const joystick = (() => {
+    const base = $('#joystick');
+    const knob = $('#knob');
+    let pointer = null;
+    let rect = null;
+    let radius = 1;
+
+    function update(e) {
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      let dx = e.clientX - cx;
+      let dy = e.clientY - cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist > radius) { dx *= radius / dist; dy *= radius / dist; }
+      knob.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      let x = dx / radius;
+      let y = -dy / radius;
+      const mag = Math.hypot(x, y);
+      if (mag < DEADZONE) { x = 0; y = 0; } else {
+        const k = shape((mag - DEADZONE) / (1 - DEADZONE)) / mag;
+        x *= k; y *= k;
+      }
+      input.joy = { x: Math.round(x * 100), y: Math.round(y * 100) };
+    }
+    function end(e) {
+      if (e && e.pointerId !== pointer) return;
+      pointer = null;
+      input.joy = null;
+      knob.style.transform = '';
+      knob.classList.remove('active');
+      driveTick();
+    }
+    base.addEventListener('pointerdown', (e) => {
+      if (pointer !== null) return;
+      e.preventDefault();
+      pointer = e.pointerId;
+      base.setPointerCapture(pointer);
+      rect = base.getBoundingClientRect();
+      radius = (rect.width - knob.offsetWidth) / 2;
+      knob.classList.add('active');
+      update(e);
+      haptic();
+      driveTick();
+    });
+    base.addEventListener('pointermove', (e) => { if (e.pointerId === pointer) update(e); });
+    base.addEventListener('pointerup', end);
+    base.addEventListener('pointercancel', end);
+    base.addEventListener('lostpointercapture', end);
+    return {
+      reset() {
+        if (pointer !== null && base.hasPointerCapture(pointer)) base.releasePointerCapture(pointer);
+        end(null);
+      },
+    };
+  })();
+
+  document.querySelectorAll('[data-move]').forEach((btn) => {
+    const move = btn.dataset.move;
+    let pointer = null;
+    btn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      pointer = e.pointerId;
+      btn.setPointerCapture(pointer);
+      btn.classList.add('active');
+      input.move = move;
+      haptic();
+      driveTick();
+    });
+    const end = (e) => {
+      if (e.pointerId !== pointer) return;
+      pointer = null;
+      btn.classList.remove('active');
+      if (input.move === move) input.move = null;
+      driveTick();
+    };
+    btn.addEventListener('pointerup', end);
+    btn.addEventListener('pointercancel', end);
+    btn.addEventListener('lostpointercapture', end);
+  });
+
+  for (const id of ['#stop', '#dpad-stop']) {
+    $(id).addEventListener('pointerdown', (e) => { e.preventDefault(); emergencyStop(); });
+  }
+
+  // Keyboard: WASD / arrows. Two keys at once drive an arc.
+  const KEYS = { KeyW: 'f', ArrowUp: 'f', KeyS: 'b', ArrowDown: 'b', KeyA: 'l', ArrowLeft: 'l', KeyD: 'r', ArrowRight: 'r' };
+  function keyVector() {
+    if (input.keys.size === 0) return null;
+    const has = (d) => [...input.keys].some((k) => KEYS[k] === d);
+    const y = (has('f') ? 100 : 0) - (has('b') ? 100 : 0);
+    let x = (has('r') ? 1 : 0) - (has('l') ? 1 : 0);
+    if (x === 0 && y === 0) return null;
+    x *= y === 0 ? KEY_TURN : 50;
+    return { x, y };
+  }
+  window.addEventListener('keydown', (e) => {
+    if (e.target.closest && e.target.closest('dialog')) return;
+    if (KEYS[e.code]) {
+      e.preventDefault();
+      if (!input.keys.has(e.code)) { input.keys.add(e.code); driveTick(); }
+    } else if (e.code === 'Space') {
+      e.preventDefault();
+      emergencyStop();
+    } else if (e.code === 'KeyL') {
+      toggleLight();
+    } else if (/^Digit[0-9]$/.test(e.code)) {
+      const n = Number(e.code.slice(5));
+      setSpeed(n === 0 ? 100 : n * 10);
+    }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (input.keys.delete(e.code)) driveTick();
+  });
+
+  // Gamepad: left stick, polled with the drive loop.
+  function gamepadVector() {
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (const p of pads) {
+      if (!p || p.axes.length < 2) continue;
+      const ax = Math.abs(p.axes[0]) > 0.12 ? p.axes[0] : 0;
+      const ay = Math.abs(p.axes[1]) > 0.12 ? p.axes[1] : 0;
+      if (ax || ay) return { x: Math.round(shape(ax) * 100), y: Math.round(-shape(ay) * 100) };
+    }
+    return null;
+  }
+
+  // Never leave the robot driving when the page goes to the background.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { emergencyStop(); stopStream(); } else { startStream(); }
+  });
+  window.addEventListener('blur', () => { if (input.keys.size) { input.keys.clear(); driveTick(); } });
+  window.addEventListener('pagehide', () => { send('stop', true); });
+
+  // ------------------------------------------------------------------ controls
+  function setMode(mode) {
+    document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+    $('#joystick').hidden = mode !== 'joystick';
+    $('#dpad').hidden = mode !== 'dpad';
+    store.set('mode', mode);
+    emergencyStop();
+  }
+  document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
+
+  let speedTimer = 0;
+  function setSpeed(v) {
+    v = Math.max(10, Math.min(100, Math.round(v)));
+    $('#speed').value = v;
+    $('#speed-val').textContent = v + '%';
+    speedTouchedAt = Date.now();
+    clearTimeout(speedTimer);
+    speedTimer = setTimeout(() => send('speed ' + v, true), 80);   // throttle while sliding
+  }
+  $('#speed').addEventListener('input', (e) => setSpeed(Number(e.target.value)));
+
+  function setLight(v) {
+    lightOn = v;
+    $('#light').value = v;
+    $('#btn-light').setAttribute('aria-pressed', v > 0 ? 'true' : 'false');
+    send('light ' + v, true);
+  }
+  function toggleLight() {
+    if (lightOn > 0) { store.set('light', lightOn); setLight(0); } else { setLight(Number(store.get('light', 60)) || 60); }
+  }
+  $('#btn-light').addEventListener('click', toggleLight);
+  $('#light').addEventListener('change', (e) => setLight(Number(e.target.value)));
+
+  $('#btn-snap').addEventListener('click', () => {
+    if (!video.classList.contains('live') || !video.naturalWidth) { toast('No video to capture'); return; }
+    const canvas = document.createElement('canvas');
+    canvas.width = video.naturalWidth;
+    canvas.height = video.naturalHeight;
+    try {
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      canvas.toBlob((blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'telebot-' + new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19) + '.jpg';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        toast('Snapshot saved');
+      }, 'image/jpeg', 0.92);
+    } catch {
+      toast('Snapshot blocked by the browser');
+    }
+  });
+
+  $('#btn-full').addEventListener('click', async () => {
+    try {
+      if (document.fullscreenElement) { await document.exitFullscreen(); return; }
+      await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+      if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape').catch(() => {});
+    } catch { toast('Full screen not available'); }
+  });
+
+  // ------------------------------------------------------------------ settings
+  const dialog = $('#settings');
+  function openSettings() {
+    $('#host').value = host;
+    $('#token').value = token;
+    $('#host-hint').hidden = servedByRobot;
+    if (!dialog.open) dialog.showModal();
+  }
+  $('#btn-settings').addEventListener('click', openSettings);
+  $('#close-settings').addEventListener('click', () => dialog.close());
+  $('#settings-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    host = $('#host').value.trim().replace(/^[a-z]+:\/\//i, '').replace(/\/.*$/, '');
+    token = $('#token').value.trim();
+    store.set('host', host);
+    store.set('token', token);
+    streamPort = null;
+    stopStream();
+    failures = 0;
+    retryMs = 500;
+    dialog.close();
+    connect();
+  });
+
+  const camSetting = (key, value) => send('cam ' + key + ' ' + value, true);
+  $('#framesize').addEventListener('change', (e) => camSetting('framesize', e.target.value));
+  $('#quality').addEventListener('input', (e) => { $('#quality-val').textContent = '(' + e.target.value + ')'; });
+  $('#quality').addEventListener('change', (e) => camSetting('quality', e.target.value));
+  $('#vflip').addEventListener('change', (e) => camSetting('vflip', e.target.checked ? 1 : 0));
+  $('#hmirror').addEventListener('change', (e) => camSetting('hmirror', e.target.checked ? 1 : 0));
+
+  function applyViewPrefs() {
+    const cover = store.get('cover', '0') === '1';
+    const cross = store.get('crosshair', '0') === '1';
+    $('#cover').checked = cover;
+    $('#crosshair-on').checked = cross;
+    $('#stage').classList.toggle('cover', cover);
+    $('#crosshair').hidden = !cross;
+  }
+  $('#cover').addEventListener('change', (e) => { store.set('cover', e.target.checked ? '1' : '0'); applyViewPrefs(); });
+  $('#crosshair-on').addEventListener('change', (e) => { store.set('crosshair', e.target.checked ? '1' : '0'); applyViewPrefs(); });
+
+  // Long presses on controls should not open context menus or select text.
+  $('#controls').addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // ------------------------------------------------------------------ start
+  applyViewPrefs();
+  setMode(store.get('mode', 'joystick') === 'dpad' ? 'dpad' : 'joystick');
+  connect();
+})();
+</script>
+</body>
+</html>

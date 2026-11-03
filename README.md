@@ -24,6 +24,23 @@ own machine. No HeyGen services or accounts are involved.
 > and is served at https://roadqueenfitness.com. `road-queen-fitness/` here only
 > redirects old links and QR codes there.
 >
+> **HGU-55/P Velcro jig**, 3D-printable jigs that place the battery pack Velcro
+> on an HGU-55/P helmet (Medium, Large and X-Large), lives in
+> `hgu55-velcro-jig/`: STL files, the generator script and a project page
+> with a 3D preview. See [hgu55-velcro-jig/README.md](hgu55-velcro-jig/README.md):
+> https://kevdogg05.github.io/hgu55-velcro-jig/
+>
+> **TeleBot**, a $30 Wi-Fi telepresence robot (ESP32-CAM, DRV8833, TT motors,
+> one 18650 cell) driven from a phone browser with live video, lives in
+> `telepresence-bot/`: firmware, the dashboard, OpenSCAD chassis with STLs,
+> wiring diagrams and BOM. See [telepresence-bot/README.md](telepresence-bot/README.md).
+>
+> **Parley**, a communication skills coach (36 lessons with quizzes and
+> flashcards, a small talk game, branching video scenarios and a speech analyzer
+> that scores pace, pauses, filler words and tone), lives in `parley/`. It is a
+> static, installable web app that works offline. See [parley/README.md](parley/README.md):
+> https://kevdogg05.github.io/parley/
+>
 > **Doodle Pals**, a drawing app for kids, is a single page in `doodle-pals/`:
 > animated step-by-step cartoon pals, a make-your-own-pal maker, daily
 > challenges, quick sketches, a gallery, and real paper-and-pencil art lessons.
