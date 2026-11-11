@@ -52,7 +52,6 @@ def sheet(D):
         if L in D['engrave']:
             s.append(f'<path d="{poly_d(D["engrave"][L])}" fill="#2b6bff" fill-rule="evenodd"/>')
         s.append('</g>')
-    y = PANEL_H - 6
     s.append('</svg>')
     return '\n'.join(s)
 
