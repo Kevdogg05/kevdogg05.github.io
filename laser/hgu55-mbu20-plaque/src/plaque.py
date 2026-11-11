@@ -84,7 +84,8 @@ def portion(curve, s0, s1):
         s1 = s[-1] + s1
     return curve[(s >= s0) & (s <= s1)]
 
-def build():
+def build(NP=None):
+    """NP: nameplate box (x0, x1, y0, y1, band, ch); the hose and mic cord dock into its top edge y0."""
     G = {}
     gap = P['gap']
     # ---------------- HGU-55/P shell (front view) ----------------
@@ -198,7 +199,8 @@ def build():
     cord_grommet = circ(-22, 192.5, 4.2)
 
     # ---------------- nameplate (engraving zone on the base) ----------------
-    NP = dict(x0=-100, x1=100, y0=240, y1=288, band=6.0, ch=10.0)
+    if NP is None:
+        NP = dict(x0=-100, x1=100, y0=240, y1=288, band=6.0, ch=10.0)
     frame_out = chamfer_rect(NP['x0'], NP['y0'], NP['x1'], NP['y1'], NP['ch'], 2.5)
     frame_in = chamfer_rect(NP['x0']+NP['band'], NP['y0']+NP['band'], NP['x1']-NP['band'],
                             NP['y1']-NP['band'], NP['ch']-NP['band']*0.414, 1.5)
@@ -245,13 +247,16 @@ def build():
     lip_line = lip_line.intersection(buf(vis3, -1.2))
 
     rim_line = buf(hard_shell, -3.2).boundary.intersection(buf(vis3, -1.0))
-    rivets = [circ(sx*84, sy, 1.4).boundary for sx in (-1, 1) for sy in (NP['y0']+3, NP['y1']-3)]
+    rivets = [circ(sx*(NP['x1'] - 16), sy, 1.4).boundary for sx in (-1, 1) for sy in (NP['y0']+3, NP['y1']-3)]
     rivet_line = unary_union(rivets).intersection(buf(L2.difference(buf(L3, 1.0)), -0.5))
     rib_zone = hose_l3.difference(buf(unary_union([cuff_l3, term_body]), 2.5))
     rib_line = unary_union(ribs).intersection(buf(rib_zone, -1.5)).intersection(buf(vis3, -1.0))
     G.update(L1=L1, L2=L2, L3=L3, L4=L4, L5=L5, frame_in=frame_in, housing=housing,
              lens=lens_zone.intersection(L2),
-             NP=NP, score={'L2': [roll_line, rivet_line], 'L3': [lip_line, rib_line, rim_line]})
+             NP=NP, score={'L2': [roll_line, rivet_line], 'L3': [lip_line, rib_line, rim_line]},
+             parts=dict(facepiece=facepiece, strap_l2=strap_l2, hose_l2=hose_l2, cord_l2=cord_l2,
+                        frame=frame, dock_l2=dock_l2, cdock_l2=cdock_l2, lens_zone=lens_zone,
+                        inner_region=inner_region))
     return G
 
 # ------------------------------------------------------------------ checks
